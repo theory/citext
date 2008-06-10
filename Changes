@@ -1,0 +1,4 @@
+Revision history for PostgreSQL data type CITEXT.
+
+2.00
+      - Initial public release.

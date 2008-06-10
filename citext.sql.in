@@ -1,0 +1,170 @@
+--
+--  PostgreSQL code for CITEXT.
+--
+
+-- Adjust this setting to control where the objects get created.
+SET search_path = public;
+SET client_min_messages = warning;
+
+--
+--  Input and output functions.
+--
+
+CREATE OR REPLACE FUNCTION citextin(cstring)
+RETURNS citext
+AS 'textin'
+LANGUAGE 'internal' IMMUTABLE STRICT;
+GRANT EXECUTE ON FUNCTION citextin(cstring) TO PUBLIC;
+COMMENT ON FUNCTION citextin(cstring) IS 'Input for locale-aware case-insensitive text';
+
+CREATE OR REPLACE FUNCTION citextout(citext)
+RETURNS cstring
+AS 'textout'
+LANGUAGE 'internal' IMMUTABLE STRICT;
+
+GRANT EXECUTE ON FUNCTION citextout(citext) TO PUBLIC;
+COMMENT ON FUNCTION citextout(citext) IS 'Output for locale-aware case-insensitive text';
+
+--
+--  The type itself.
+--
+
+CREATE TYPE citext (
+    INPUT          = citextin,
+    OUTPUT         = citextout,
+    INTERNALLENGTH = VARIABLE
+);
+
+COMMENT ON TYPE citext IS 'Variable-length, locale-aware, case-insensitive text';
+
+--
+--  Implicit type casts.
+--
+
+CREATE CAST (citext AS text)    WITHOUT FUNCTION AS IMPLICIT;
+CREATE CAST (citext AS varchar) WITHOUT FUNCTION AS IMPLICIT;
+CREATE CAST (citext AS bpchar)  WITHOUT FUNCTION AS IMPLICIT;
+
+--
+-- Operator Functions.
+--
+
+CREATE OR REPLACE FUNCTION citext_eq( citext, citext )
+RETURNS bool
+AS 'MODULE_PATHNAME'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION citext_ne( citext, citext )
+RETURNS bool
+AS 'MODULE_PATHNAME'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION citext_lt( citext, citext )
+RETURNS bool
+AS 'MODULE_PATHNAME'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION citext_le( citext, citext )
+RETURNS bool
+AS 'MODULE_PATHNAME'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION citext_gt( citext, citext )
+RETURNS bool
+AS 'MODULE_PATHNAME'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION citext_ge( citext, citext )
+RETURNS bool
+AS 'MODULE_PATHNAME'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION textcat(citext, citext)
+RETURNS citext
+AS 'textcat'
+LANGUAGE 'internal' IMMUTABLE STRICT;
+
+--
+-- Operators.
+--
+
+CREATE OPERATOR = (
+    LEFTARG    = CITEXT,
+    RIGHTARG   = CITEXT,
+    COMMUTATOR = =,
+--  NEGATOR    = <>,
+    PROCEDURE  = citext_eq
+);
+
+CREATE OPERATOR <> (
+    LEFTARG   = CITEXT,
+    RIGHTARG  = CITEXT,
+    NEGATOR   = =,
+    PROCEDURE = citext_ne
+);
+
+CREATE OPERATOR < (
+    LEFTARG   = CITEXT,
+    RIGHTARG  = CITEXT,
+--      NEGATOR   = >=,
+    PROCEDURE = citext_lt
+);
+
+CREATE OPERATOR <= (
+    LEFTARG   = CITEXT,
+    RIGHTARG  = CITEXT,
+--      NEGATOR   = >,
+    PROCEDURE = citext_le
+);
+
+CREATE OPERATOR >= (
+    LEFTARG   = CITEXT,
+    RIGHTARG  = CITEXT,
+    NEGATOR   = <,
+    PROCEDURE = citext_ge
+);
+
+CREATE OPERATOR > (
+    LEFTARG   = CITEXT,
+    RIGHTARG  = CITEXT,
+    NEGATOR   = <=,
+    PROCEDURE = citext_gt
+);
+
+
+CREATE OPERATOR || (
+    LEFTARG   = CITEXT,
+    RIGHTARG  = CITEXT,
+    NEGATOR   = <=,
+    PROCEDURE = textcat
+);
+
+--
+-- Comparison functions for indexing.
+--
+
+CREATE FUNCTION citext_cmp(CITEXT, CITEXT)
+RETURNS INT
+AS 'MODULE_PATHNAME'
+LANGUAGE C STRICT IMMUTABLE;
+
+/*
+CREATE FUNCTION citext_smaller(citext, citext)
+RETURNS citext
+AS 'MODULE_PATHNAME'
+LANGUAGE 'C' IMMUTABLE STRICT;
+
+CREATE FUNCTION citext_larger(citext, citext)
+RETURNS citext
+AS 'MODULE_PATHNAME'
+IMMUTABLE STRICT;
+*/
+
+CREATE OPERATOR CLASS citext_ops
+DEFAULT FOR TYPE CITEXT USING btree AS
+    OPERATOR    1   <  (citext, citext),
+    OPERATOR    2   <= (citext, citext),
+    OPERATOR    3   =  (citext, citext),
+    OPERATOR    4   >= (citext, citext),
+    OPERATOR    5   >  (citext, citext),
+    FUNCTION    1   citext_cmp(citext, citext);
