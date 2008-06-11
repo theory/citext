@@ -1,4 +1,5 @@
 \set ECHO none
+\encoding UTF-8
 
 --
 -- Tests for the CITEXT data type.
@@ -10,24 +11,27 @@
 \pset tuples_only true
 \pset pager
 
--- Create plpgsql if it's not already there.
+-- Just ignore errors from the next few commands.
 SET client_min_messages = fatal;
+
+-- Create plpgsql if it's not already there.
 CREATE LANGUAGE plpgsql;
+
+-- Load the TAP functions and the data type.
+BEGIN;
+\i pgtap.sql
+--\i citext.sql
 
 -- Keep things quiet.
 SET client_min_messages = warning;
 
 -- Revert all changes on failure.
 \set ON_ERROR_ROLBACK true
-
--- Load the TAP functions and the data type.
-BEGIN;
-\i pgtap.sql
-\i citext.sql
+\set ON_ERROR_STOP true
 
 -- Plan the tests.
-SELECT plan(85);
---SELECT no_plan();
+--SELECT plan(86);
+SELECT * FROM no_plan();
 
 -- Output a diagnostic message if the collation is not en_US.UTF-8.
 SELECT diag(
@@ -210,7 +214,8 @@ CREATE AGGREGATE array_accum (anyelement) (
     initcond = '{}'
 );
 
---SELECT ok( MIN(name), 'AAA', 'The first value should be "AAA"' )
+-- citext_smaller() seems to be segfaulting.
+--SELECT is( MIN(name), 'AAA', 'The first value should be "AAA"' )
 --  FROM srt;
 
 SELECT is(
@@ -218,6 +223,29 @@ SELECT is(
            ARRAY['aardvark','AAA','aba','ABC','abc','AAAA','â']::text,
            'The words should be case-insensitively sorted'
 ) FROM srt; 
+
+SELECT is(
+           array_accum(LOWER(name))::text,
+           ARRAY['aardvark','aaa','aba','abc','abc','aaaa','â']::text,
+           'The words should be case-insensitively sorted'
+) FROM srt; 
+
+SELECT is( LOWER(name), 'aaa', 'LOWER("AAA") should return "aaa"' )
+  FROM srt
+ WHERE name = 'AAA'::text;
+
+SELECT is( UPPER(name), 'Â', 'UPPER("â") should return "Â"' )
+  FROM srt
+ WHERE name = 'â'::text;
+
+-- I think that i need to add the assignment cast operators to get this to work.
+-- SELECT is( LOWER(name), 'aaa', 'LOWER("AAA") should return "aaa"' )
+--   FROM srt
+--  WHERE name = 'AAA'::citext;
+
+-- SELECT is( UPPER(name), 'Â', 'UPPER("â") should return "Â"' )
+--   FROM srt
+--  WHERE name = 'â'::citext;
 
 SELECT * FROM finish();
 

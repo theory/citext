@@ -148,7 +148,6 @@ RETURNS INT
 AS 'MODULE_PATHNAME'
 LANGUAGE C STRICT IMMUTABLE;
 
-/*
 CREATE FUNCTION citext_smaller(citext, citext)
 RETURNS citext
 AS 'MODULE_PATHNAME'
@@ -157,8 +156,7 @@ LANGUAGE 'C' IMMUTABLE STRICT;
 CREATE FUNCTION citext_larger(citext, citext)
 RETURNS citext
 AS 'MODULE_PATHNAME'
-IMMUTABLE STRICT;
-*/
+LANGUAGE 'C' IMMUTABLE STRICT;
 
 CREATE OPERATOR CLASS citext_ops
 DEFAULT FOR TYPE CITEXT USING btree AS
@@ -168,3 +166,7 @@ DEFAULT FOR TYPE CITEXT USING btree AS
     OPERATOR    4   >= (citext, citext),
     OPERATOR    5   >  (citext, citext),
     FUNCTION    1   citext_cmp(citext, citext);
+
+-- Aggregates.
+CREATE AGGREGATE max(BASETYPE=citext, SFUNC=citext_larger,  STYPE=citext);
+CREATE AGGREGATE min(BASETYPE=citext, SFUNC=citext_smaller, STYPE=citext);

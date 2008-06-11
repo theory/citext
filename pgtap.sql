@@ -92,22 +92,23 @@ BEGIN
    END IF;
 
    IF exp_tests = 0 THEN
-        -- No plan.
+        -- No plan. Output one now.
        exp_tests = curr_test;
+       RETURN NEXT '1..' || exp_tests;
    END IF;
 
    IF curr_test < exp_tests THEN
-       RETURN QUERY SELECT diag(
+       RETURN NEXT diag(
            'Looks like you planned ' || exp_tests || ' test' ||
            plural || ' but only ran ' || curr_test
        );
    ELSIF curr_test > exp_tests THEN
-       RETURN QUERY SELECT diag(
+       RETURN NEXT diag(
            'Looks like you planned ' || exp_tests || ' test' ||
            plural || ' but ran ' || curr_test - exp_tests || ' extra'
        );
    ELSIF num_failed > 0 THEN
-       RETURN QUERY SELECT diag(
+       RETURN NEXT diag(
            'Looks like you failed ' || num_failed || ' test' ||
            plural || ' of ' || exp_tests
        );
