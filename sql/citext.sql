@@ -149,6 +149,110 @@ SELECT ok( 'À'::text <> 'à'::citext, 'text "À" should <  citext "à"' );
 SELECT ok( 'a'::text <> 'b'::citext, 'text "a" should <> citext "b"' );
 SELECT ok( 'À'::text <> 'B'::citext, 'text "À" should <> citext "B"' );
 
+-- Some longerr comparisons.
+SELECT is(
+    'aardvark'::citext,
+    'aardvark'::citext,
+    'citext "aardvark" should  eq   citext "aardvark"'
+);
+
+SELECT is(
+    'AARDVARK'::citext,
+    'AARDVARK'::citext,
+    'citext "AARDVARK" should  eq   citext "AARDVARK"'
+);
+SELECT is(
+    'aardvark'::citext,
+    'AARDVARK'::citext,
+    'citext "aardvark" should  eq   citext "AARDVARK"'
+);
+
+SELECT is(
+    'Ask Bjørn Hansen'::citext,
+    'Ask Bjørn Hansen'::citext,
+    '"Ask Bjørn Hansen" shoulde eq "Ask Bjørn Hansen"'
+);
+
+SELECT is(
+    'Ask Bjørn Hansen'::citext,
+    'ASK BJØRN HANSEN'::citext,
+    '"Ask Bjørn Hansen" shoulde eq "ASK BJØRN HANSEN"'
+);
+
+SELECT is(
+    'ask bjørn hansen'::citext,
+    'ASK BJØRN HANSEN'::citext,
+    '"ask bjørn hansen" shoulde eq "ASK BJØRN HANSEN"'
+);
+
+SELECT isnt(
+    'Ask Bjørn Hansen'::citext,
+    'Ask Bjorn Hansen'::citext,
+    '"Ask Bjørn Hansen" shoulde ne "Ask Bjorn Hansen"'
+);
+
+SELECT isnt(
+    'Ask Bjørn Hansen'::citext,
+    'ASK BJORN HANSEN'::citext,
+    '"Ask Bjørn Hansen" shoulde ne "ASK BJORN HANSEN"'
+);
+
+SELECT isnt(
+    'ask bjørn hansen'::citext,
+    'ASK BJORN HANSEN'::citext,
+    '"ask bjørn hansen" shoulde ne "ASK BJORN HANSEN"'
+);
+
+-- Check the citext_cmp() function explicitly.
+SELECT is(
+    citext_cmp ( 'aardvark'::citext, 'aardvark'::citext ),
+    0,
+    'citext_cmp( citext "aardvark", citext "aardvark") should be 0'
+);
+
+SELECT is(
+    citext_cmp ( 'aardvark'::citext, 'AARDVARK'::citext ),
+    0,
+    'citext_cmp( citext "aardvark", citext "AARDVARK") should be 0'
+);
+
+SELECT is(
+    citext_cmp ( 'AARDVARK'::citext, 'AARDVARK'::citext ),
+    0,
+    'citext_cmp( citext "AARDVARK", citext "AARDVARK") should be 0'
+);
+
+SELECT is(
+    citext_cmp( 'Ask Bjørn Hansen', 'Ask Bjørn Hansen' ),
+    0,
+    'citext_cmp( "Ask Bjørn Hansen", "Ask Bjørn Hansen") should be 0'
+);
+
+SELECT is(
+    citext_cmp( 'Ask Bjørn Hansen', 'ask bjørn hansen' ),
+    0,
+    'citext_cmp( "Ask Bjørn Hansen", "ask bjørn hansen") should be 0'
+);
+
+SELECT is(
+    citext_cmp( 'Ask Bjørn Hansen', 'ASK BJØRN HANSEN' ),
+    0,
+    'citext_cmp( "Ask Bjørn Hansen", "ASK BJØRN HANSEN") should be 0'
+);
+
+SELECT is(
+    citext_cmp( 'Ask Bjørn Hansen', 'Ask Bjorn Hansen' ),
+    137,
+    'citext_cmp( "Ask Bjørn Hansen", "Ask Bjorn Hansen") should be -1'
+);
+
+SELECT is(
+    citext_cmp( 'Ask Bjorn Hansen', 'Ask Bjørn Hansen' ),
+    -137,
+    'citext_cmp( "Ask Bjorn Hansen", "Ask Bjørn Hansen") should be 1'
+);
+
+
 -- Now try writing to a table.
 INSERT INTO try (name)
 VALUES ('a'), ('ab'), ('â'), ('aba'), ('b'), ('ba'), ('bab'), ('AZ');
@@ -194,6 +298,19 @@ SELECT throws_ok(
     'We should get an error inserting an uppercase accented letter'
 );
 
+
+-- Make sure that citext_smaller() and citext_lager() work properly.
+SELECT is( citext_smaller( 'aa'::citext, 'ab'::citext ), 'aa', '"aa" should be smaller' );
+SELECT is( citext_smaller( 'Â'::citext, 'ç'::citext ), 'Â', '"Â" should be smaller' );
+SELECT is( citext_smaller( 'AAAA'::citext, 'bbbb'::citext ), 'AAAA', '"AAAA" should be smaller' );
+SELECT is( citext_smaller( 'aardvark'::citext, 'Aaba'::citext ), 'Aaba', '"Aaba" should be smaller' );
+SELECT is( citext_smaller( 'aardvark'::citext, 'AARDVARK'::citext ), 'AARDVARK', '"AARDVARK" should be smaller' );
+
+SELECT is( citext_larger( 'aa'::citext, 'ab'::citext ), 'ab', '"ab" should be larger' );
+SELECT is( citext_larger( 'Â'::citext, 'ç'::citext ), 'ç', '"ç" should be larger' );
+SELECT is( citext_larger( 'AAAA'::citext, 'bbbb'::citext ), 'bbbb', '"bbbb" should be larger' );
+SELECT is( citext_larger( 'aardvark'::citext, 'Aaba'::citext ), 'aardvark', '"aardvark" should be smaller' );
+
 -- Now check the sort order of things.
 CREATE TEMP TABLE srt (
     name CITEXT
@@ -204,31 +321,35 @@ VALUES ('aardvark'),
        ('AAA'),
        ('aba'),
        ('ABC'),
-       ('abc'),
-       ('AAAA'),
+       ('abc'::citext),
+       ('ç'::text),
        ('â');
+
+SELECT is( MIN(name)::text, 'AAA'::text, 'The min::text value should be "AAA"' )
+  FROM srt;
+SELECT is( MAX(name)::text, 'ç'::text, 'The max::text value should be "ç"' )
+  FROM srt;
+SELECT is( MIN(name), 'AAA', 'The min value should be "AAA"' )
+  FROM srt;
+SELECT is( MAX(name), 'ç', 'The max value should be "ç"' )
+  FROM srt;
 
 CREATE AGGREGATE array_accum (anyelement) (
     sfunc = array_append,
     stype = anyarray,
     initcond = '{}'
 );
-
--- citext_smaller() seems to be segfaulting.
---SELECT is( MIN(name), 'AAA', 'The first value should be "AAA"' )
---  FROM srt;
-
 SELECT is(
            array_accum(name)::text,
            ARRAY['aardvark','AAA','aba','ABC','abc','AAAA','â']::text,
            'The words should be case-insensitively sorted'
-) FROM srt; 
+) FROM srt ORDER BY name;
 
 SELECT is(
            array_accum(LOWER(name))::text,
            ARRAY['aardvark','aaa','aba','abc','abc','aaaa','â']::text,
            'The words should be case-insensitively sorted'
-) FROM srt; 
+) FROM srt ORDER BY name;
 
 SELECT is( LOWER(name), 'aaa', 'LOWER("AAA") should return "aaa"' )
   FROM srt
@@ -239,13 +360,22 @@ SELECT is( UPPER(name), 'Â', 'UPPER("â") should return "Â"' )
  WHERE name = 'â'::text;
 
 -- I think that i need to add the assignment cast operators to get this to work.
--- SELECT is( LOWER(name), 'aaa', 'LOWER("AAA") should return "aaa"' )
---   FROM srt
---  WHERE name = 'AAA'::citext;
+SELECT is( LOWER(name), 'aaa', 'LOWER("AAA") should return "aaa"' )
+  FROM srt
+ WHERE name = 'AAA'::citext;
 
--- SELECT is( UPPER(name), 'Â', 'UPPER("â") should return "Â"' )
---   FROM srt
---  WHERE name = 'â'::citext;
+SELECT is( UPPER(name), 'Â', 'UPPER("â") should return "Â"' )
+  FROM srt
+ WHERE name = 'â'::citext;
+
+-- Check implicit assignment casts.
+SELECT is( LOWER(name), 'aaa', 'LOWER("AAA") should return "aaa"' )
+  FROM srt
+ WHERE name = 'AAA';
+
+SELECT is( UPPER(name), 'Â', 'UPPER("â") should return "Â"' )
+  FROM srt
+ WHERE name = 'â';
 
 SELECT * FROM finish();
 

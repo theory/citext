@@ -38,12 +38,15 @@ CREATE TYPE citext (
 COMMENT ON TYPE citext IS 'Variable-length, locale-aware, case-insensitive text';
 
 --
---  Implicit type casts.
+--  Implicit and assignment type casts.
 --
 
 CREATE CAST (citext AS text)    WITHOUT FUNCTION AS IMPLICIT;
 CREATE CAST (citext AS varchar) WITHOUT FUNCTION AS IMPLICIT;
 CREATE CAST (citext AS bpchar)  WITHOUT FUNCTION AS IMPLICIT;
+CREATE CAST (text AS citext)    WITHOUT FUNCTION AS ASSIGNMENT;
+CREATE CAST (varchar AS citext) WITHOUT FUNCTION AS ASSIGNMENT;
+CREATE CAST (bpchar AS citext)  WITHOUT FUNCTION AS ASSIGNMENT;
 
 --
 -- Operator Functions.
@@ -170,3 +173,11 @@ DEFAULT FOR TYPE CITEXT USING btree AS
 -- Aggregates.
 CREATE AGGREGATE max(BASETYPE=citext, SFUNC=citext_larger,  STYPE=citext);
 CREATE AGGREGATE min(BASETYPE=citext, SFUNC=citext_smaller, STYPE=citext);
+
+CREATE FUNCTION lower(citext)
+RETURNS citext AS 'lower'
+LANGUAGE 'internal' IMMUTABLE STRICT;
+
+CREATE FUNCTION upper(citext)
+RETURNS citext AS 'upper'
+LANGUAGE 'internal' IMMUTABLE STRICT;
