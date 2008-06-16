@@ -311,7 +311,7 @@ SELECT is( citext_larger( 'Â'::citext, 'ç'::citext ), 'ç', '"ç" should be la
 SELECT is( citext_larger( 'AAAA'::citext, 'bbbb'::citext ), 'bbbb', '"bbbb" should be larger' );
 SELECT is( citext_larger( 'aardvark'::citext, 'Aaba'::citext ), 'aardvark', '"aardvark" should be smaller' );
 
--- Now check the sort order of things.
+-- Create a table with some records with which to do some testing.
 CREATE TEMP TABLE srt (
     name CITEXT
 );
@@ -325,6 +325,7 @@ VALUES ('aardvark'),
        ('ç'::text),
        ('â');
 
+-- Check the min() and max() aggregates.
 SELECT is( MIN(name)::text, 'AAA'::text, 'The min::text value should be "AAA"' )
   FROM srt;
 SELECT is( MAX(name)::text, 'ç'::text, 'The max::text value should be "ç"' )
@@ -334,6 +335,7 @@ SELECT is( MIN(name), 'AAA', 'The min value should be "AAA"' )
 SELECT is( MAX(name), 'ç', 'The max value should be "ç"' )
   FROM srt;
 
+-- Now check the sort order of things.
 CREATE AGGREGATE array_accum (anyelement) (
     sfunc = array_append,
     stype = anyarray,
@@ -388,6 +390,7 @@ SELECT is(
     'The LOWER(words) should case-insensitively compare'
 ) FROM ( SELECT name FROM srt ORDER BY name ) AS a(b);
 
+-- Check explicit comparison to text.
 SELECT is( LOWER(name), 'aaa', 'LOWER("AAA") should return "aaa"' )
   FROM srt
  WHERE name = 'AAA'::text;
@@ -396,7 +399,7 @@ SELECT is( UPPER(name), 'Â', 'UPPER("â") should return "Â"' )
   FROM srt
  WHERE name = 'â'::text;
 
--- I think that i need to add the assignment cast operators to get this to work.
+-- Check explicit comparison to citext.
 SELECT is( LOWER(name), 'aaa', 'LOWER("AAA") should return "aaa"' )
   FROM srt
  WHERE name = 'AAA'::citext;
@@ -414,7 +417,365 @@ SELECT is( UPPER(name), 'Â', 'UPPER("â") should return "Â"' )
   FROM srt
  WHERE name = 'â';
 
-SELECT * FROM finish();
+-- Check text length.
+SELECT is( textlen( name ), textlen(name::text), 'textlen("' || name || '") should be correct' )
+  FROM srt;
+
+SELECT is( length( name ), length(name::text), 'length("' || name || '") should be correct' )
+  FROM srt;
+
+-- Check LIKE, ILIKE, NOT LIKE, and NOT ILIKE.
+SELECT is( name, 'ç', 'LIKE should work properly' )
+  FROM srt
+ WHERE name LIKE 'ç%';
+
+SELECT is( name, 'ç', 'LIKE should work case-insensitively' )
+  FROM srt
+ WHERE name LIKE 'Ç%';
+
+SELECT is( name, 'ç', 'ILIKE should work properly' )
+  FROM srt
+ WHERE name ILIKE 'Ç%';
+
+SELECT is(
+    array_accum(b),
+    ARRAY['â'::citext, 'ç'::citext ],
+    'NOT LIKE should work properly'
+) FROM ( SELECT name FROM srt WHERE name NOT LIKE '%a%' ORDER BY name ) AS a(b);
+
+SELECT is(
+    array_accum(b),
+    ARRAY['â'::citext, 'ç'::citext ],
+    'NOT LIKE should work properly and case-insensitively'
+) FROM ( SELECT name FROM srt WHERE name NOT LIKE '%A%' ORDER BY name ) AS a(b);
+
+SELECT is(
+    array_accum(b),
+    ARRAY['â'::citext, 'ç'::citext ],
+    'NOT ILIKE should work properly'
+) FROM ( SELECT name FROM srt WHERE name NOT LIKE '%a%' ORDER BY name ) AS a(b);
+
+-- Check ~~, ~~*, !~~, and !~~*
+SELECT is( name, 'ç', '~~ should work properly' )
+  FROM srt
+ WHERE name ~~ 'ç%';
+
+SELECT is( name, 'ç', '~~ should work case-insensitively' )
+  FROM srt
+ WHERE name ~~ 'Ç%';
+
+SELECT is( name, 'ç', '~~* should work properly' )
+  FROM srt
+ WHERE name ~~* 'Ç%';
+
+SELECT is(
+    array_accum(b),
+    ARRAY['â'::citext, 'ç'::citext ],
+    '!~~ should work properly'
+) FROM ( SELECT name FROM srt WHERE name !~~ '%a%' ORDER BY name ) AS a(b);
+
+SELECT is(
+    array_accum(b),
+    ARRAY['â'::citext, 'ç'::citext ],
+    '!~~ should work properly and case-insensitively'
+) FROM ( SELECT name FROM srt WHERE name !~~ '%A%' ORDER BY name ) AS a(b);
+
+SELECT is(
+    array_accum(b),
+    ARRAY['â'::citext, 'ç'::citext ],
+    '!~~* should work properly and case-insensitively'
+) FROM ( SELECT name FROM srt WHERE name !~~* '%A%' ORDER BY name ) AS a(b);
+
+-- Check ~, ~*, !~, and !~*
+SELECT is( name, 'ç', '~ should work properly' )
+  FROM srt
+ WHERE name ~ 'ç+';
+
+SELECT is( name, 'ç', '~ should work case-insensitively' )
+  FROM srt
+ WHERE name ~ 'Ç+';
+
+SELECT is( name, 'ç', '~* should work properly' )
+  FROM srt
+ WHERE name ~* 'Ç+';
+
+SELECT is(
+    array_accum(b),
+    ARRAY['â'::citext, 'ç'::citext ],
+    '!~ should work properly'
+) FROM ( SELECT name FROM srt WHERE name !~ 'a+' ORDER BY name ) AS a(b);
+
+SELECT is(
+    array_accum(b),
+    ARRAY['â'::citext, 'ç'::citext ],
+    '!~ should work properly and case-insensitively'
+) FROM ( SELECT name FROM srt WHERE name !~ 'A+' ORDER BY name ) AS a(b);
+
+SELECT is(
+    array_accum(b),
+    ARRAY['â'::citext, 'ç'::citext ],
+    '!~* should work properly and case-insensitively'
+) FROM ( SELECT name FROM srt WHERE name !~* 'A+' ORDER BY name ) AS a(b);
+
+-- Check cast to to varchar and text for LIKE and ILIKE.
+SELECT is( name::varchar, 'ç', 'varchar LIKE should work properly' )
+  FROM srt
+ WHERE name LIKE 'ç%';
+
+SELECT is( name::varchar, 'ç', 'varchar ILIKE should work properly' )
+  FROM srt
+ WHERE name ILIKE 'Ç%';
+
+SELECT is(
+    array_accum(b::varchar),
+    ARRAY['â'::varchar, 'ç'::varchar ],
+    'varchar NOT LIKE should work properly'
+) FROM ( SELECT name FROM srt WHERE name NOT LIKE '%a%' ORDER BY name ) AS a(b);
+
+SELECT is( name::text, 'ç', 'text LIKE should work properly' )
+  FROM srt
+ WHERE name LIKE 'ç%';
+
+SELECT is( name::text, 'ç', 'text ILIKE should work properly' )
+  FROM srt
+ WHERE name ILIKE 'Ç%';
+
+SELECT is(
+    array_accum(b::text),
+    ARRAY['â'::text, 'ç'::text ],
+    'text NOT LIKE should work properly'
+) FROM ( SELECT name FROM srt WHERE name NOT LIKE '%a%' ORDER BY name ) AS a(b);
+
+-- Check LIKE and ILIKE text, varchar, and name.
+SELECT is( name, 'ç', 'text LIKE should work properly' )
+  FROM srt
+ WHERE name LIKE 'ç%'::text;
+
+SELECT is( name, 'ç', 'text ILIKE should work properly' )
+  FROM srt
+ WHERE name ILIKE 'Ç%'::text;
+
+SELECT is(
+    array_accum(b),
+    ARRAY['â'::citext, 'ç'::citext ],
+    'text NOT LIKE should work properly'
+) FROM ( SELECT name FROM srt WHERE name NOT LIKE '%a%'::text ORDER BY name ) AS a(b);
+
+SELECT is( name, 'ç', 'varchar LIKE should work properly' )
+  FROM srt
+ WHERE name LIKE 'ç%'::varchar;
+
+SELECT is( name, 'ç', 'varchar ILIKE should work properly' )
+  FROM srt
+ WHERE name ILIKE 'Ç%'::varchar;
+
+SELECT is(
+    array_accum(b),
+    ARRAY['â'::citext, 'ç'::citext ],
+    'varchar NOT LIKE should work properly'
+) FROM ( SELECT name FROM srt WHERE name NOT LIKE '%a%'::varchar ORDER BY name ) AS a(b);
+
+SELECT is( name, 'ç', 'name LIKE should work properly' )
+  FROM srt
+ WHERE name LIKE 'ç%'::name;
+
+SELECT is( name, 'ç', 'name ILIKE should work properly' )
+  FROM srt
+ WHERE name ILIKE 'Ç%'::name;
+
+SELECT is(
+    array_accum(b),
+    ARRAY['â'::citext, 'ç'::citext ],
+    'name NOT LIKE should work properly'
+) FROM ( SELECT name FROM srt WHERE name NOT LIKE '%a%'::name ORDER BY name ) AS a(b);
+
+SELECT is( name, 'ç', 'bpchar LIKE should work properly' )
+  FROM srt
+ WHERE name LIKE 'ç%'::bpchar;
+
+SELECT is( name, 'ç', 'bpchar ILIKE should work properly' )
+  FROM srt
+ WHERE name ILIKE 'Ç%'::bpchar;
+
+SELECT is(
+    array_accum(b),
+    ARRAY['â'::citext, 'ç'::citext ],
+    'bpchar NOT LIKE should work properly'
+) FROM ( SELECT name FROM srt WHERE name NOT LIKE '%a%'::bpchar ORDER BY name ) AS a(b);
+
+SELECT is( name, 'ç', 'char LIKE should work properly' )
+  FROM srt
+ WHERE name LIKE 'ç'::char;
+
+SELECT is( name, 'ç', 'char ILIKE should work properly' )
+  FROM srt
+ WHERE name ILIKE 'Ç'::char;
+
+SELECT is(
+    array_accum(b),
+    ARRAY['AAA'::citext, 'aardvark'::citext, 'aba'::citext, 'ABC'::citext, 'abc'::citext, 'â'::citext, 'ç'::citext],
+    'char NOT LIKE should work properly'
+) FROM ( SELECT name FROM srt WHERE name NOT LIKE 'a'::char ORDER BY name ) AS a(b);
+
+
+-- Check SIMILAR TO.
+--SELECT is( name, 'ç', 'SIMILAR TO should work properly' )
+--  FROM srt
+-- WHERE name SIMILAR TO '%ç*';
+
+-- Check btrim.
+SELECT is(
+    btrim('    trim'::citext),
+    'trim',
+    'btrim(citext) should work'
+);
+
+SELECT is(
+    btrim('xyxtrimyyx'::citext, 'xy'::citext),
+    'trim',
+    'btrim(citext, citext) should work'
+);
+
+SELECT is(
+    btrim('xyxtrimyyx'::text, 'xy'::citext),
+    'trim',
+    'btrim(text, citext) should work'
+);
+
+SELECT is(
+    btrim('xyxtrimyyx'::citext, 'xy'::text),
+    'trim',
+    'btrim(citext, text) should work'
+);
+
+-- Check ltrim.
+SELECT is(
+    ltrim('    trim'::citext),
+    'trim',
+    'ltrim(citext) should work'
+);
+
+SELECT is(
+    ltrim('zzzytrim'::citext, 'xyz'::citext),
+    'trim',
+    'ltrim(citext, citext) should work'
+);
+
+SELECT is(
+    ltrim('zzzytrim'::text, 'xyz'::citext),
+    'trim',
+    'ltrim(text, citext) should work'
+);
+
+SELECT is(
+    ltrim('zzzytrim'::citext, 'xyz'::text),
+    'trim',
+    'ltrim(citext, text) should work'
+);
+
+-- Check rtrim.
+SELECT is(
+    rtrim('trim    '::citext),
+    'trim',
+    'rtrim(citext) should work'
+);
+
+SELECT is(
+    rtrim('trimxxxx'::citext, 'x'::citext),
+    'trim',
+    'rtrim(citext, citext) should work'
+);
+
+SELECT is(
+    rtrim('trimxxxx'::text, 'x'::citext),
+    'trim',
+    'rtrim(text, citext) should work'
+);
+
+SELECT is(
+    rtrim('trimxxxx'::text, 'x'::citext),
+    'trim',
+    'rtrim(citext, text) should work'
+);
+
+-- Test lpad.
+SELECT is(
+    lpad('hi'::citext, 5),
+    '   hi',
+    'lpad(citext, int) should work'
+);
+
+SELECT is(
+    lpad('hi'::citext, 5, 'xy'::citext),
+    'xyxhi',
+    'lpad(citext, int, citext) should work'
+);
+
+SELECT is(
+    lpad('hi'::text, 5, 'xy'::citext),
+    'xyxhi',
+    'lpad(text, int, citext) should work'
+);
+
+SELECT is(
+    lpad('hi'::citext, 5, 'xy'::text),
+    'xyxhi',
+    'lpad(citext, int, text) should work'
+);
+
+-- Test rpad.
+SELECT is(
+    rpad('hi'::citext, 5),
+    'hi   ',
+    'rpad(citext, int) should work'
+);
+
+SELECT is(
+    rpad('hi'::citext, 5, 'xy'::citext),
+    'hixyx',
+    'rpad(citext, int, citext) should work'
+);
+
+SELECT is(
+    rpad('hi'::text, 5, 'xy'::citext),
+    'hixyx',
+    'rpad(text, int, citext) should work'
+);
+
+SELECT is(
+    rpad('hi'::citext, 5, 'xy'::text),
+    'hixyx',
+    'rpad(citext, int, text) should work'
+);
+
+-- Test repeat()
+SELECT is( 	repeat('Pg'::citext, 4), 'PgPgPgPg', 'repeat(citext, int) should work' );
+
+-- Test substr() and substring().
+SELECT is(
+    substr('alphabet'::citext, 3),
+    'phabet',
+    'subtr(citext, int) should work'
+);
+
+SELECT is(
+    substr('alphabet'::citext, 3, 2),
+    'ph',
+    'subtr(citext, int, int) should work'
+);
+
+SELECT is(
+    substring('alphabet'::citext, 3),
+    'phabet',
+    'subtr(citext, int) should work'
+);
+
+SELECT is(
+    substring('alphabet'::citext, 3, 2),
+    'ph',
+    'subtr(citext, int, int) should work'
+);
 
 -- Clean up.
+SELECT * FROM finish();
 ROLLBACK;
