@@ -342,20 +342,50 @@ CREATE AGGREGATE array_accum (anyelement) (
 
 SELECT is(
     array_accum(b)::text,
-    ARRAY['AAA' , 'aardvark' , 'aba' , 'ABC' , 'abc' , 'â' , 'ç']::text,
+    ARRAY['AAA', 'aardvark', 'aba', 'ABC', 'abc', 'â', 'ç']::text,
     'The words should be case-insensitively sorted'
 ) FROM ( SELECT name FROM srt ORDER BY name ) AS a(b);
 
 SELECT is(
+    array_accum(b),
+    ARRAY['AAA'::citext, 'aardvark'::citext, 'aba'::citext, 'ABC'::citext, 'abc'::citext, 'â'::citext, 'ç'],
+    'The words should be case-insensitively sorted (citext array)'
+) FROM ( SELECT name FROM srt ORDER BY name ) AS a(b);
+
+SELECT is(
     array_accum(UPPER(b))::text,
-    ARRAY['AAA' , 'AARDVARK' , 'ABA' , 'ABC' , 'ABC' , 'Â' , 'Ç']::text,
+    ARRAY['AAA', 'AARDVARK', 'ABA', 'ABC', 'ABC', 'Â', 'Ç']::text,
+    'The UPPER(words) should be case-insensitively sorted'
+) FROM ( SELECT name FROM srt ORDER BY name ) AS a(b);
+
+SELECT is(
+    array_accum(UPPER(b))::text,
+    ARRAY['AAA'::citext, 'AARDVARK'::citext, 'ABA'::citext, 'ABC'::citext, 'ABC'::citext, 'Â'::citext, 'Ç']::text,
+    'The UPPER(words) should be case-insensitively sorted (citext array_'
+) FROM ( SELECT name FROM srt ORDER BY name ) AS a(b);
+
+SELECT is(
+    array_accum(UPPER(b)),
+    ARRAY['aaa'::citext, 'aardvark'::citext, 'aba'::citext, 'abc'::citext, 'abc'::citext, 'â'::citext, 'ç'],
+    'The UPPER(words) should case-insensitively compare'
+) FROM ( SELECT name FROM srt ORDER BY name ) AS a(b);
+
+SELECT is(
+    array_accum(LOWER(b))::text,
+    ARRAY['aaa', 'aardvark', 'aba', 'abc', 'abc', 'â', 'ç']::text,
     'The UPPER(words) should be case-insensitively sorted'
 ) FROM ( SELECT name FROM srt ORDER BY name ) AS a(b);
 
 SELECT is(
     array_accum(LOWER(b))::text,
-    ARRAY['aaa' , 'aardvark' , 'aba' , 'abc' , 'abc' , 'â' , 'ç']::text,
-    'The UPPER(words) should be case-insensitively sorted'
+    ARRAY['aaa'::citext, 'aardvark'::citext, 'aba'::citext, 'abc'::citext, 'abc'::citext, 'â'::citext, 'ç']::text,
+    'The UPPER(words) should be case-insensitively sorted (citext array)'
+) FROM ( SELECT name FROM srt ORDER BY name ) AS a(b);
+
+SELECT is(
+    array_accum(LOWER(b)),
+    ARRAY['AAA'::citext, 'AARDVARK'::citext, 'ABA'::citext, 'ABC'::citext, 'ABC'::citext, 'Â'::citext, 'Ç'],
+    'The LOWER(words) should case-insensitively compare'
 ) FROM ( SELECT name FROM srt ORDER BY name ) AS a(b);
 
 SELECT is( LOWER(name), 'aaa', 'LOWER("AAA") should return "aaa"' )
