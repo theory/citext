@@ -20,6 +20,9 @@ PG_MODULE_MAGIC;
  */
 
 #define PG_ARGS fcinfo // Might need to change if fmgr changes its name
+#define GET_TEXT_STR(textp) DatumGetCString( \
+    DirectFunctionCall1( textout, PointerGetDatum( textp ) ) \
+)
 
 /*
  *      ====================
@@ -51,14 +54,9 @@ extern Datum  citext_larger  (PG_FUNCTION_ARGS);
 #define USE_WIDE_UPPER_LOWER
 #endif
 
-#define GET_TEXT_STR(textp) DatumGetCString( \
-    DirectFunctionCall1( textout, PointerGetDatum( textp ) ) \
-)
-
 char * cilower(text * arg) {
     // Do I need to free anything here?
     char * str  = GET_TEXT_STR( arg );
-    //    char * str = VARDATA_ANY( arg );
 #ifdef USE_WIDE_UPPER_LOWER
     // Have wstring_lower() do the work.
     return wstring_lower( str );

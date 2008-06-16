@@ -339,17 +339,24 @@ CREATE AGGREGATE array_accum (anyelement) (
     stype = anyarray,
     initcond = '{}'
 );
-SELECT is(
-           array_accum(name)::text,
-           ARRAY['aardvark','AAA','aba','ABC','abc','AAAA','â']::text,
-           'The words should be case-insensitively sorted'
-) FROM srt ORDER BY name;
 
 SELECT is(
-           array_accum(LOWER(name))::text,
-           ARRAY['aardvark','aaa','aba','abc','abc','aaaa','â']::text,
-           'The words should be case-insensitively sorted'
-) FROM srt ORDER BY name;
+    array_accum(b)::text,
+    ARRAY['AAA' , 'aardvark' , 'aba' , 'ABC' , 'abc' , 'â' , 'ç']::text,
+    'The words should be case-insensitively sorted'
+) FROM ( SELECT name FROM srt ORDER BY name ) AS a(b);
+
+SELECT is(
+    array_accum(UPPER(b))::text,
+    ARRAY['AAA' , 'AARDVARK' , 'ABA' , 'ABC' , 'ABC' , 'Â' , 'Ç']::text,
+    'The UPPER(words) should be case-insensitively sorted'
+) FROM ( SELECT name FROM srt ORDER BY name ) AS a(b);
+
+SELECT is(
+    array_accum(LOWER(b))::text,
+    ARRAY['aaa' , 'aardvark' , 'aba' , 'abc' , 'abc' , 'â' , 'ç']::text,
+    'The UPPER(words) should be case-insensitively sorted'
+) FROM ( SELECT name FROM srt ORDER BY name ) AS a(b);
 
 SELECT is( LOWER(name), 'aaa', 'LOWER("AAA") should return "aaa"' )
   FROM srt
