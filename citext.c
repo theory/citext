@@ -51,9 +51,14 @@ extern Datum  citext_larger  (PG_FUNCTION_ARGS);
 #define USE_WIDE_UPPER_LOWER
 #endif
 
+#define GET_TEXT_STR(textp) DatumGetCString( \
+    DirectFunctionCall1( textout, PointerGetDatum( textp ) ) \
+)
+
 char * cilower(text * arg) {
     // Do I need to free anything here?
-    char * str = VARDATA_ANY( arg );
+    char * str  = GET_TEXT_STR( arg );
+    //    char * str = VARDATA_ANY( arg );
 #ifdef USE_WIDE_UPPER_LOWER
     // Have wstring_lower() do the work.
     return wstring_lower( str );
@@ -89,6 +94,9 @@ int citextcmp (PG_FUNCTION_ARGS) {
  *      OPERATOR FUNCTIONS
  *      ==================
  */
+
+// XXX I's usually nice if btree comparison functions free memory because
+// that way index rebuilds on large tables don't run you out of memory.
 
 PG_FUNCTION_INFO_V1(citext_cmp);
 
