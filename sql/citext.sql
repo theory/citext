@@ -336,59 +336,52 @@ SELECT is( MAX(name), 'ç', 'The max value should be "ç"' )
   FROM srt;
 
 -- Now check the sort order of things.
-CREATE AGGREGATE array_accum (anyelement) (
-    sfunc = array_append,
-    stype = anyarray,
-    initcond = '{}'
+SELECT is(
+    ARRAY( SELECT name FROM srt ORDER BY name )::text,
+    ARRAY['AAA', 'aardvark', 'aba', 'ABC', 'abc', 'â', 'ç']::text,
+    'The words should be case-insensitively sorted'
 );
 
 SELECT is(
-    array_accum(b)::text,
-    ARRAY['AAA', 'aardvark', 'aba', 'ABC', 'abc', 'â', 'ç']::text,
-    'The words should be case-insensitively sorted'
-) FROM ( SELECT name FROM srt ORDER BY name ) AS a(b);
-
-SELECT is(
-    array_accum(b),
+    ARRAY( SELECT name FROM srt ORDER BY name ),
     ARRAY['AAA'::citext, 'aardvark'::citext, 'aba'::citext, 'ABC'::citext, 'abc'::citext, 'â'::citext, 'ç'],
     'The words should be case-insensitively sorted (citext array)'
-) FROM ( SELECT name FROM srt ORDER BY name ) AS a(b);
+);
 
 SELECT is(
-    array_accum(UPPER(b))::text,
+    ARRAY( SELECT UPPER(name) FROM srt ORDER BY name )::text,
     ARRAY['AAA', 'AARDVARK', 'ABA', 'ABC', 'ABC', 'Â', 'Ç']::text,
     'The UPPER(words) should be case-insensitively sorted'
-) FROM ( SELECT name FROM srt ORDER BY name ) AS a(b);
+);
 
 SELECT is(
-    array_accum(UPPER(b))::text,
+    ARRAY( SELECT UPPER(name) FROM srt ORDER BY name )::text,
     ARRAY['AAA'::citext, 'AARDVARK'::citext, 'ABA'::citext, 'ABC'::citext, 'ABC'::citext, 'Â'::citext, 'Ç']::text,
-    'The UPPER(words) should be case-insensitively sorted (citext array_'
-) FROM ( SELECT name FROM srt ORDER BY name ) AS a(b);
+    'The UPPER(words) should be case-insensitively sorted (citext array)');
 
 SELECT is(
-    array_accum(UPPER(b)),
+    ARRAY( SELECT UPPER(name) FROM srt ORDER BY name ),
     ARRAY['aaa'::citext, 'aardvark'::citext, 'aba'::citext, 'abc'::citext, 'abc'::citext, 'â'::citext, 'ç'],
     'The UPPER(words) should case-insensitively compare'
-) FROM ( SELECT name FROM srt ORDER BY name ) AS a(b);
+);
 
 SELECT is(
-    array_accum(LOWER(b))::text,
+    ARRAY( SELECT LOWER(name) FROM srt ORDER BY name )::text,
     ARRAY['aaa', 'aardvark', 'aba', 'abc', 'abc', 'â', 'ç']::text,
     'The UPPER(words) should be case-insensitively sorted'
-) FROM ( SELECT name FROM srt ORDER BY name ) AS a(b);
+);
 
 SELECT is(
-    array_accum(LOWER(b))::text,
+    ARRAY( SELECT LOWER(name) FROM srt ORDER BY name )::text,
     ARRAY['aaa'::citext, 'aardvark'::citext, 'aba'::citext, 'abc'::citext, 'abc'::citext, 'â'::citext, 'ç']::text,
     'The UPPER(words) should be case-insensitively sorted (citext array)'
-) FROM ( SELECT name FROM srt ORDER BY name ) AS a(b);
+);
 
 SELECT is(
-    array_accum(LOWER(b)),
+    ARRAY( SELECT LOWER(name) FROM srt ORDER BY name ),
     ARRAY['AAA'::citext, 'AARDVARK'::citext, 'ABA'::citext, 'ABC'::citext, 'ABC'::citext, 'Â'::citext, 'Ç'],
     'The LOWER(words) should case-insensitively compare'
-) FROM ( SELECT name FROM srt ORDER BY name ) AS a(b);
+);
 
 -- Check explicit comparison to text.
 SELECT is( LOWER(name), 'aaa', 'LOWER("AAA") should return "aaa"' )
@@ -424,6 +417,9 @@ SELECT is( textlen( name ), textlen(name::text), 'textlen("' || name || '") shou
 SELECT is( length( name ), length(name::text), 'length("' || name || '") should be correct' )
   FROM srt;
 
+SELECT is( char_length( name ), char_length(name::text), 'char_length("' || name || '") should be correct' )
+  FROM srt;
+
 -- Check LIKE, ILIKE, NOT LIKE, and NOT ILIKE.
 SELECT is( name, 'ç', 'LIKE should work properly' )
   FROM srt
@@ -438,22 +434,22 @@ SELECT is( name, 'ç', 'ILIKE should work properly' )
  WHERE name ILIKE 'Ç%';
 
 SELECT is(
-    array_accum(b),
+    ARRAY( SELECT name FROM srt WHERE name NOT LIKE '%a%' ORDER BY name ),
     ARRAY['â'::citext, 'ç'::citext ],
     'NOT LIKE should work properly'
-) FROM ( SELECT name FROM srt WHERE name NOT LIKE '%a%' ORDER BY name ) AS a(b);
+);
 
 SELECT is(
-    array_accum(b),
+    ARRAY( SELECT name FROM srt WHERE name NOT LIKE '%A%' ORDER BY name ),
     ARRAY['â'::citext, 'ç'::citext ],
     'NOT LIKE should work properly and case-insensitively'
-) FROM ( SELECT name FROM srt WHERE name NOT LIKE '%A%' ORDER BY name ) AS a(b);
+);
 
 SELECT is(
-    array_accum(b),
+    ARRAY( SELECT name FROM srt WHERE name NOT LIKE '%a%' ORDER BY name ),
     ARRAY['â'::citext, 'ç'::citext ],
     'NOT ILIKE should work properly'
-) FROM ( SELECT name FROM srt WHERE name NOT LIKE '%a%' ORDER BY name ) AS a(b);
+);
 
 -- Check ~~, ~~*, !~~, and !~~*
 SELECT is( name, 'ç', '~~ should work properly' )
@@ -469,22 +465,22 @@ SELECT is( name, 'ç', '~~* should work properly' )
  WHERE name ~~* 'Ç%';
 
 SELECT is(
-    array_accum(b),
+    ARRAY( SELECT name FROM srt WHERE name !~~ '%a%' ORDER BY name ),
     ARRAY['â'::citext, 'ç'::citext ],
     '!~~ should work properly'
-) FROM ( SELECT name FROM srt WHERE name !~~ '%a%' ORDER BY name ) AS a(b);
+);
 
 SELECT is(
-    array_accum(b),
+    ARRAY( SELECT name FROM srt WHERE name !~~ '%A%' ORDER BY name ),
     ARRAY['â'::citext, 'ç'::citext ],
     '!~~ should work properly and case-insensitively'
-) FROM ( SELECT name FROM srt WHERE name !~~ '%A%' ORDER BY name ) AS a(b);
+);
 
 SELECT is(
-    array_accum(b),
+    ARRAY( SELECT name FROM srt WHERE name !~~* '%A%' ORDER BY name ),
     ARRAY['â'::citext, 'ç'::citext ],
     '!~~* should work properly and case-insensitively'
-) FROM ( SELECT name FROM srt WHERE name !~~* '%A%' ORDER BY name ) AS a(b);
+);
 
 -- Check ~, ~*, !~, and !~*
 SELECT is( name, 'ç', '~ should work properly' )
@@ -500,22 +496,22 @@ SELECT is( name, 'ç', '~* should work properly' )
  WHERE name ~* 'Ç+';
 
 SELECT is(
-    array_accum(b),
+    ARRAY( SELECT name FROM srt WHERE name !~ 'a+' ORDER BY name ),
     ARRAY['â'::citext, 'ç'::citext ],
     '!~ should work properly'
-) FROM ( SELECT name FROM srt WHERE name !~ 'a+' ORDER BY name ) AS a(b);
+);
 
 SELECT is(
-    array_accum(b),
+    ARRAY( SELECT name FROM srt WHERE name !~ 'A+' ORDER BY name ),
     ARRAY['â'::citext, 'ç'::citext ],
     '!~ should work properly and case-insensitively'
-) FROM ( SELECT name FROM srt WHERE name !~ 'A+' ORDER BY name ) AS a(b);
+);
 
 SELECT is(
-    array_accum(b),
+    ARRAY( SELECT name FROM srt WHERE name !~* 'A+' ORDER BY name ),
     ARRAY['â'::citext, 'ç'::citext ],
     '!~* should work properly and case-insensitively'
-) FROM ( SELECT name FROM srt WHERE name !~* 'A+' ORDER BY name ) AS a(b);
+);
 
 -- Check cast to to varchar and text for LIKE and ILIKE.
 SELECT is( name::varchar, 'ç', 'varchar LIKE should work properly' )
@@ -527,10 +523,10 @@ SELECT is( name::varchar, 'ç', 'varchar ILIKE should work properly' )
  WHERE name ILIKE 'Ç%';
 
 SELECT is(
-    array_accum(b::varchar),
+    ARRAY( SELECT name::varchar FROM srt WHERE name NOT LIKE '%a%' ORDER BY name ),
     ARRAY['â'::varchar, 'ç'::varchar ],
     'varchar NOT LIKE should work properly'
-) FROM ( SELECT name FROM srt WHERE name NOT LIKE '%a%' ORDER BY name ) AS a(b);
+);
 
 SELECT is( name::text, 'ç', 'text LIKE should work properly' )
   FROM srt
@@ -541,10 +537,10 @@ SELECT is( name::text, 'ç', 'text ILIKE should work properly' )
  WHERE name ILIKE 'Ç%';
 
 SELECT is(
-    array_accum(b::text),
+    ARRAY( SELECT name::text FROM srt WHERE name NOT LIKE '%a%' ORDER BY name ),
     ARRAY['â'::text, 'ç'::text ],
     'text NOT LIKE should work properly'
-) FROM ( SELECT name FROM srt WHERE name NOT LIKE '%a%' ORDER BY name ) AS a(b);
+);
 
 -- Check LIKE and ILIKE text, varchar, and name.
 SELECT is( name, 'ç', 'text LIKE should work properly' )
@@ -556,10 +552,10 @@ SELECT is( name, 'ç', 'text ILIKE should work properly' )
  WHERE name ILIKE 'Ç%'::text;
 
 SELECT is(
-    array_accum(b),
+    ARRAY( SELECT name FROM srt WHERE name NOT LIKE '%a%'::text ORDER BY name ),
     ARRAY['â'::citext, 'ç'::citext ],
     'text NOT LIKE should work properly'
-) FROM ( SELECT name FROM srt WHERE name NOT LIKE '%a%'::text ORDER BY name ) AS a(b);
+);
 
 SELECT is( name, 'ç', 'varchar LIKE should work properly' )
   FROM srt
@@ -570,10 +566,10 @@ SELECT is( name, 'ç', 'varchar ILIKE should work properly' )
  WHERE name ILIKE 'Ç%'::varchar;
 
 SELECT is(
-    array_accum(b),
+    ARRAY( SELECT name FROM srt WHERE name NOT LIKE '%a%'::varchar ORDER BY name ),
     ARRAY['â'::citext, 'ç'::citext ],
     'varchar NOT LIKE should work properly'
-) FROM ( SELECT name FROM srt WHERE name NOT LIKE '%a%'::varchar ORDER BY name ) AS a(b);
+);
 
 SELECT is( name, 'ç', 'name LIKE should work properly' )
   FROM srt
@@ -584,10 +580,10 @@ SELECT is( name, 'ç', 'name ILIKE should work properly' )
  WHERE name ILIKE 'Ç%'::name;
 
 SELECT is(
-    array_accum(b),
+    ARRAY( SELECT name FROM srt WHERE name NOT LIKE '%a%'::name ORDER BY name ),
     ARRAY['â'::citext, 'ç'::citext ],
     'name NOT LIKE should work properly'
-) FROM ( SELECT name FROM srt WHERE name NOT LIKE '%a%'::name ORDER BY name ) AS a(b);
+);
 
 SELECT is( name, 'ç', 'bpchar LIKE should work properly' )
   FROM srt
@@ -598,10 +594,10 @@ SELECT is( name, 'ç', 'bpchar ILIKE should work properly' )
  WHERE name ILIKE 'Ç%'::bpchar;
 
 SELECT is(
-    array_accum(b),
+    ARRAY( SELECT name FROM srt WHERE name NOT LIKE '%a%'::bpchar ORDER BY name ),
     ARRAY['â'::citext, 'ç'::citext ],
     'bpchar NOT LIKE should work properly'
-) FROM ( SELECT name FROM srt WHERE name NOT LIKE '%a%'::bpchar ORDER BY name ) AS a(b);
+);
 
 SELECT is( name, 'ç', 'char LIKE should work properly' )
   FROM srt
@@ -612,10 +608,10 @@ SELECT is( name, 'ç', 'char ILIKE should work properly' )
  WHERE name ILIKE 'Ç'::char;
 
 SELECT is(
-    array_accum(b),
+    ARRAY( SELECT name FROM srt WHERE name NOT LIKE 'a'::char ORDER BY name ),
     ARRAY['AAA'::citext, 'aardvark'::citext, 'aba'::citext, 'ABC'::citext, 'abc'::citext, 'â'::citext, 'ç'::citext],
     'char NOT LIKE should work properly'
-) FROM ( SELECT name FROM srt WHERE name NOT LIKE 'a'::char ORDER BY name ) AS a(b);
+);
 
 
 -- Check SIMILAR TO.
@@ -775,6 +771,22 @@ SELECT is(
     'ph',
     'subtr(citext, int, int) should work'
 );
+
+-- Test concatenation.
+SELECT is(
+    'D'::citext || 'avid'::citext,
+    'David'::citext,
+    'citext || citext should work'
+);
+
+SELECT is(
+    'Value: '::citext || 42,
+    'Value: 42',
+    'citext || int should work'
+);
+
+-- Bit length.
+SELECT is( bit_length('jose'::citext), 32, 'bit_length(citext) should work' );
 
 -- Clean up.
 SELECT * FROM finish();
