@@ -145,16 +145,19 @@ Datum citext_ge (PG_FUNCTION_ARGS) {
 PG_FUNCTION_INFO_V1(citext_smaller);
 
 Datum citext_smaller (PG_FUNCTION_ARGS) {
-    text * left  = PG_GETARG_TEXT_P(0);
-    text * right = PG_GETARG_TEXT_P(1);
-    PG_RETURN_TEXT_P( citextcmp( PG_ARGS ) < 0 ? left : right );
+    PG_RETURN_TEXT_P(
+        citextcmp( PG_ARGS ) < 0
+          ? PG_GETARG_TEXT_P(0)
+          : PG_GETARG_TEXT_P(1)
+    );
 }
 
 PG_FUNCTION_INFO_V1(citext_larger);
 
 Datum citext_larger (PG_FUNCTION_ARGS) {
-    text * left  = PG_GETARG_TEXT_P(0);
-    text * right = PG_GETARG_TEXT_P(1);
-    PG_RETURN_TEXT_P( citextcmp( PG_ARGS ) > 0 ? left : right );
-  //    PG_RETURN_TEXT_P( citextcmp( PG_ARGS ) > 0 ? PG_GETARG_TEXT_P(0) : PG_GETARG_TEXT_P(1) );
+    PG_RETURN_TEXT_P(
+        citextcmp( PG_ARGS ) > 0
+          ? PG_GETARG_TEXT_P(0)
+          : PG_GETARG_TEXT_P(1)
+    );
 }
