@@ -20,7 +20,7 @@ CREATE LANGUAGE plpgsql;
 -- Load the TAP functions and the data type.
 BEGIN;
 \i pgtap.sql
---\i citext.sql
+\i citext.sql
 
 -- Keep things quiet.
 SET client_min_messages = warning;
@@ -170,37 +170,37 @@ SELECT is(
 SELECT is(
     'Ask Bjørn Hansen'::citext,
     'Ask Bjørn Hansen'::citext,
-    '"Ask Bjørn Hansen" shoulde eq "Ask Bjørn Hansen"'
+    '"Ask Bjørn Hansen" should eq "Ask Bjørn Hansen"'
 );
 
 SELECT is(
     'Ask Bjørn Hansen'::citext,
     'ASK BJØRN HANSEN'::citext,
-    '"Ask Bjørn Hansen" shoulde eq "ASK BJØRN HANSEN"'
+    '"Ask Bjørn Hansen" should eq "ASK BJØRN HANSEN"'
 );
 
 SELECT is(
     'ask bjørn hansen'::citext,
     'ASK BJØRN HANSEN'::citext,
-    '"ask bjørn hansen" shoulde eq "ASK BJØRN HANSEN"'
+    '"ask bjørn hansen" should eq "ASK BJØRN HANSEN"'
 );
 
 SELECT isnt(
     'Ask Bjørn Hansen'::citext,
     'Ask Bjorn Hansen'::citext,
-    '"Ask Bjørn Hansen" shoulde ne "Ask Bjorn Hansen"'
+    '"Ask Bjørn Hansen" should ne "Ask Bjorn Hansen"'
 );
 
 SELECT isnt(
     'Ask Bjørn Hansen'::citext,
     'ASK BJORN HANSEN'::citext,
-    '"Ask Bjørn Hansen" shoulde ne "ASK BJORN HANSEN"'
+    '"Ask Bjørn Hansen" should ne "ASK BJORN HANSEN"'
 );
 
 SELECT isnt(
     'ask bjørn hansen'::citext,
     'ASK BJORN HANSEN'::citext,
-    '"ask bjørn hansen" shoulde ne "ASK BJORN HANSEN"'
+    '"ask bjørn hansen" should ne "ASK BJORN HANSEN"'
 );
 
 -- Check the citext_cmp() function explicitly.
@@ -419,6 +419,28 @@ SELECT is( length( name ), length(name::text), 'length("' || name || '") should 
 
 SELECT is( char_length( name ), char_length(name::text), 'char_length("' || name || '") should be correct' )
   FROM srt;
+
+SELECT is( character_length( name ), character_length(name::text), 'character_length("' || name || '") should be correct' )
+  FROM srt;
+
+SELECT is( bit_length( name ), bit_length(name::text), 'bit_length("' || name || '") should be correct' )
+  FROM srt;
+
+-- Check overlay().
+SELECT is(
+    overlay( name placing 'hom' from 2 for 4),
+    overlay( name::text placing 'hom' from 2 for 4),
+    'overlay() should work'
+) FROM srt;
+
+-- Check position().
+SELECT is(
+    position( 'a' IN name ),
+    position( 'a' IN name::text ),
+    'position() should work'
+) FROM srt;
+
+
 
 -- Check LIKE, ILIKE, NOT LIKE, and NOT ILIKE.
 SELECT is( name, 'ç', 'LIKE should work properly' )
@@ -694,6 +716,31 @@ SELECT is(
     'rtrim(citext, text) should work'
 );
 
+-- Check trim.
+SELECT is(
+    trim('    trim    '::citext),
+    'trim',
+    'trim(citext) should work'
+);
+
+SELECT is(
+    trim('xxxxxtrimxxxx'::citext, 'x'::citext),
+    'trim',
+    'trim(citext, citext) should work'
+);
+
+SELECT is(
+    trim('xxxxxxtrimxxxx'::text, 'x'::citext),
+    'trim',
+    'trim(text, citext) should work'
+);
+
+SELECT is(
+    trim('xxxxxtrimxxxx'::text, 'x'::citext),
+    'trim',
+    'trim(citext, text) should work'
+);
+
 -- Test lpad.
 SELECT is(
     lpad('hi'::citext, 5),
@@ -755,9 +802,9 @@ SELECT is(
 );
 
 SELECT is(
-    substr('alphabet'::citext, 3, 2),
-    'ph',
-    'subtr(citext, int, int) should work'
+    substr('alphabet'::citext, 3),
+    'phabet',
+    'subtr(citext, int) should work'
 );
 
 SELECT is(
@@ -772,6 +819,30 @@ SELECT is(
     'subtr(citext, int, int) should work'
 );
 
+SELECT is(
+    substring('Thomas'::citext from 2 for 3),
+    'hom',
+    'subtr(citext from int for int) should work'
+);
+
+SELECT is(
+    substring('Thomas'::citext from 2),
+    'homas',
+    'subtr(citext from int) should work'
+);
+
+SELECT is(
+    substring('Thomas'::citext from '...$'),
+    'mas',
+    'subtr(citext from regex) should work'
+);
+
+SELECT is(
+    substring('Thomas'::citext from '%#"o_a#"_' for '#'),
+    'oma',
+    'subtr(citext from regex for escape) should work'
+);
+
 -- Test concatenation.
 SELECT is(
     'D'::citext || 'avid'::citext,
@@ -782,6 +853,12 @@ SELECT is(
 SELECT is(
     'Value: '::citext || 42,
     'Value: 42',
+    'citext || int should work'
+);
+
+SELECT is(
+     42 || ': value'::citext,
+    '42: value',
     'citext || int should work'
 );
 

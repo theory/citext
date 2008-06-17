@@ -4,7 +4,7 @@
 
 -- Adjust this setting to control where the objects get created.
 SET search_path = public;
-SET client_min_messages = warning;
+--SET client_min_messages = warning;
 
 --
 --  Input and output functions.
@@ -171,6 +171,13 @@ DEFAULT FOR TYPE CITEXT USING btree AS
     FUNCTION    1   citext_cmp(citext, citext);
 
 --
+-- Aggregates.
+--
+
+CREATE AGGREGATE max(BASETYPE=citext, SFUNC=citext_larger,  STYPE=citext);
+CREATE AGGREGATE min(BASETYPE=citext, SFUNC=citext_smaller, STYPE=citext);
+
+--
 -- Size functions
 --
 
@@ -182,12 +189,17 @@ CREATE FUNCTION length(citext)
 RETURNS int4 AS 'textlen'
 LANGUAGE 'internal' IMMUTABLE STRICT;
 
---
--- Aggregates.
---
+CREATE FUNCTION char_length(citext)
+RETURNS int4 AS 'textlen'
+LANGUAGE 'internal' IMMUTABLE STRICT;
 
-CREATE AGGREGATE max(BASETYPE=citext, SFUNC=citext_larger,  STYPE=citext);
-CREATE AGGREGATE min(BASETYPE=citext, SFUNC=citext_smaller, STYPE=citext);
+CREATE FUNCTION character_length(citext)
+RETURNS int4 AS 'textlen'
+LANGUAGE 'internal' IMMUTABLE STRICT;
+
+CREATE FUNCTION octet_length(citext)
+RETURNS int4 AS 'textoctetlen'
+LANGUAGE 'internal' IMMUTABLE STRICT;
 
 --
 -- Miscelaneous functions

@@ -1,11 +1,10 @@
 /*
- * PostgreSQL type definitions for CITEXT.
+ * PostgreSQL type definitions for CITEXT 2.0.
  *
  */
 
 #include "postgres.h"
 #include "fmgr.h"
-
 #include "utils/builtins.h"
 
 // PostgreSQL 8.2 Magic.
@@ -62,7 +61,7 @@ char * cilower(text * arg) {
     return wstring_lower( str );
 # else
     // Copy the string and process it.
-    int    inex, len;
+    int    index, len;
     char * result;
 
     index  = 0;
