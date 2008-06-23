@@ -19,9 +19,6 @@ PG_MODULE_MAGIC;
  */
 
 #define PG_ARGS fcinfo // Might need to change if fmgr changes its name
-#define GET_TEXT_STR(textp) DatumGetCString( \
-    DirectFunctionCall1( textout, PointerGetDatum( textp ) ) \
-)
 
 /*
  *      ====================
@@ -54,8 +51,10 @@ extern Datum  citext_larger  (PG_FUNCTION_ARGS);
 #endif
 
 char * cilower(text * arg) {
-    // Do I need to free anything here?
-    char * str  = GET_TEXT_STR( arg );
+    // XXX Do I need to free anything here?
+    char * str  = DatumGetCString(
+        DirectFunctionCall1( textout, PointerGetDatum( arg ) )
+    );
 #ifdef USE_WIDE_UPPER_LOWER
     // Have wstring_lower() do the work.
     return wstring_lower( str );
@@ -72,7 +71,7 @@ char * cilower(text * arg) {
         result[index] = tolower((unsigned char) str[index] );
     }
     return result;
-#endif   /* USE_WIDE_UPPER_LOWER */
+#endif /* USE_WIDE_UPPER_LOWER */
 }
 
 int citextcmp (PG_FUNCTION_ARGS) {
@@ -103,7 +102,7 @@ Datum citext_cmp (PG_FUNCTION_ARGS) {
 PG_FUNCTION_INFO_V1(citext_eq);
 
 Datum citext_eq (PG_FUNCTION_ARGS) {
-    // fast path for different-length inputs
+    // Fast path for different-length inputs. Okay for canonical equivalence?
     if (VARSIZE(PG_GETARG_TEXT_P(0)) != VARSIZE(PG_GETARG_TEXT_P(1)))
         PG_RETURN_BOOL( 0 );
     PG_RETURN_BOOL( citextcmp( PG_ARGS ) == 0 );
@@ -112,7 +111,7 @@ Datum citext_eq (PG_FUNCTION_ARGS) {
 PG_FUNCTION_INFO_V1(citext_ne);
 
 Datum citext_ne (PG_FUNCTION_ARGS) {
-    // fast path for different-length inputs
+    // Fast path for different-length inputs. Okay for canonical equivalence?
     if (VARSIZE(PG_GETARG_TEXT_P(0)) != VARSIZE(PG_GETARG_TEXT_P(1)))
         PG_RETURN_BOOL( 1 );
     PG_RETURN_BOOL( citextcmp( PG_ARGS ) != 0 );
