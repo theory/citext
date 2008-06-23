@@ -931,30 +931,85 @@ SELECT is(
     'quote_literal() should work as for text'
 ) FROM srt;
 
--- Check rtrim.
+-- Check regexp_matches().
 SELECT is(
-    rtrim('trim    '::citext),
-    'trim',
-    'rtrim(citext) should work'
+    regexp_matches('foobarbequebaz'::citext, '(bar)(beque)'),
+    ARRAY[ 'bar', 'beque' ],
+    'regexp_matches() should work'
 );
 
 SELECT is(
-    rtrim('trimxxxx'::citext, 'x'::citext),
-    'trim',
-    'rtrim(citext, citext) should work'
+    regexp_matches('foobarbequebaz'::citext, '(BAR)(BEQUE)'),
+    ARRAY[ 'bar', 'beque' ],
+    'regexp_matches() should work case-insensitively'
 );
 
+-- Check regexp_replace('Thomas', '.[mN]a.', 'M')
 SELECT is(
-    rtrim('trimxxxx'::text, 'x'::citext),
-    'trim',
-    'rtrim(text, citext) should work'
+   regexp_replace('Thomas'::citext, '.[mN]a.', 'M'),
+   'ThM',
+   'regexp_replace() should work'
 );
 
+/* XXX Case-insensitive regpexp_replace() doesn't work. :-(
 SELECT is(
-    rtrim('trimxxxx'::text, 'x'::citext),
-    'trim',
-    'rtrim(citext, text) should work'
+   regexp_replace('Thomas'::citext, '.[MN]A.', 'M'),
+   'ThM',
+   'regexp_replace() should work case-insensitively'
 );
+*/
+
+-- Check regexp_split_to_array().
+SELECT is(
+    regexp_split_to_array('hello world'::citext, E'\\s+'),
+    ARRAY[ 'hello', 'world' ],
+    'regexp_split_to_array() should work'
+);
+
+/* XXX Case-insensitive regpexp_split_to_array() doesn't work. :-(
+SELECT is(
+    regexp_split_to_array('helloTworld'::citext, 't'),
+    ARRAY[ 'hello', 'world' ],
+    'regexp_split_to_array() should work case-insensitively'
+);
+*/
+
+-- Check regexp_split_to_table('hello world', E'\\s+')
+SELECT is(
+    ARRAY( SELECT regexp_split_to_table('hello world'::citext, E'\\s+') ),
+    ARRAY[ 'hello', 'world' ],
+    'regexp_split_to_table() should work'
+);
+
+/* XXX Case-insensitive regpexp_split_to_table() doesn't work. :-(
+SELECT is(
+    ARRAY( SELECT regexp_split_to_table('helloTworld'::citext, 't') ),
+    ARRAY[ 'hello', 'world' ],
+    'regexp_split_to_table() should work case-insensitively'
+);
+*/
+
+-- Check repeat().
+SELECT is(
+    repeat('Pg'::citext, 4),
+    'PgPgPgPg',
+    'repeat(citext, int) should work'
+);
+
+-- Check replace().
+SELECT is(
+    replace('abcdefabcdef'::citext, 'cd', 'XX'),
+    'abXXefabXXef',
+    'replace() should work'
+);
+
+/* XXX Case-insensitive replace() doesn't work. :-(
+SELECT is(
+    replace('abcdefabcdef'::citext, 'CD', 'XX'),
+    'abXXefabXXef',
+    'replace() should work case-insensitvely'
+);
+*/
 
 -- Test rpad.
 SELECT is(
@@ -981,8 +1036,92 @@ SELECT is(
     'rpad(citext, int, text) should work'
 );
 
--- Test repeat()
-SELECT is( 	repeat('Pg'::citext, 4), 'PgPgPgPg', 'repeat(citext, int) should work' );
+-- Check rtrim.
+SELECT is(
+    rtrim('trim    '::citext),
+    'trim',
+    'rtrim(citext) should work'
+);
+
+SELECT is(
+    rtrim('trimxxxx'::citext, 'x'::citext),
+    'trim',
+    'rtrim(citext, citext) should work'
+);
+
+SELECT is(
+    rtrim('trimxxxx'::text, 'x'::citext),
+    'trim',
+    'rtrim(text, citext) should work'
+);
+
+SELECT is(
+    rtrim('trimxxxx'::text, 'x'::citext),
+    'trim',
+    'rtrim(citext, text) should work'
+);
+
+-- Check split_part().
+SELECT is(
+    split_part('abc~@~def~@~ghi'::citext, '~@~', 2),
+    'def',
+    'split_part() should work'
+);
+
+/* XXX Case-insensitive split_part() doesn't work. :-(
+SELECT is(
+    split_part('abcTdefTghi'::citext, 't', 2),
+    'def',
+    'split_part() should work case-insensitively'
+);
+*/
+
+-- Check strpos().
+SELECT is(
+    strpos('high'::citext, 'ig'),
+    2,
+    'strpos(citext, text) should work'
+);
+
+SELECT is(
+    strpos('high'::citext,'ig'::citext),
+    2,
+    'strpos(citext, citext) should work'
+);
+
+/* XXX Case-insensitive strpos() doesn't work. :-(
+SELECT is(
+    strpos('high'::citext, 'IG'::citext),
+    2,
+    'strpos(citext, citext) should work case-insensitively'
+);
+*/
+
+-- to_ascii() does not support UTF-8.
+-- to_hex() takes a numeric argument.
+    
+
+-- check substr().
+SELECT is(
+    substr('alphabet', 3, 2),
+    'ph',
+    'substr() should work'
+);
+
+-- Check translate().
+SELECT is(
+    translate('abcdefabcdef'::citext, 'cd', 'XX'),
+    'abXXefabXXef',
+    'translate() should work'
+);
+
+/* XXX Case-insensitive translate() doesn't work. :-(
+SELECT is(
+    translate('abcdefabcdef'::citext, 'CD', 'XX'),
+    'abXXefabXXef',
+    'translate() should work case-insensitvely'
+);
+*/
 
 -- Clean up.
 SELECT * FROM finish();
