@@ -1,10 +1,11 @@
 \set ECHO none
 \encoding UTF-8
 
---
--- Tests for the CITEXT data type.
---
---
+/*
+ *  ===============================
+ *  Tests for the CITEXT data type.
+ *  ===============================
+ */
 
 -- Format the output for nice TAP.
 \pset format unaligned
@@ -43,9 +44,11 @@ SELECT diag(
  WHERE name = 'lc_collate'
    AND setting <> 'en_US.UTF-8';
 
-CREATE TEMP TABLE try (
-    name citext PRIMARY KEY
-);
+/*
+ *  ==========================================
+ *  Test the operators and indexing functions.
+ *  ==========================================
+ */
 
 -- Test = and <>.
 SELECT is(   'a'::citext,  'a'::citext,  'citext "a" should  eq   citext "a"' );
@@ -133,6 +136,10 @@ SELECT ok(   'a' <= 'B'::citext, 'text "B" should be le citext "B"' );
 SELECT ok(   'à' <  'Á'::citext, 'text "à" should be lt citext "Á"' );
 SELECT ok(   'à' <= 'Á'::citext, 'text "à" should be le citext "Á"' );
 
+-- Test combining characters making up canonically equivalent strings.
+SELECT isnt( 'Ä'::text,   'Ä'::text,   'Combining text characters are not equivalent' );
+SELECT isnt( 'Ä'::citext, 'Ä'::citext, 'Combining citext characters are not equivalent' );
+
 -- Test implicit casting. citext casts to text, but not vice-versa.
 SELECT ok( 'a'::citext =  'a'::text, 'citext "a" should =  text "a"' );
 SELECT ok( 'A'::citext <> 'a'::text, 'citext "A" should <> text "a"' );
@@ -149,7 +156,7 @@ SELECT ok( 'À'::text <> 'à'::citext, 'text "À" should <  citext "à"' );
 SELECT ok( 'a'::text <> 'b'::citext, 'text "a" should <> citext "b"' );
 SELECT ok( 'À'::text <> 'B'::citext, 'text "À" should <> citext "B"' );
 
--- Some longerr comparisons.
+-- Some longer comparisons.
 SELECT is(
     'aardvark'::citext,
     'aardvark'::citext,
@@ -252,8 +259,17 @@ SELECT is(
     'citext_cmp( "Ask Bjorn Hansen", "Ask Bjørn Hansen") should be 1'
 );
 
+/*
+ *  ============================
+ *  Do some tests using a table.
+ *  ============================
+ */
 
 -- Now try writing to a table.
+CREATE TEMP TABLE try (
+    name citext PRIMARY KEY
+);
+
 INSERT INTO try (name)
 VALUES ('a'), ('ab'), ('â'), ('aba'), ('b'), ('ba'), ('bab'), ('AZ');
 
@@ -298,7 +314,6 @@ SELECT throws_ok(
     'We should get an error inserting an uppercase accented letter'
 );
 
-
 -- Make sure that citext_smaller() and citext_lager() work properly.
 SELECT is( citext_smaller( 'aa'::citext, 'ab'::citext ), 'aa', '"aa" should be smaller' );
 SELECT is( citext_smaller( 'Â'::citext, 'ç'::citext ), 'Â', '"Â" should be smaller' );
@@ -311,7 +326,13 @@ SELECT is( citext_larger( 'Â'::citext, 'ç'::citext ), 'ç', '"ç" should be la
 SELECT is( citext_larger( 'AAAA'::citext, 'bbbb'::citext ), 'bbbb', '"bbbb" should be larger' );
 SELECT is( citext_larger( 'aardvark'::citext, 'Aaba'::citext ), 'aardvark', '"aardvark" should be smaller' );
 
--- Create a table with some records with which to do some testing.
+/*
+ *  ===========================================
+ *  Test aggregate functions and sort ordering.
+ *  ===========================================
+ */
+
+-- Create another table with some records with which to do some testing.
 CREATE TEMP TABLE srt (
     name CITEXT
 );
@@ -383,6 +404,12 @@ SELECT is(
     'The LOWER(words) should case-insensitively compare'
 );
 
+/*
+ *  ===================================
+ *  Test implicit and assignment casts.
+ *  ===================================
+ */
+
 -- Check explicit comparison to text.
 SELECT is( LOWER(name), 'aaa', 'LOWER("AAA") should return "aaa"' )
   FROM srt
@@ -410,37 +437,11 @@ SELECT is( UPPER(name), 'Â', 'UPPER("â") should return "Â"' )
   FROM srt
  WHERE name = 'â';
 
--- Check text length.
-SELECT is( textlen( name ), textlen(name::text), 'textlen("' || name || '") should be correct' )
-  FROM srt;
-
-SELECT is( length( name ), length(name::text), 'length("' || name || '") should be correct' )
-  FROM srt;
-
-SELECT is( char_length( name ), char_length(name::text), 'char_length("' || name || '") should be correct' )
-  FROM srt;
-
-SELECT is( character_length( name ), character_length(name::text), 'character_length("' || name || '") should be correct' )
-  FROM srt;
-
-SELECT is( bit_length( name ), bit_length(name::text), 'bit_length("' || name || '") should be correct' )
-  FROM srt;
-
--- Check overlay().
-SELECT is(
-    overlay( name placing 'hom' from 2 for 4),
-    overlay( name::text placing 'hom' from 2 for 4),
-    'overlay() should work'
-) FROM srt;
-
--- Check position().
-SELECT is(
-    position( 'a' IN name ),
-    position( 'a' IN name::text ),
-    'position() should work'
-) FROM srt;
-
-
+/*
+ *  =====================
+ *  9.7. Pattern Matching
+ *  =====================
+ */
 
 -- Check LIKE, ILIKE, NOT LIKE, and NOT ILIKE.
 SELECT is( name, 'ç', 'LIKE should work properly' )
@@ -635,11 +636,157 @@ SELECT is(
     'char NOT LIKE should work properly'
 );
 
+--- Check SIMILAR TO.
+SELECT is( name, 'ç', 'SIMILAR TO should work properly' )
+  FROM srt
+ WHERE name SIMILAR TO '%ç.*';
 
--- Check SIMILAR TO.
---SELECT is( name, 'ç', 'SIMILAR TO should work properly' )
---  FROM srt
--- WHERE name SIMILAR TO '%ç*';
+/*
+ *  =============================================
+ *  Table 9-5. SQL String Functions and Operators
+ *  =============================================
+ */
+
+-- Test concatenation.
+SELECT is(
+    'D'::citext || 'avid'::citext,
+    'David'::citext,
+    'citext || citext should work'
+);
+
+SELECT is(
+    'Value: '::citext || 42,
+    'Value: 42',
+    'citext || int should work'
+);
+
+SELECT is(
+     42 || ': value'::citext,
+    '42: value',
+    'citext || int should work'
+);
+
+-- Check bit length.
+SELECT is( bit_length('jose'::citext), 32, 'bit_length(citext) should work' );
+
+SELECT is( bit_length( name ), bit_length(name::text), 'bit_length("' || name || '") should be correct' )
+  FROM srt;
+
+-- Check text length.
+SELECT is( textlen( name ), textlen(name::text), 'textlen("' || name || '") should be correct' )
+  FROM srt;
+
+SELECT is( length( name ), length(name::text), 'length("' || name || '") should be correct' )
+  FROM srt;
+
+-- Check character length.
+SELECT is( char_length( name ), char_length(name::text), 'char_length("' || name || '") should be correct' )
+  FROM srt;
+
+SELECT is( character_length( name ), character_length(name::text), 'character_length("' || name || '") should be correct' )
+  FROM srt;
+
+-- Check lower.
+SELECT is( LOWER( name )::text, LOWER(name::text), 'LOWER("' || name || '") should be correct' )
+  FROM srt;
+
+-- Check octet length.
+SELECT is( octet_length('jose'::citext), 4, 'octet_length(citext) should work' );
+
+SELECT is( octet_length( name ), octet_length(name::text), 'octet_length("' || name || '") should be correct' )
+  FROM srt;
+
+-- Check overlay().
+SELECT is(
+    overlay( name placing 'hom' from 2 for 4),
+    overlay( name::text placing 'hom' from 2 for 4),
+    'overlay() should work'
+) FROM srt;
+
+-- Check position().
+SELECT is(
+    position( 'a' IN name ),
+    position( 'a' IN name::text ),
+    'position() should work'
+) FROM srt;
+
+-- Test substr() and substring().
+SELECT is(
+    substr('alphabet'::citext, 3),
+    'phabet',
+    'subtr(citext, int) should work'
+);
+
+SELECT is(
+    substr('alphabet'::citext, 3),
+    'phabet',
+    'subtr(citext, int) should work'
+);
+
+SELECT is(
+    substring('alphabet'::citext, 3),
+    'phabet',
+    'subtr(citext, int) should work'
+);
+
+SELECT is(
+    substring('alphabet'::citext, 3, 2),
+    'ph',
+    'subtr(citext, int, int) should work'
+);
+
+SELECT is(
+    substring('Thomas'::citext from 2 for 3),
+    'hom',
+    'subtr(citext from int for int) should work'
+);
+
+SELECT is(
+    substring('Thomas'::citext from 2),
+    'homas',
+    'subtr(citext from int) should work'
+);
+
+SELECT is(
+    substring('Thomas'::citext from '...$'),
+    'mas',
+    'subtr(citext from regex) should work'
+);
+
+SELECT is(
+    substring('Thomas'::citext from '%#"o_a#"_' for '#'),
+    'oma',
+    'subtr(citext from regex for escape) should work'
+);
+
+-- Check trim.
+SELECT is(
+    trim('    trim    '::citext),
+    'trim',
+    'trim(citext) should work'
+);
+
+SELECT is(
+    trim('xxxxxtrimxxxx'::citext, 'x'::citext),
+    'trim',
+    'trim(citext, citext) should work'
+);
+
+SELECT is(
+    trim('xxxxxxtrimxxxx'::text, 'x'::citext),
+    'trim',
+    'trim(text, citext) should work'
+);
+
+SELECT is(
+    trim('xxxxxtrimxxxx'::text, 'x'::citext),
+    'trim',
+    'trim(citext, text) should work'
+);
+
+-- Check upper.
+SELECT is( UPPER( name )::text, UPPER(name::text), 'UPPER("' || name || '") should be correct' )
+  FROM srt;
 
 -- Check btrim.
 SELECT is(
@@ -716,31 +863,6 @@ SELECT is(
     'rtrim(citext, text) should work'
 );
 
--- Check trim.
-SELECT is(
-    trim('    trim    '::citext),
-    'trim',
-    'trim(citext) should work'
-);
-
-SELECT is(
-    trim('xxxxxtrimxxxx'::citext, 'x'::citext),
-    'trim',
-    'trim(citext, citext) should work'
-);
-
-SELECT is(
-    trim('xxxxxxtrimxxxx'::text, 'x'::citext),
-    'trim',
-    'trim(text, citext) should work'
-);
-
-SELECT is(
-    trim('xxxxxtrimxxxx'::text, 'x'::citext),
-    'trim',
-    'trim(citext, text) should work'
-);
-
 -- Test lpad.
 SELECT is(
     lpad('hi'::citext, 5),
@@ -793,77 +915,6 @@ SELECT is(
 
 -- Test repeat()
 SELECT is( 	repeat('Pg'::citext, 4), 'PgPgPgPg', 'repeat(citext, int) should work' );
-
--- Test substr() and substring().
-SELECT is(
-    substr('alphabet'::citext, 3),
-    'phabet',
-    'subtr(citext, int) should work'
-);
-
-SELECT is(
-    substr('alphabet'::citext, 3),
-    'phabet',
-    'subtr(citext, int) should work'
-);
-
-SELECT is(
-    substring('alphabet'::citext, 3),
-    'phabet',
-    'subtr(citext, int) should work'
-);
-
-SELECT is(
-    substring('alphabet'::citext, 3, 2),
-    'ph',
-    'subtr(citext, int, int) should work'
-);
-
-SELECT is(
-    substring('Thomas'::citext from 2 for 3),
-    'hom',
-    'subtr(citext from int for int) should work'
-);
-
-SELECT is(
-    substring('Thomas'::citext from 2),
-    'homas',
-    'subtr(citext from int) should work'
-);
-
-SELECT is(
-    substring('Thomas'::citext from '...$'),
-    'mas',
-    'subtr(citext from regex) should work'
-);
-
-SELECT is(
-    substring('Thomas'::citext from '%#"o_a#"_' for '#'),
-    'oma',
-    'subtr(citext from regex for escape) should work'
-);
-
--- Test concatenation.
-SELECT is(
-    'D'::citext || 'avid'::citext,
-    'David'::citext,
-    'citext || citext should work'
-);
-
-SELECT is(
-    'Value: '::citext || 42,
-    'Value: 42',
-    'citext || int should work'
-);
-
-SELECT is(
-     42 || ': value'::citext,
-    '42: value',
-    'citext || int should work'
-);
-
--- Bit length.
-SELECT is( bit_length('jose'::citext), 32, 'bit_length(citext) should work' );
 
 -- Clean up.
 SELECT * FROM finish();
