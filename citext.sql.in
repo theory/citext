@@ -349,6 +349,10 @@ CREATE FUNCTION texticregexne(citext, citext)
 RETURNS bool AS 'texticregexne'
 LANGUAGE 'internal' IMMUTABLE STRICT;
 
+CREATE FUNCTION quote_literal(citext)
+RETURNS text AS 'quote_literal'
+LANGUAGE 'internal' IMMUTABLE STRICT;
+
 -- regular expression Operators citext : citext
 CREATE OPERATOR ~ (
     PROCEDURE = texticregexeq,

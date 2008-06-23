@@ -676,9 +676,6 @@ SELECT is( bit_length( name ), bit_length(name::text), 'bit_length("' || name ||
 SELECT is( textlen( name ), textlen(name::text), 'textlen("' || name || '") should be correct' )
   FROM srt;
 
-SELECT is( length( name ), length(name::text), 'length("' || name || '") should be correct' )
-  FROM srt;
-
 -- Check character length.
 SELECT is( char_length( name ), char_length(name::text), 'char_length("' || name || '") should be correct' )
   FROM srt;
@@ -788,6 +785,19 @@ SELECT is(
 SELECT is( UPPER( name )::text, UPPER(name::text), 'UPPER("' || name || '") should be correct' )
   FROM srt;
 
+/*
+ *  =================================
+ *  Table 9-6. Other String Functions
+ *  =================================
+ */
+
+-- Check ascii().
+SELECT is(
+    ascii(name),
+    ascii( name::text ),
+    'ascii(' || name || ') should work properly'
+) FROM srt;
+
 -- Check btrim.
 SELECT is(
     btrim('    trim'::citext),
@@ -811,6 +821,66 @@ SELECT is(
     btrim('xyxtrimyyx'::citext, 'xy'::text),
     'trim',
     'btrim(citext, text) should work'
+);
+
+-- chr() takes an int and returns text.
+-- convert() and convert_from take bytea and return text.
+
+-- Check conert_to().
+SELECT is(
+    convert_to( name, 'ISO-8859-1' ),
+    convert_to( name::text, 'ISO-8859-1' ),
+    'convert_to() should work the same as for text'
+) FROM srt;
+
+-- Check decode()
+SELECT is(
+    decode('MTIzAAE='::citext, 'base64'),
+    decode('MTIzAAE='::text, 'base64'),
+    'decode() should work the same as for text'
+);
+
+-- encode() takes bytea and returns text.
+
+-- Check initcap().
+SELECT is(
+    initcap('hi THOMAS'::citext),
+    initcap('hi THOMAS'::text),
+    'initcap() whould work as for text'
+);
+SELECT is(
+    initcap(name),
+    initcap(name::text),
+    'initcap() whould work as for text on all rows'
+) FROM srt;
+
+-- Check length.
+SELECT is( length( name ), length(name::text), 'length("' || name || '") should be correct' )
+  FROM srt;
+
+-- Test lpad.
+SELECT is(
+    lpad('hi'::citext, 5),
+    '   hi',
+    'lpad(citext, int) should work'
+);
+
+SELECT is(
+    lpad('hi'::citext, 5, 'xy'::citext),
+    'xyxhi',
+    'lpad(citext, int, citext) should work'
+);
+
+SELECT is(
+    lpad('hi'::text, 5, 'xy'::citext),
+    'xyxhi',
+    'lpad(text, int, citext) should work'
+);
+
+SELECT is(
+    lpad('hi'::citext, 5, 'xy'::text),
+    'xyxhi',
+    'lpad(citext, int, text) should work'
 );
 
 -- Check ltrim.
@@ -838,6 +908,29 @@ SELECT is(
     'ltrim(citext, text) should work'
 );
 
+-- Check md5().
+SELECT is(
+    md5(name),
+    md5(name::text),
+    'md5() should work as for text'
+) FROM srt;
+
+-- pg_client_encoding() takes no args and returns a name.
+
+-- Check quote_ident().
+SELECT is(
+    quote_ident(name),
+    quote_ident(name::text),
+    'quote_ident() should work as for text'
+) FROM srt;
+
+-- Check quote_literal().
+SELECT is(
+    quote_literal(name),
+    quote_literal(name::text),
+    'quote_literal() should work as for text'
+) FROM srt;
+
 -- Check rtrim.
 SELECT is(
     rtrim('trim    '::citext),
@@ -861,31 +954,6 @@ SELECT is(
     rtrim('trimxxxx'::text, 'x'::citext),
     'trim',
     'rtrim(citext, text) should work'
-);
-
--- Test lpad.
-SELECT is(
-    lpad('hi'::citext, 5),
-    '   hi',
-    'lpad(citext, int) should work'
-);
-
-SELECT is(
-    lpad('hi'::citext, 5, 'xy'::citext),
-    'xyxhi',
-    'lpad(citext, int, citext) should work'
-);
-
-SELECT is(
-    lpad('hi'::text, 5, 'xy'::citext),
-    'xyxhi',
-    'lpad(text, int, citext) should work'
-);
-
-SELECT is(
-    lpad('hi'::citext, 5, 'xy'::text),
-    'xyxhi',
-    'lpad(citext, int, text) should work'
 );
 
 -- Test rpad.
