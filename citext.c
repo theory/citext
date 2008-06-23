@@ -103,12 +103,18 @@ Datum citext_cmp (PG_FUNCTION_ARGS) {
 PG_FUNCTION_INFO_V1(citext_eq);
 
 Datum citext_eq (PG_FUNCTION_ARGS) {
+    // fast path for different-length inputs
+    if (VARSIZE(PG_GETARG_TEXT_P(0)) != VARSIZE(PG_GETARG_TEXT_P(1))) \
+        PG_RETURN_BOOL( 0 );
     PG_RETURN_BOOL( citextcmp( PG_ARGS ) == 0 );
 }
 
 PG_FUNCTION_INFO_V1(citext_ne);
 
 Datum citext_ne (PG_FUNCTION_ARGS) {
+    // fast path for different-length inputs
+    if (VARSIZE(PG_GETARG_TEXT_P(0)) != VARSIZE(PG_GETARG_TEXT_P(1))) \
+        PG_RETURN_BOOL( 1 );
     PG_RETURN_BOOL( citextcmp( PG_ARGS ) != 0 );
 }
 
