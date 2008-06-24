@@ -31,8 +31,8 @@ SET client_min_messages = warning;
 \set ON_ERROR_STOP true
 
 -- Plan the tests.
---SELECT plan(86);
-SELECT * FROM no_plan();
+SELECT plan(339);
+--SELECT * FROM no_plan();
 
 -- Output a diagnostic message if the collation is not en_US.UTF-8.
 SELECT diag(
@@ -951,13 +951,12 @@ SELECT is(
    'regexp_replace() should work'
 );
 
-/* XXX Case-insensitive regpexp_replace() doesn't work. :-(
+SELECT * FROM todo( 'XXX Case-insensitive support missing', 1);
 SELECT is(
    regexp_replace('Thomas'::citext, '.[MN]A.', 'M'),
    'ThM',
    'regexp_replace() should work case-insensitively'
 );
-*/
 
 -- Check regexp_split_to_array().
 SELECT is(
@@ -966,13 +965,12 @@ SELECT is(
     'regexp_split_to_array() should work'
 );
 
-/* XXX Case-insensitive regpexp_split_to_array() doesn't work. :-(
+SELECT * FROM todo( 'XXX Case-insensitive support missing', 1);
 SELECT is(
     regexp_split_to_array('helloTworld'::citext, 't'),
     ARRAY[ 'hello', 'world' ],
     'regexp_split_to_array() should work case-insensitively'
 );
-*/
 
 -- Check regexp_split_to_table('hello world', E'\\s+')
 SELECT is(
@@ -981,13 +979,12 @@ SELECT is(
     'regexp_split_to_table() should work'
 );
 
-/* XXX Case-insensitive regpexp_split_to_table() doesn't work. :-(
+SELECT * FROM todo( 'XXX Case-insensitive support missing', 1);
 SELECT is(
     ARRAY( SELECT regexp_split_to_table('helloTworld'::citext, 't') ),
     ARRAY[ 'hello', 'world' ],
     'regexp_split_to_table() should work case-insensitively'
 );
-*/
 
 -- Check repeat().
 SELECT is(
@@ -1003,13 +1000,12 @@ SELECT is(
     'replace() should work'
 );
 
-/* XXX Case-insensitive replace() doesn't work. :-(
+SELECT * FROM todo( 'XXX Case-insensitive support missing', 1);
 SELECT is(
     replace('abcdefabcdef'::citext, 'CD', 'XX'),
     'abXXefabXXef',
     'replace() should work case-insensitvely'
 );
-*/
 
 -- Test rpad.
 SELECT is(
@@ -1068,13 +1064,12 @@ SELECT is(
     'split_part() should work'
 );
 
-/* XXX Case-insensitive split_part() doesn't work. :-(
+SELECT * FROM todo( 'XXX Case-insensitive support missing', 1);
 SELECT is(
     split_part('abcTdefTghi'::citext, 't', 2),
     'def',
     'split_part() should work case-insensitively'
 );
-*/
 
 -- Check strpos().
 SELECT is(
@@ -1089,13 +1084,12 @@ SELECT is(
     'strpos(citext, citext) should work'
 );
 
-/* XXX Case-insensitive strpos() doesn't work. :-(
+SELECT * FROM todo( 'XXX Case-insensitive support missing', 1);
 SELECT is(
     strpos('high'::citext, 'IG'::citext),
     2,
     'strpos(citext, citext) should work case-insensitively'
 );
-*/
 
 -- to_ascii() does not support UTF-8.
 -- to_hex() takes a numeric argument.
@@ -1115,13 +1109,12 @@ SELECT is(
     'translate() should work'
 );
 
-/* XXX Case-insensitive translate() doesn't work. :-(
+SELECT * FROM todo( 'XXX Case-insensitive support missing', 1);
 SELECT is(
     translate('abcdefabcdef'::citext, 'CD', 'XX'),
     'abXXefabXXef',
     'translate() should work case-insensitvely'
 );
-*/
 
 -- Clean up.
 SELECT * FROM finish();
