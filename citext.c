@@ -51,7 +51,7 @@ extern Datum  citext_larger  (PG_FUNCTION_ARGS);
 #endif
 
 char * cilower(text * arg) {
-    // XXX Do I need to free anything here?
+    // XXX I *think* this gives me a nul-terminated string.
     char * str  = DatumGetCString(
         DirectFunctionCall1( textout, PointerGetDatum( arg ) )
     );
@@ -70,19 +70,21 @@ char * cilower(text * arg) {
     for (index = 0; index <= len; index++) {
         result[index] = tolower((unsigned char) str[index] );
     }
+    // XXX I don't need to pfree result if I'm returning it, right?
     return result;
 #endif /* USE_WIDE_UPPER_LOWER */
 }
 
 int citextcmp (PG_FUNCTION_ARGS) {
-    // Could we do away with the varlena struct here?
+    // XXX These are all just references to existing structures, right?
     text * left  = PG_GETARG_TEXT_P(0);
     text * right = PG_GETARG_TEXT_P(1);
-    char * lstr  = cilower( left );
-    char * rstr  = cilower( right );
-    int    llen  = VARSIZE_ANY_EXHDR(left);
-    int    rlen  = VARSIZE_ANY_EXHDR(right);
-    return varstr_cmp(lstr, llen, rstr, rlen);
+    return varstr_cmp(
+        cilower( left ),
+        VARSIZE_ANY_EXHDR(left),
+        cilower( right ),
+        VARSIZE_ANY_EXHDR(right)
+    );
 }
 
 /*
