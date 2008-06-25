@@ -1,5 +1,5 @@
 \set ECHO none
-1..339
+1..371
 ok 1 - citext "a" should  eq   citext "a"
 ok 2 - citext "a" should  eq   citext "A"
 ok 3 - citext "a" should  ne   citext "b"
@@ -360,3 +360,35 @@ not ok 339 - translate() should work case-insensitvely # TODO XXX Case-insensiti
 # Failed (TODO) test 339: "translate() should work case-insensitvely"
 #          got: abcdefabcdef
 #     expected: abXXefabXXef
+ok 340 - todate(citext, citext) should work
+ok 341 - todate(citext, text) should work
+ok 342 - todate(text, citext) should work
+ok 343 - to_number(citext, citext) should work
+ok 344 - to_number(citext, text) should work
+ok 345 - to_number(text, citext) should work
+ok 346 - to_timestamp(citext, citext) should work
+ok 347 - to_timestamp(citext, text) should work
+ok 348 - to_timestamp(text, citext) should work
+ok 349 - Should have 7 rows before to_char() inserts
+ok 350 - Should now have 19 rows
+ok 351 - like_escape("aardvark", text) should work
+ok 352 - like_escape("AAA", text) should work
+ok 353 - like_escape("aba", text) should work
+ok 354 - like_escape("ABC", text) should work
+ok 355 - like_escape("abc", text) should work
+ok 356 - like_escape("ç", text) should work
+ok 357 - like_escape("â", text) should work
+ok 358 - like_escape("aardvark", citext) should work
+ok 359 - like_escape("AAA", citext) should work
+ok 360 - like_escape("aba", citext) should work
+ok 361 - like_escape("ABC", citext) should work
+ok 362 - like_escape("abc", citext) should work
+ok 363 - like_escape("ç", citext) should work
+ok 364 - like_escape("â", citext) should work
+ok 365 - like_escape("aardvark"::text, citext) should work
+ok 366 - like_escape("AAA"::text, citext) should work
+ok 367 - like_escape("aba"::text, citext) should work
+ok 368 - like_escape("ABC"::text, citext) should work
+ok 369 - like_escape("abc"::text, citext) should work
+ok 370 - like_escape("ç"::text, citext) should work
+ok 371 - like_escape("â"::text, citext) should work
