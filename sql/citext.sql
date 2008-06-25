@@ -31,7 +31,7 @@ SET client_min_messages = warning;
 \set ON_ERROR_STOP true
 
 -- Plan the tests.
-SELECT plan(339);
+SELECT plan(371);
 --SELECT * FROM no_plan();
 
 -- Output a diagnostic message if the collation is not en_US.UTF-8.
@@ -1115,6 +1115,126 @@ SELECT is(
     'abXXefabXXef',
     'translate() should work case-insensitvely'
 );
+
+/*
+ *  ================================
+ *  Table 9-20. Formatting Functions
+ *  ================================
+ */
+
+-- Check to_date().
+SELECT is(
+    to_date('05 Dec 2000'::citext, 'DD Mon YYYY'::citext),
+    to_date('05 Dec 2000', 'DD Mon YYYY'),
+    'todate(citext, citext) should work'
+);
+
+SELECT is(
+    to_date('05 Dec 2000'::citext, 'DD Mon YYYY'),
+    to_date('05 Dec 2000', 'DD Mon YYYY'),
+    'todate(citext, text) should work'
+);
+
+SELECT is(
+    to_date('05 Dec 2000', 'DD Mon YYYY'::citext),
+    to_date('05 Dec 2000', 'DD Mon YYYY'),
+    'todate(text, citext) should work'
+);
+
+-- Check to_number().
+SELECT is(
+    to_number('12,454.8-'::citext, '99G999D9S'::citext),
+    to_number('12,454.8-', '99G999D9S'),
+    'to_number(citext, citext) should work'
+);
+
+SELECT is(
+    to_number('12,454.8-'::citext, '99G999D9S'),
+    to_number('12,454.8-', '99G999D9S'),
+    'to_number(citext, text) should work'
+);
+
+SELECT is(
+    to_number('12,454.8-', '99G999D9S'::citext),
+    to_number('12,454.8-', '99G999D9S'),
+    'to_number(text, citext) should work'
+);
+
+-- Check to_timestamp().
+SELECT is(
+    to_timestamp('05 Dec 2000'::citext, 'DD Mon YYYY'::citext),
+    to_timestamp('05 Dec 2000', 'DD Mon YYYY'),
+    'to_timestamp(citext, citext) should work'
+);
+
+SELECT is(
+    to_timestamp('05 Dec 2000'::citext, 'DD Mon YYYY'),
+    to_timestamp('05 Dec 2000', 'DD Mon YYYY'),
+    'to_timestamp(citext, text) should work'
+);
+
+SELECT is(
+    to_timestamp('05 Dec 2000', 'DD Mon YYYY'::citext),
+    to_timestamp('05 Dec 2000', 'DD Mon YYYY'),
+    'to_timestamp(text, citext) should work'
+);
+
+-- Try assigning function results to a column.
+SELECT is( COUNT(*), 8::bigint, 'Should have 7 rows before to_char() inserts' )
+  FROM try;
+
+INSERT INTO try
+VALUES ( to_char(  now()::timestamp,          'HH12:MI:SS') ),
+       ( to_char(  now() + '1 sec'::interval, 'HH12:MI:SS') ), -- timetamptz
+       ( to_char(  '15h 2m 12s'::interval,    'HH24:MI:SS') ),
+       ( to_char(  current_date,              '999') ),
+       ( to_char(  125::int,                  '999') ),
+       ( to_char(  127::int4,                 '999') ),
+       ( to_char(  126::int8,                 '999') ),
+       ( to_char(  128.8::real,               '999D9') ),
+       ( to_char(  125.7::float4,             '999D9') ),
+       ( to_char(  125.9::float8,             '999D9') ),
+       ( to_char( -125.8::numeric,            '999D99S') );
+
+SELECT is( COUNT(*), 19::bigint, 'Should now have 19 rows' )
+  FROM try;
+
+
+-- Check like_escape().
+SELECT is(
+    like_escape( name, '' ),
+    like_escape( name::text, '' ),
+    'like_escape("' || name || '", text) should work'
+) FROM srt;
+
+SELECT is(
+    like_escape( name, ''::citext ),
+    like_escape( name::text, '' ),
+    'like_escape("' || name || '", citext) should work'
+) FROM srt;
+
+SELECT is(
+    like_escape( name::text, ''::citext ),
+    like_escape( name::text, '' ),
+    'like_escape("' || name || '"::text, citext) should work'
+) FROM srt;
+
+/*
+-- Check cidr().
+SELECT is(
+    cidr( '192.168.1.2'::citext ), 
+    cidr( '192.168.1.2'::text ), 
+    'cidr(citext) should work'
+);
+
+-- Check cast functions.
+SELECT is(
+    '192.168.1.2'::cidr::citext,
+    '192.168.1.2'::cidr::text,
+    'Cast from cidr should work'
+);
+*/
+
 
 -- Clean up.
 SELECT * FROM finish();
