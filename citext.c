@@ -13,14 +13,6 @@ PG_MODULE_MAGIC;
 #endif
 
 /*
- *      ==================
- *      MACRO DECLARATIONS
- *      ==================
- */
-
-#define PG_ARGS fcinfo // Might need to change if fmgr changes its name
-
-/*
  *      ====================
  *      FORWARD DECLARATIONS
  *      ====================
@@ -28,7 +20,7 @@ PG_MODULE_MAGIC;
 
 extern char * wstring_lower  (char *str); // In oracle_compat.c
 static char * cilower        (text * arg);
-int           citextcmp      (PG_FUNCTION_ARGS);
+static int    citextcmp      (text * left, text * right);
 extern Datum  citext_cmp     (PG_FUNCTION_ARGS);
 extern Datum  citext_eq      (PG_FUNCTION_ARGS);
 extern Datum  citext_ne      (PG_FUNCTION_ARGS);
@@ -50,11 +42,16 @@ extern Datum  citext_larger  (PG_FUNCTION_ARGS);
 #define USE_WIDE_UPPER_LOWER
 #endif
 
-char * cilower(text * arg) {
-    // XXX I *think* this gives me a nul-terminated string.
-    char * str  = DatumGetCString(
+char *
+cilower(text * arg)
+{
+    char * str;
+
+    // Get a the nul-terminated string from the text struct.
+    str  = DatumGetCString(
         DirectFunctionCall1( textout, PointerGetDatum( arg ) )
     );
+
 #ifdef USE_WIDE_UPPER_LOWER
     // Have wstring_lower() do the work.
     return wstring_lower( str );
@@ -70,19 +67,26 @@ char * cilower(text * arg) {
     for (index = 0; index <= len; index++) {
         result[index] = tolower((unsigned char) str[index] );
     }
-    // XXX I don't need to pfree result if I'm returning it, right?
     return result;
 #endif /* USE_WIDE_UPPER_LOWER */
 }
 
-int citextcmp (PG_FUNCTION_ARGS) {
-    // XXX These are all just references to existing structures, right?
-    text * left  = PG_GETARG_TEXT_P(0);
-    text * right = PG_GETARG_TEXT_P(1);
-    char * lcstr = cilower( left  );
-    char * rcstr = cilower( right );
 
-    int result = varstr_cmp(
+/* citextcmp()
+ * Internal comparison function for citext strings.
+ * Returns -1, 0 or 1
+ */
+
+static int
+citextcmp (text * left, text * right)
+{
+    char * lcstr, * rcstr;
+    int    result;
+
+    lcstr = cilower( left  );
+    rcstr = cilower( right );
+
+    result = varstr_cmp(
         cilower( left ),
         VARSIZE_ANY_EXHDR(left),
         cilower( right ),
@@ -96,82 +100,170 @@ int citextcmp (PG_FUNCTION_ARGS) {
 
 /*
  *      ==================
- *      OPERATOR FUNCTIONS
+ *      INDEXING FUNCTIONS
  *      ==================
  */
 
-// XXX I's usually nice if btree comparison functions free memory because
-// that way index rebuilds on large tables don't run you out of memory.
-
 PG_FUNCTION_INFO_V1(citext_cmp);
 
-Datum citext_cmp (PG_FUNCTION_ARGS) {
-    PG_RETURN_INT32( citextcmp( PG_ARGS ) );
+Datum
+citext_cmp(PG_FUNCTION_ARGS)
+{
+    text * left  = PG_GETARG_TEXT_PP(0);
+    text * right = PG_GETARG_TEXT_PP(1);
+    int32  result;
+
+    result = citextcmp(left, right);
+
+    PG_FREE_IF_COPY(left, 0);
+    PG_FREE_IF_COPY(right, 1);
+
+    PG_RETURN_INT32( result );
 }
-PG_FUNCTION_INFO_V1(citext_eq);
-
-Datum citext_eq (PG_FUNCTION_ARGS) {
-    // Fast path for different-length inputs. Okay for canonical equivalence?
-    if (VARSIZE(PG_GETARG_TEXT_P(0)) != VARSIZE(PG_GETARG_TEXT_P(1)))
-        PG_RETURN_BOOL( 0 );
-    PG_RETURN_BOOL( citextcmp( PG_ARGS ) == 0 );
-}
-
-PG_FUNCTION_INFO_V1(citext_ne);
-
-Datum citext_ne (PG_FUNCTION_ARGS) {
-    // Fast path for different-length inputs. Okay for canonical equivalence?
-    if (VARSIZE(PG_GETARG_TEXT_P(0)) != VARSIZE(PG_GETARG_TEXT_P(1)))
-        PG_RETURN_BOOL( 1 );
-    PG_RETURN_BOOL( citextcmp( PG_ARGS ) != 0 );
-}
-
-PG_FUNCTION_INFO_V1(citext_lt);
-
-Datum citext_lt (PG_FUNCTION_ARGS) {
-    PG_RETURN_BOOL( citextcmp( PG_ARGS ) < 0 );
-}
-
-PG_FUNCTION_INFO_V1(citext_le);
-
-Datum citext_le (PG_FUNCTION_ARGS) {
-    PG_RETURN_BOOL( citextcmp( PG_ARGS ) <= 0 );
-}
-
-PG_FUNCTION_INFO_V1(citext_gt);
-
-Datum citext_gt (PG_FUNCTION_ARGS) {
-    PG_RETURN_BOOL( citextcmp( PG_ARGS ) > 0 );
-}
-
-PG_FUNCTION_INFO_V1(citext_ge);
-
-Datum citext_ge (PG_FUNCTION_ARGS) {
-    PG_RETURN_BOOL( citextcmp( PG_ARGS ) >= 0 );
-}
-
-/*
- *      ===============
- *      OTHER FUNCTIONS
- *      ===============
- */
 
 PG_FUNCTION_INFO_V1(citext_smaller);
 
-Datum citext_smaller (PG_FUNCTION_ARGS) {
-    PG_RETURN_TEXT_P(
-        citextcmp( PG_ARGS ) < 0
-          ? PG_GETARG_TEXT_P(0)
-          : PG_GETARG_TEXT_P(1)
-    );
+Datum
+citext_smaller(PG_FUNCTION_ARGS)
+{
+    text * left  = PG_GETARG_TEXT_PP(0);
+    text * right = PG_GETARG_TEXT_PP(1);
+    text * result;
+
+    result = citextcmp(left, right) < 0 ? left : right;
+    PG_RETURN_TEXT_P(result);
 }
 
 PG_FUNCTION_INFO_V1(citext_larger);
 
-Datum citext_larger (PG_FUNCTION_ARGS) {
-    PG_RETURN_TEXT_P(
-        citextcmp( PG_ARGS ) > 0
-          ? PG_GETARG_TEXT_P(0)
-          : PG_GETARG_TEXT_P(1)
-    );
+Datum
+citext_larger(PG_FUNCTION_ARGS)
+{
+    text * left  = PG_GETARG_TEXT_PP(0);
+    text * right = PG_GETARG_TEXT_PP(1);
+    text * result;
+
+    result = citextcmp(left, right) > 0 ? left : right;
+    PG_RETURN_TEXT_P(result);
+}
+/*
+ *      ==================
+ *      OPERATOR FUNCTIONS
+ *      ==================
+ */
+
+PG_FUNCTION_INFO_V1(citext_eq);
+
+Datum
+citext_eq(PG_FUNCTION_ARGS)
+{
+    text * left  = PG_GETARG_TEXT_PP(0);
+    text * right = PG_GETARG_TEXT_PP(1);
+    bool   result;
+    
+    /*
+     * Since we only care about equality or not-equality, we can avoid all the
+     * expense of strcoll() here, and just do bitwise comparison.
+     */
+    if (VARSIZE_ANY_EXHDR(left) != VARSIZE_ANY_EXHDR(right))
+        result = false;
+    else
+        result = citextcmp( left, right ) == 0;
+
+    PG_FREE_IF_COPY(left, 0);
+    PG_FREE_IF_COPY(right, 1);
+
+    PG_RETURN_BOOL(result);
+}
+
+PG_FUNCTION_INFO_V1(citext_ne);
+
+Datum
+citext_ne(PG_FUNCTION_ARGS)
+{
+    text * left  = PG_GETARG_TEXT_PP(0);
+    text * right = PG_GETARG_TEXT_PP(1);
+    bool   result;
+    
+    /*
+     * Since we only care about equality or not-equality, we can avoid all the
+     * expense of strcoll() here, and just do bitwise comparison.
+     */
+    if (VARSIZE_ANY_EXHDR(left) != VARSIZE_ANY_EXHDR(right))
+        result = true;
+    else
+        result = citextcmp( left, right ) != 0;
+
+    PG_FREE_IF_COPY(left, 0);
+    PG_FREE_IF_COPY(right, 1);
+
+    PG_RETURN_BOOL(result);
+}
+
+PG_FUNCTION_INFO_V1(citext_lt);
+
+Datum
+citext_lt(PG_FUNCTION_ARGS)
+{
+    text * left  = PG_GETARG_TEXT_PP(0);
+    text * right = PG_GETARG_TEXT_PP(1);
+    bool   result;
+    
+    result = citextcmp( left, right ) < 0;
+
+    PG_FREE_IF_COPY(left, 0);
+    PG_FREE_IF_COPY(right, 1);
+
+    PG_RETURN_BOOL(result);
+}
+
+PG_FUNCTION_INFO_V1(citext_le);
+
+Datum
+citext_le(PG_FUNCTION_ARGS)
+{
+    text * left  = PG_GETARG_TEXT_PP(0);
+    text * right = PG_GETARG_TEXT_PP(1);
+    bool   result;
+    
+    result = citextcmp( left, right ) <= 0;
+
+    PG_FREE_IF_COPY(left, 0);
+    PG_FREE_IF_COPY(right, 1);
+
+    PG_RETURN_BOOL(result);
+}
+
+PG_FUNCTION_INFO_V1(citext_gt);
+
+Datum
+citext_gt(PG_FUNCTION_ARGS)
+{
+    text * left  = PG_GETARG_TEXT_PP(0);
+    text * right = PG_GETARG_TEXT_PP(1);
+    bool   result;
+    
+    result = citextcmp( left, right ) > 0;
+
+    PG_FREE_IF_COPY(left, 0);
+    PG_FREE_IF_COPY(right, 1);
+
+    PG_RETURN_BOOL(result);
+}
+
+PG_FUNCTION_INFO_V1(citext_ge);
+
+Datum
+citext_ge(PG_FUNCTION_ARGS)
+{
+    text * left  = PG_GETARG_TEXT_PP(0);
+    text * right = PG_GETARG_TEXT_PP(1);
+    bool   result;
+    
+    result = citextcmp( left, right ) >= 0;
+
+    PG_FREE_IF_COPY(left, 0);
+    PG_FREE_IF_COPY(right, 1);
+
+    PG_RETURN_BOOL(result);
 }
