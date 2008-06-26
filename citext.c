@@ -79,12 +79,19 @@ int citextcmp (PG_FUNCTION_ARGS) {
     // XXX These are all just references to existing structures, right?
     text * left  = PG_GETARG_TEXT_P(0);
     text * right = PG_GETARG_TEXT_P(1);
-    return varstr_cmp(
+    char * lcstr = cilower( left  );
+    char * rcstr = cilower( right );
+
+    int result = varstr_cmp(
         cilower( left ),
         VARSIZE_ANY_EXHDR(left),
         cilower( right ),
         VARSIZE_ANY_EXHDR(right)
     );
+
+    pfree( lcstr );
+    pfree( rcstr );
+    return result;
 }
 
 /*
