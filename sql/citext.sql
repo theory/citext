@@ -142,7 +142,7 @@ SELECT isnt( 'Ä'::citext, 'Ä'::citext, 'Combining citext characters are not e
 
 -- Test the Turkish dotted I. The lowercase is a single byte while the
 -- uppercase is multibyte. This is why the comparison code can't be optimized
--- to compare string lenghts.
+-- to compare string lengths.
 SELECT ok( 'i'::citext = 'İ'::citext, 'Turkish dotted "i" should be the same' );
 
 -- Test implicit casting. citext casts to text, but not vice-versa.
