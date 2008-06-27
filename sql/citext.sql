@@ -641,7 +641,7 @@ SELECT is(
     'char NOT LIKE should work properly'
 );
 
---- Check SIMILAR TO.
+-- Check SIMILAR TO.
 SELECT is( name, 'ç', 'SIMILAR TO should work properly' )
   FROM srt
  WHERE name SIMILAR TO '%ç.*';
