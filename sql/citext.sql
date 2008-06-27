@@ -31,7 +31,7 @@ SET client_min_messages = warning;
 \set ON_ERROR_STOP true
 
 -- Plan the tests.
-SELECT plan(371);
+SELECT plan(372);
 --SELECT * FROM no_plan();
 
 -- Output a diagnostic message if the collation is not en_US.UTF-8.
@@ -139,6 +139,11 @@ SELECT ok(   'à' <= 'Á'::citext, 'text "à" should be le citext "Á"' );
 -- Test combining characters making up canonically equivalent strings.
 SELECT isnt( 'Ä'::text,   'Ä'::text,   'Combining text characters are not equivalent' );
 SELECT isnt( 'Ä'::citext, 'Ä'::citext, 'Combining citext characters are not equivalent' );
+
+-- Test the Turkish dotted I. The lowercase is a single byte while the
+-- uppercase is multibyte. This is why the comparison code can't be optimized
+-- to compare string lenghts.
+SELECT ok( 'i'::citext = 'İ'::citext, 'Turkish dotted "i" should be the same' );
 
 -- Test implicit casting. citext casts to text, but not vice-versa.
 SELECT ok( 'a'::citext =  'a'::text, 'citext "a" should =  text "a"' );

@@ -162,13 +162,12 @@ citext_eq(PG_FUNCTION_ARGS)
     bool   result;
     
     /*
-     * Since we only care about equality or not-equality, we can avoid all the
-     * expense of strcoll() here, and just do bitwise comparison.
+     * We can't do the length-comparison optimization here, as is done for the
+     * text type in varlena.c, because sometimes the lengths can be different.
+     * The canonical example is the turkish dotted i: the lowercase version is
+     * the standard ASCII i, but the uppercase version is multibyte.
      */
-    if (VARSIZE_ANY_EXHDR(left) != VARSIZE_ANY_EXHDR(right))
-        result = false;
-    else
-        result = citextcmp( left, right ) == 0;
+    result = citextcmp( left, right ) == 0;
 
     PG_FREE_IF_COPY(left, 0);
     PG_FREE_IF_COPY(right, 1);
@@ -186,13 +185,12 @@ citext_ne(PG_FUNCTION_ARGS)
     bool   result;
     
     /*
-     * Since we only care about equality or not-equality, we can avoid all the
-     * expense of strcoll() here, and just do bitwise comparison.
+     * We can't do the length-comparison optimization here, as is done for the
+     * text type in varlena.c, because sometimes the lengths can be different.
+     * The canonical example is the turkish dotted i: the lowercase version is
+     * the standard ASCII i, but the uppercase version is multibyte.
      */
-    if (VARSIZE_ANY_EXHDR(left) != VARSIZE_ANY_EXHDR(right))
-        result = true;
-    else
-        result = citextcmp( left, right ) != 0;
+    result = citextcmp( left, right ) != 0;
 
     PG_FREE_IF_COPY(left, 0);
     PG_FREE_IF_COPY(right, 1);
