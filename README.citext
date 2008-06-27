@@ -1,15 +1,35 @@
 CITEXT Data Type 2.00
 =====================
 
-This distribution creates a custom PostgreSQL data type, CITEXT, a locale-aware
-case-insensitve TEXT type. Essentially, it internally calls LOWER() when
-comparing values. Otherwise, it behaves exactl like TEXT. The idea here is to
-replace all the calls to LOWER() in client code that wants to perform
-case-insensitive queries, while also allowing a primary key to be
-case-insensitive. CITEXT is multibyte aware, just like TEXT, which means that
-the comparison of uppercase and lowercase characters is dependent on the rules
-in the LC_COLLATE locale setting. Again, this behavior is identical to the use
-of LOWER() in queries.
+This distribution creates a custom PostgreSQL data type, CITEXT, a locale-
+aware, case-insensitve TEXT type. Essentially, it internally calls `LOWER()`
+when comparing values. Otherwise, it behaves exactly like TEXT.
+
+The standard approach to doing case-insensitive matches in PostgreSQL has been
+to use the LOWER() function in your queries, something like this:
+
+    SELECT *
+    FROM tab
+    WHERE lower(col) = LOWER(?);
+
+This works reasonabley well, but has a number of drawbacks:
+
+* It makes your SQL statements verbose, and you always have to remember to use
+  `LOWER()` on both the column and on the query value (so that both use the
+  same collations).
+* It won't use an index, unless you create a functional index using `LOWER()`.
+* You can't have a case-insensitive primary key without creating two UNIQUE
+  indexes, one for the primary key (implicitly created) and a functional index
+  using `LOWER()`.
+
+The CITEXT data type allows you to replace all the calls to `LOWER()` in
+client code that wants to perform case-insensitive queries, while also
+allowing a primary key to be case-insensitive. CITEXT is multibyte aware, just
+like TEXT, which means that the comparison of uppercase and lowercase
+characters is dependent on the rules in the LC_COLLATE locale setting. Again,
+this behavior is identical to the use of `LOWER()` in queries. But because
+it's done in C and is transparent, you don't have to remember to do anything
+special in your queries.
 
 Installation
 ------------
@@ -61,8 +81,8 @@ Once you've installed the CITEXT data type, you can start using it in your
 database.
 
   CREATE TABLE users (
-      login    CITEXT,
-      password TEXT
+      nick CITEXT,
+      pass TEXT
   );
 
   INSERT INTO users VALUES ( 'larry',  md5(random()::text) );
@@ -72,11 +92,10 @@ database.
   INSERT INTO users VALUES ( 'Bjørn',  md5(random()::text) );
   INSERT INTO users VALUES ( '☺唐鳳☻', md5(random()::text) );
 
-For more example usage, consult 'test.sql'.
-
 If you ever need to install the data type into another database, you'll find
 'citext.sql' in the 'share/contrib' subdirectory of your PostgreSQL server
-directory. This 'README.citext' file will be in the 'doc/contrib' subdirectory.
+directory. This 'README.citext' file will be in the 'doc/contrib'
+subdirectory.
 
 Suported Platforms
 ------------------
@@ -95,10 +114,12 @@ Author
 ------
 David E. Wheeler <david@kineticode.com>
 
+Inspired by CITEXT 1.0 by Donald Fraser.
+
 Copyright and License
 ---------------------
 
-Copyright (c) 2008 David Wheeler. Some rights reserved.
+Copyright (c) 2008 David E. Wheeler. Some rights reserved.
 
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose, without fee, and without a written agreement is
