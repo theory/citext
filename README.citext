@@ -12,7 +12,7 @@ to use the LOWER() function in your queries, something like this:
     FROM tab
     WHERE lower(col) = LOWER(?);
 
-This works reasonabley well, but has a number of drawbacks:
+This works reasonably well, but has a number of drawbacks:
 
 * It makes your SQL statements verbose, and you always have to remember to use
   `LOWER()` on both the column and on the query value (so that both use the
