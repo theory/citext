@@ -87,9 +87,9 @@ citextcmp (text * left, text * right)
     rcstr = cilower( right );
 
     result = varstr_cmp(
-        cilower( left ),
+        lcstr,
         VARSIZE_ANY_EXHDR(left),
-        cilower( right ),
+        rcstr,
         VARSIZE_ANY_EXHDR(right)
     );
 
