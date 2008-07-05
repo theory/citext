@@ -6,8 +6,9 @@
 #include "postgres.h"
 #include "fmgr.h"
 #include "utils/builtins.h"
+#include "access/hash.h"
 
-// PostgreSQL 8.2 Magic.
+/* PostgreSQL 8.2 Magic. */
 #ifdef PG_MODULE_MAGIC
 PG_MODULE_MAGIC;
 #endif
@@ -18,10 +19,11 @@ PG_MODULE_MAGIC;
  *      ====================
  */
 
-extern char * wstring_lower  (char *str); // In oracle_compat.c
+extern char * wstring_lower  (char *str); /* In oracle_compat.c */
 static char * cilower        (text * arg);
 static int    citextcmp      (text * left, text * right);
 extern Datum  citext_cmp     (PG_FUNCTION_ARGS);
+extern Datum  citext_hash    (PG_FUNCTION_ARGS);
 extern Datum  citext_eq      (PG_FUNCTION_ARGS);
 extern Datum  citext_ne      (PG_FUNCTION_ARGS);
 extern Datum  citext_gt      (PG_FUNCTION_ARGS);
@@ -47,16 +49,16 @@ cilower(text * arg)
 {
     char * str;
 
-    // Get a the nul-terminated string from the text struct.
+    /* Get a the nul-terminated string from the text struct. */
     str  = DatumGetCString(
         DirectFunctionCall1( textout, PointerGetDatum( arg ) )
     );
 
 #ifdef USE_WIDE_UPPER_LOWER
-    // Have wstring_lower() do the work.
+    /* Have wstring_lower() do the work. */
     return wstring_lower( str );
 # else
-    // Copy the string and process it.
+    /* Copy the string and process it. */
     int    index, len;
     char * result;
 
@@ -119,6 +121,27 @@ citext_cmp(PG_FUNCTION_ARGS)
     PG_FREE_IF_COPY(right, 1);
 
     PG_RETURN_INT32( result );
+}
+
+PG_FUNCTION_INFO_V1(citext_hash);
+
+Datum
+citext_hash(PG_FUNCTION_ARGS)
+{
+    char       *txt;
+    char       *str;
+    Datum       result;
+
+    txt = cilower( PG_GETARG_TEXT_PP(0) );
+    str = VARDATA_ANY(txt);
+
+    result = hash_any((unsigned char *) str, VARSIZE_ANY_EXHDR(txt));
+
+    /* Avoid leaking memory for toasted inputs */
+    PG_FREE_IF_COPY(txt, 0);
+    pfree( str );
+
+    return result;
 }
 
 PG_FUNCTION_INFO_V1(citext_smaller);
