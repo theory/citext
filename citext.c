@@ -19,9 +19,9 @@ PG_MODULE_MAGIC;
  *      ====================
  */
 
-extern char * wstring_lower  (char *str); /* In oracle_compat.c */
-static char * cilower        (text * arg);
-static int    citextcmp      (text * left, text * right);
+extern char  *wstring_lower  (char *str); /* In oracle_compat.c */
+static char  *cilower        (text *arg);
+static int    citextcmp      (text *left, text *right);
 extern Datum  citext_cmp     (PG_FUNCTION_ARGS);
 extern Datum  citext_hash    (PG_FUNCTION_ARGS);
 extern Datum  citext_eq      (PG_FUNCTION_ARGS);
@@ -45,26 +45,26 @@ extern Datum  citext_larger  (PG_FUNCTION_ARGS);
 #endif
 
 char *
-cilower(text * arg)
+cilower(text *arg)
 {
-    char * str;
+    char *str;
 
     /* Get a the nul-terminated string from the text struct. */
     str  = DatumGetCString(
-        DirectFunctionCall1( textout, PointerGetDatum( arg ) )
+        DirectFunctionCall1(textout, PointerGetDatum(arg))
     );
 
 #ifdef USE_WIDE_UPPER_LOWER
     /* Have wstring_lower() do the work. */
-    return wstring_lower( str );
+    return wstring_lower(str);
 # else
     /* Copy the string and process it. */
-    int    index, len;
-    char * result;
+    int   index, len;
+    char *result;
 
     index  = 0;
     len    = VARSIZE(arg) - VARHDRSZ;
-    result = (char *) palloc( strlen( str ) + 1 );
+    result = (char *) palloc(strlen(str) + 1);
 
     for (index = 0; index <= len; index++) {
         result[index] = tolower((unsigned char) str[index] );
@@ -80,13 +80,13 @@ cilower(text * arg)
  */
 
 static int32
-citextcmp (text * left, text * right)
+citextcmp (text *left, text *right)
 {
-    char * lcstr, * rcstr;
-    int    result;
+    char *lcstr, *rcstr;
+    int   result;
 
-    lcstr = cilower( left  );
-    rcstr = cilower( right );
+    lcstr = cilower(left);
+    rcstr = cilower(right);
 
     result = varstr_cmp(
         lcstr,
@@ -95,8 +95,8 @@ citextcmp (text * left, text * right)
         VARSIZE_ANY_EXHDR(right)
     );
 
-    pfree( lcstr );
-    pfree( rcstr );
+    pfree(lcstr);
+    pfree(rcstr);
     return result;
 }
 
@@ -111,16 +111,16 @@ PG_FUNCTION_INFO_V1(citext_cmp);
 Datum
 citext_cmp(PG_FUNCTION_ARGS)
 {
-    text * left  = PG_GETARG_TEXT_PP(0);
-    text * right = PG_GETARG_TEXT_PP(1);
-    int32  result;
+    text *left  = PG_GETARG_TEXT_PP(0);
+    text *right = PG_GETARG_TEXT_PP(1);
+    int32 result;
 
     result = citextcmp(left, right);
 
     PG_FREE_IF_COPY(left, 0);
     PG_FREE_IF_COPY(right, 1);
 
-    PG_RETURN_INT32( result );
+    PG_RETURN_INT32(result);
 }
 
 PG_FUNCTION_INFO_V1(citext_hash);
@@ -132,14 +132,14 @@ citext_hash(PG_FUNCTION_ARGS)
     char       *str;
     Datum       result;
 
-    txt = cilower( PG_GETARG_TEXT_PP(0) );
+    txt = cilower(PG_GETARG_TEXT_PP(0));
     str = VARDATA_ANY(txt);
 
     result = hash_any((unsigned char *) str, VARSIZE_ANY_EXHDR(txt));
 
     /* Avoid leaking memory for toasted inputs */
     PG_FREE_IF_COPY(txt, 0);
-    pfree( str );
+    pfree(str);
 
     return result;
 }
@@ -149,9 +149,9 @@ PG_FUNCTION_INFO_V1(citext_smaller);
 Datum
 citext_smaller(PG_FUNCTION_ARGS)
 {
-    text * left  = PG_GETARG_TEXT_PP(0);
-    text * right = PG_GETARG_TEXT_PP(1);
-    text * result;
+    text *left  = PG_GETARG_TEXT_PP(0);
+    text *right = PG_GETARG_TEXT_PP(1);
+    text *result;
 
     result = citextcmp(left, right) < 0 ? left : right;
     PG_RETURN_TEXT_P(result);
@@ -162,9 +162,9 @@ PG_FUNCTION_INFO_V1(citext_larger);
 Datum
 citext_larger(PG_FUNCTION_ARGS)
 {
-    text * left  = PG_GETARG_TEXT_PP(0);
-    text * right = PG_GETARG_TEXT_PP(1);
-    text * result;
+    text *left  = PG_GETARG_TEXT_PP(0);
+    text *right = PG_GETARG_TEXT_PP(1);
+    text *result;
 
     result = citextcmp(left, right) > 0 ? left : right;
     PG_RETURN_TEXT_P(result);
@@ -180,9 +180,9 @@ PG_FUNCTION_INFO_V1(citext_eq);
 Datum
 citext_eq(PG_FUNCTION_ARGS)
 {
-    text * left  = PG_GETARG_TEXT_PP(0);
-    text * right = PG_GETARG_TEXT_PP(1);
-    bool   result;
+    text *left  = PG_GETARG_TEXT_PP(0);
+    text *right = PG_GETARG_TEXT_PP(1);
+    bool  result;
     
     /*
      * We can't do the length-comparison optimization here, as is done for the
@@ -190,7 +190,7 @@ citext_eq(PG_FUNCTION_ARGS)
      * The canonical example is the turkish dotted i: the lowercase version is
      * the standard ASCII i, but the uppercase version is multibyte.
      */
-    result = citextcmp( left, right ) == 0;
+    result = citextcmp(left, right) == 0;
 
     PG_FREE_IF_COPY(left, 0);
     PG_FREE_IF_COPY(right, 1);
@@ -203,9 +203,9 @@ PG_FUNCTION_INFO_V1(citext_ne);
 Datum
 citext_ne(PG_FUNCTION_ARGS)
 {
-    text * left  = PG_GETARG_TEXT_PP(0);
-    text * right = PG_GETARG_TEXT_PP(1);
-    bool   result;
+    text *left  = PG_GETARG_TEXT_PP(0);
+    text *right = PG_GETARG_TEXT_PP(1);
+    bool  result;
     
     /*
      * We can't do the length-comparison optimization here, as is done for the
@@ -213,7 +213,7 @@ citext_ne(PG_FUNCTION_ARGS)
      * The canonical example is the turkish dotted i: the lowercase version is
      * the standard ASCII i, but the uppercase version is multibyte.
      */
-    result = citextcmp( left, right ) != 0;
+    result = citextcmp(left, right) != 0;
 
     PG_FREE_IF_COPY(left, 0);
     PG_FREE_IF_COPY(right, 1);
@@ -226,11 +226,11 @@ PG_FUNCTION_INFO_V1(citext_lt);
 Datum
 citext_lt(PG_FUNCTION_ARGS)
 {
-    text * left  = PG_GETARG_TEXT_PP(0);
-    text * right = PG_GETARG_TEXT_PP(1);
-    bool   result;
+    text *left  = PG_GETARG_TEXT_PP(0);
+    text *right = PG_GETARG_TEXT_PP(1);
+    bool  result;
     
-    result = citextcmp( left, right ) < 0;
+    result = citextcmp(left, right) < 0;
 
     PG_FREE_IF_COPY(left, 0);
     PG_FREE_IF_COPY(right, 1);
@@ -243,11 +243,11 @@ PG_FUNCTION_INFO_V1(citext_le);
 Datum
 citext_le(PG_FUNCTION_ARGS)
 {
-    text * left  = PG_GETARG_TEXT_PP(0);
-    text * right = PG_GETARG_TEXT_PP(1);
-    bool   result;
+    text *left  = PG_GETARG_TEXT_PP(0);
+    text *right = PG_GETARG_TEXT_PP(1);
+    bool  result;
     
-    result = citextcmp( left, right ) <= 0;
+    result = citextcmp(left, right) <= 0;
 
     PG_FREE_IF_COPY(left, 0);
     PG_FREE_IF_COPY(right, 1);
@@ -260,11 +260,11 @@ PG_FUNCTION_INFO_V1(citext_gt);
 Datum
 citext_gt(PG_FUNCTION_ARGS)
 {
-    text * left  = PG_GETARG_TEXT_PP(0);
-    text * right = PG_GETARG_TEXT_PP(1);
-    bool   result;
+    text *left  = PG_GETARG_TEXT_PP(0);
+    text *right = PG_GETARG_TEXT_PP(1);
+    bool  result;
     
-    result = citextcmp( left, right ) > 0;
+    result = citextcmp(left, right) > 0;
 
     PG_FREE_IF_COPY(left, 0);
     PG_FREE_IF_COPY(right, 1);
@@ -277,11 +277,11 @@ PG_FUNCTION_INFO_V1(citext_ge);
 Datum
 citext_ge(PG_FUNCTION_ARGS)
 {
-    text * left  = PG_GETARG_TEXT_PP(0);
-    text * right = PG_GETARG_TEXT_PP(1);
-    bool   result;
+    text *left  = PG_GETARG_TEXT_PP(0);
+    text *right = PG_GETARG_TEXT_PP(1);
+    bool  result;
     
-    result = citextcmp( left, right ) >= 0;
+    result = citextcmp(left, right) >= 0;
 
     PG_FREE_IF_COPY(left, 0);
     PG_FREE_IF_COPY(right, 1);
