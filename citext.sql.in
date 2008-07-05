@@ -95,7 +95,7 @@ CREATE OPERATOR = (
     LEFTARG    = CITEXT,
     RIGHTARG   = CITEXT,
     COMMUTATOR = =,
---  NEGATOR    = <>,
+    NEGATOR    = <>,
     PROCEDURE  = citext_eq
 );
 
@@ -109,14 +109,14 @@ CREATE OPERATOR <> (
 CREATE OPERATOR < (
     LEFTARG   = CITEXT,
     RIGHTARG  = CITEXT,
---      NEGATOR   = >=,
+    NEGATOR   = >=,
     PROCEDURE = citext_lt
 );
 
 CREATE OPERATOR <= (
     LEFTARG   = CITEXT,
     RIGHTARG  = CITEXT,
---      NEGATOR   = >,
+    NEGATOR   >,
     PROCEDURE = citext_le
 );
 
