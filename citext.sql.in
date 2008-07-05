@@ -138,7 +138,7 @@ CREATE OPERATOR > (
 CREATE OPERATOR || (
     LEFTARG   = CITEXT,
     RIGHTARG  = CITEXT,
-    NEGATOR   = <=,
+    NEGATOR   = <>,
     PROCEDURE = textcat
 );
 
@@ -169,6 +169,20 @@ DEFAULT FOR TYPE CITEXT USING btree AS
     OPERATOR    4   >= (citext, citext),
     OPERATOR    5   >  (citext, citext),
     FUNCTION    1   citext_cmp(citext, citext);
+
+--
+-- Hash index support.
+--
+
+CREATE FUNCTION citext_hash(citext)
+RETURNS int4
+AS 'MODULE_PATHNAME'
+LANGUAGE C IMMUTABLE RETURNS NULL ON NULL INPUT;
+
+CREATE OPERATOR CLASS citext_ops
+DEFAULT FOR TYPE citext USING hash AS
+OPERATOR  1  =  (citext, citext),
+FUNCTION  1  citext_hash(citext);
 
 --
 -- Aggregates.
