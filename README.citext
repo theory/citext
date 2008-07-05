@@ -21,6 +21,7 @@ This works reasonably well, but has a number of drawbacks:
 * You can't have a case-insensitive primary key without creating two UNIQUE
   indexes, one for the primary key (implicitly created) and a functional index
   using `LOWER()`.
+* It supports hash indexes and joins.
 
 The CITEXT data type allows you to replace all the calls to `LOWER()` in
 client code that wants to perform case-insensitive queries, while also
