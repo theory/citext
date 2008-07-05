@@ -76,10 +76,10 @@ cilower(text * arg)
 
 /* citextcmp()
  * Internal comparison function for citext strings.
- * Returns -1, 0 or 1
+ * Returns int32 negative, zero, or positive.
  */
 
-static int
+static int32
 citextcmp (text * left, text * right)
 {
     char * lcstr, * rcstr;
