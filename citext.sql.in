@@ -161,6 +161,15 @@ RETURNS citext
 AS 'MODULE_PATHNAME'
 LANGUAGE 'C' IMMUTABLE STRICT;
 
+CREATE FUNCTION citext_hash(citext)
+RETURNS int4
+AS 'MODULE_PATHNAME'
+LANGUAGE C IMMUTABLE RETURNS NULL ON NULL INPUT;
+
+--
+-- The btree indexing operator class.
+--
+
 CREATE OPERATOR CLASS citext_ops
 DEFAULT FOR TYPE CITEXT USING btree AS
     OPERATOR    1   <  (citext, citext),
@@ -171,18 +180,13 @@ DEFAULT FOR TYPE CITEXT USING btree AS
     FUNCTION    1   citext_cmp(citext, citext);
 
 --
--- Hash index support.
+-- The hash indexing operator class.
 --
-
-CREATE FUNCTION citext_hash(citext)
-RETURNS int4
-AS 'MODULE_PATHNAME'
-LANGUAGE C IMMUTABLE RETURNS NULL ON NULL INPUT;
 
 CREATE OPERATOR CLASS citext_ops
 DEFAULT FOR TYPE citext USING hash AS
-OPERATOR  1  =  (citext, citext),
-FUNCTION  1  citext_hash(citext);
+    OPERATOR    1   =  (citext, citext),
+    FUNCTION    1   citext_hash(citext);
 
 --
 -- Aggregates.

@@ -1,5 +1,5 @@
 \set ECHO none
-1..372
+1..373
 ok 1 - citext "a" should  eq   citext "a"
 ok 2 - citext "a" should  eq   citext "A"
 ok 3 - citext "a" should  ne   citext "b"
@@ -67,329 +67,330 @@ ok 64 - text "à" should be le citext "Á"
 ok 65 - Combining text characters are not equivalent
 ok 66 - Combining citext characters are not equivalent
 ok 67 - Turkish dotted "i" should be the same
-ok 68 - citext "a" should =  text "a"
-ok 69 - citext "A" should <> text "a"
-ok 70 - citext "À" should =  text "À"
-ok 71 - citext "À" should <  text "à"
-ok 72 - citext "a" should <> text "b"
-ok 73 - citext "À" should <> text "B"
-ok 74 - text "a" should =  citext "a"
-ok 75 - text "A" should <> citext "a"
-ok 76 - text "À" should =  citext "À"
-ok 77 - text "À" should <  citext "à"
-ok 78 - text "a" should <> citext "b"
-ok 79 - text "À" should <> citext "B"
-ok 80 - citext "aardvark" should  eq   citext "aardvark"
-ok 81 - citext "AARDVARK" should  eq   citext "AARDVARK"
-ok 82 - citext "aardvark" should  eq   citext "AARDVARK"
-ok 83 - "Ask Bjørn Hansen" should eq "Ask Bjørn Hansen"
-ok 84 - "Ask Bjørn Hansen" should eq "ASK BJØRN HANSEN"
-ok 85 - "ask bjørn hansen" should eq "ASK BJØRN HANSEN"
-ok 86 - "Ask Bjørn Hansen" should ne "Ask Bjorn Hansen"
-ok 87 - "Ask Bjørn Hansen" should ne "ASK BJORN HANSEN"
-ok 88 - "ask bjørn hansen" should ne "ASK BJORN HANSEN"
-ok 89 - citext_cmp( citext "aardvark", citext "aardvark") should be 0
-ok 90 - citext_cmp( citext "aardvark", citext "AARDVARK") should be 0
-ok 91 - citext_cmp( citext "AARDVARK", citext "AARDVARK") should be 0
-ok 92 - citext_cmp( "Ask Bjørn Hansen", "Ask Bjørn Hansen") should be 0
-ok 93 - citext_cmp( "Ask Bjørn Hansen", "ask bjørn hansen") should be 0
-ok 94 - citext_cmp( "Ask Bjørn Hansen", "ASK BJØRN HANSEN") should be 0
-ok 95 - citext_cmp( "Ask Bjørn Hansen", "Ask Bjorn Hansen") should be -1
-ok 96 - citext_cmp( "Ask Bjorn Hansen", "Ask Bjørn Hansen") should be 1
-ok 97 - We should be able to select the value
-ok 98 - We should be able to select the value in uppercase
-ok 99 - We should be able to select an accented value
-ok 100 - We should be able to select an accented value in uppercase
-ok 101 - We should get an error inserting a lowercase letter
-ok 102 - We should get an error inserting an uppercase letter
-ok 103 - We should get an error inserting a lowercase accented letter
-ok 104 - We should get an error inserting an uppercase accented letter
-ok 105 - "aa" should be smaller
-ok 106 - "Â" should be smaller
-ok 107 - "AAAA" should be smaller
-ok 108 - "Aaba" should be smaller
-ok 109 - "AARDVARK" should be smaller
-ok 110 - "ab" should be larger
-ok 111 - "ç" should be larger
-ok 112 - "bbbb" should be larger
-ok 113 - "aardvark" should be smaller
-ok 114 - The min::text value should be "AAA"
-ok 115 - The max::text value should be "ç"
-ok 116 - The min value should be "AAA"
-ok 117 - The max value should be "ç"
-ok 118 - The words should be case-insensitively sorted
-ok 119 - The words should be case-insensitively sorted (citext array)
-ok 120 - The UPPER(words) should be case-insensitively sorted
-ok 121 - The UPPER(words) should be case-insensitively sorted (citext array)
-ok 122 - The UPPER(words) should case-insensitively compare
-ok 123 - The UPPER(words) should be case-insensitively sorted
-ok 124 - The UPPER(words) should be case-insensitively sorted (citext array)
-ok 125 - The LOWER(words) should case-insensitively compare
-ok 126 - LOWER("AAA") should return "aaa"
-ok 127 - UPPER("â") should return "Â"
-ok 128 - LOWER("AAA") should return "aaa"
-ok 129 - UPPER("â") should return "Â"
-ok 130 - LOWER("AAA") should return "aaa"
-ok 131 - UPPER("â") should return "Â"
-ok 132 - LIKE should work properly
-ok 133 - LIKE should work case-insensitively
-ok 134 - ILIKE should work properly
-ok 135 - NOT LIKE should work properly
-ok 136 - NOT LIKE should work properly and case-insensitively
-ok 137 - NOT ILIKE should work properly
-ok 138 - ~~ should work properly
-ok 139 - ~~ should work case-insensitively
-ok 140 - ~~* should work properly
-ok 141 - !~~ should work properly
-ok 142 - !~~ should work properly and case-insensitively
-ok 143 - !~~* should work properly and case-insensitively
-ok 144 - ~ should work properly
-ok 145 - ~ should work case-insensitively
-ok 146 - ~* should work properly
-ok 147 - !~ should work properly
-ok 148 - !~ should work properly and case-insensitively
-ok 149 - !~* should work properly and case-insensitively
-ok 150 - varchar LIKE should work properly
-ok 151 - varchar ILIKE should work properly
-ok 152 - varchar NOT LIKE should work properly
-ok 153 - text LIKE should work properly
-ok 154 - text ILIKE should work properly
-ok 155 - text NOT LIKE should work properly
-ok 156 - text LIKE should work properly
-ok 157 - text ILIKE should work properly
-ok 158 - text NOT LIKE should work properly
-ok 159 - varchar LIKE should work properly
-ok 160 - varchar ILIKE should work properly
-ok 161 - varchar NOT LIKE should work properly
-ok 162 - name LIKE should work properly
-ok 163 - name ILIKE should work properly
-ok 164 - name NOT LIKE should work properly
-ok 165 - bpchar LIKE should work properly
-ok 166 - bpchar ILIKE should work properly
-ok 167 - bpchar NOT LIKE should work properly
-ok 168 - char LIKE should work properly
-ok 169 - char ILIKE should work properly
-ok 170 - char NOT LIKE should work properly
-ok 171 - SIMILAR TO should work properly
-ok 172 - citext || citext should work
-ok 173 - citext || int should work
+ok 68 - Diffrent accented characters should not be equivalent
+ok 69 - citext "a" should =  text "a"
+ok 70 - citext "A" should <> text "a"
+ok 71 - citext "À" should =  text "À"
+ok 72 - citext "À" should <  text "à"
+ok 73 - citext "a" should <> text "b"
+ok 74 - citext "À" should <> text "B"
+ok 75 - text "a" should =  citext "a"
+ok 76 - text "A" should <> citext "a"
+ok 77 - text "À" should =  citext "À"
+ok 78 - text "À" should <  citext "à"
+ok 79 - text "a" should <> citext "b"
+ok 80 - text "À" should <> citext "B"
+ok 81 - citext "aardvark" should  eq   citext "aardvark"
+ok 82 - citext "AARDVARK" should  eq   citext "AARDVARK"
+ok 83 - citext "aardvark" should  eq   citext "AARDVARK"
+ok 84 - "Ask Bjørn Hansen" should eq "Ask Bjørn Hansen"
+ok 85 - "Ask Bjørn Hansen" should eq "ASK BJØRN HANSEN"
+ok 86 - "ask bjørn hansen" should eq "ASK BJØRN HANSEN"
+ok 87 - "Ask Bjørn Hansen" should ne "Ask Bjorn Hansen"
+ok 88 - "Ask Bjørn Hansen" should ne "ASK BJORN HANSEN"
+ok 89 - "ask bjørn hansen" should ne "ASK BJORN HANSEN"
+ok 90 - citext_cmp( citext "aardvark", citext "aardvark") should be 0
+ok 91 - citext_cmp( citext "aardvark", citext "AARDVARK") should be 0
+ok 92 - citext_cmp( citext "AARDVARK", citext "AARDVARK") should be 0
+ok 93 - citext_cmp( "Ask Bjørn Hansen", "Ask Bjørn Hansen") should be 0
+ok 94 - citext_cmp( "Ask Bjørn Hansen", "ask bjørn hansen") should be 0
+ok 95 - citext_cmp( "Ask Bjørn Hansen", "ASK BJØRN HANSEN") should be 0
+ok 96 - citext_cmp( "Ask Bjørn Hansen", "Ask Bjorn Hansen") should be -1
+ok 97 - citext_cmp( "Ask Bjorn Hansen", "Ask Bjørn Hansen") should be 1
+ok 98 - We should be able to select the value
+ok 99 - We should be able to select the value in uppercase
+ok 100 - We should be able to select an accented value
+ok 101 - We should be able to select an accented value in uppercase
+ok 102 - We should get an error inserting a lowercase letter
+ok 103 - We should get an error inserting an uppercase letter
+ok 104 - We should get an error inserting a lowercase accented letter
+ok 105 - We should get an error inserting an uppercase accented letter
+ok 106 - "aa" should be smaller
+ok 107 - "Â" should be smaller
+ok 108 - "AAAA" should be smaller
+ok 109 - "Aaba" should be smaller
+ok 110 - "AARDVARK" should be smaller
+ok 111 - "ab" should be larger
+ok 112 - "ç" should be larger
+ok 113 - "bbbb" should be larger
+ok 114 - "aardvark" should be smaller
+ok 115 - The min::text value should be "AAA"
+ok 116 - The max::text value should be "ç"
+ok 117 - The min value should be "AAA"
+ok 118 - The max value should be "ç"
+ok 119 - The words should be case-insensitively sorted
+ok 120 - The words should be case-insensitively sorted (citext array)
+ok 121 - The UPPER(words) should be case-insensitively sorted
+ok 122 - The UPPER(words) should be case-insensitively sorted (citext array)
+ok 123 - The UPPER(words) should case-insensitively compare
+ok 124 - The UPPER(words) should be case-insensitively sorted
+ok 125 - The UPPER(words) should be case-insensitively sorted (citext array)
+ok 126 - The LOWER(words) should case-insensitively compare
+ok 127 - LOWER("AAA") should return "aaa"
+ok 128 - UPPER("â") should return "Â"
+ok 129 - LOWER("AAA") should return "aaa"
+ok 130 - UPPER("â") should return "Â"
+ok 131 - LOWER("AAA") should return "aaa"
+ok 132 - UPPER("â") should return "Â"
+ok 133 - LIKE should work properly
+ok 134 - LIKE should work case-insensitively
+ok 135 - ILIKE should work properly
+ok 136 - NOT LIKE should work properly
+ok 137 - NOT LIKE should work properly and case-insensitively
+ok 138 - NOT ILIKE should work properly
+ok 139 - ~~ should work properly
+ok 140 - ~~ should work case-insensitively
+ok 141 - ~~* should work properly
+ok 142 - !~~ should work properly
+ok 143 - !~~ should work properly and case-insensitively
+ok 144 - !~~* should work properly and case-insensitively
+ok 145 - ~ should work properly
+ok 146 - ~ should work case-insensitively
+ok 147 - ~* should work properly
+ok 148 - !~ should work properly
+ok 149 - !~ should work properly and case-insensitively
+ok 150 - !~* should work properly and case-insensitively
+ok 151 - varchar LIKE should work properly
+ok 152 - varchar ILIKE should work properly
+ok 153 - varchar NOT LIKE should work properly
+ok 154 - text LIKE should work properly
+ok 155 - text ILIKE should work properly
+ok 156 - text NOT LIKE should work properly
+ok 157 - text LIKE should work properly
+ok 158 - text ILIKE should work properly
+ok 159 - text NOT LIKE should work properly
+ok 160 - varchar LIKE should work properly
+ok 161 - varchar ILIKE should work properly
+ok 162 - varchar NOT LIKE should work properly
+ok 163 - name LIKE should work properly
+ok 164 - name ILIKE should work properly
+ok 165 - name NOT LIKE should work properly
+ok 166 - bpchar LIKE should work properly
+ok 167 - bpchar ILIKE should work properly
+ok 168 - bpchar NOT LIKE should work properly
+ok 169 - char LIKE should work properly
+ok 170 - char ILIKE should work properly
+ok 171 - char NOT LIKE should work properly
+ok 172 - SIMILAR TO should work properly
+ok 173 - citext || citext should work
 ok 174 - citext || int should work
-ok 175 - bit_length(citext) should work
-ok 176 - bit_length("aardvark") should be correct
-ok 177 - bit_length("AAA") should be correct
-ok 178 - bit_length("aba") should be correct
-ok 179 - bit_length("ABC") should be correct
-ok 180 - bit_length("abc") should be correct
-ok 181 - bit_length("ç") should be correct
-ok 182 - bit_length("â") should be correct
-ok 183 - textlen("aardvark") should be correct
-ok 184 - textlen("AAA") should be correct
-ok 185 - textlen("aba") should be correct
-ok 186 - textlen("ABC") should be correct
-ok 187 - textlen("abc") should be correct
-ok 188 - textlen("ç") should be correct
-ok 189 - textlen("â") should be correct
-ok 190 - char_length("aardvark") should be correct
-ok 191 - char_length("AAA") should be correct
-ok 192 - char_length("aba") should be correct
-ok 193 - char_length("ABC") should be correct
-ok 194 - char_length("abc") should be correct
-ok 195 - char_length("ç") should be correct
-ok 196 - char_length("â") should be correct
-ok 197 - character_length("aardvark") should be correct
-ok 198 - character_length("AAA") should be correct
-ok 199 - character_length("aba") should be correct
-ok 200 - character_length("ABC") should be correct
-ok 201 - character_length("abc") should be correct
-ok 202 - character_length("ç") should be correct
-ok 203 - character_length("â") should be correct
-ok 204 - LOWER("aardvark") should be correct
-ok 205 - LOWER("AAA") should be correct
-ok 206 - LOWER("aba") should be correct
-ok 207 - LOWER("ABC") should be correct
-ok 208 - LOWER("abc") should be correct
-ok 209 - LOWER("ç") should be correct
-ok 210 - LOWER("â") should be correct
-ok 211 - octet_length(citext) should work
-ok 212 - octet_length("aardvark") should be correct
-ok 213 - octet_length("AAA") should be correct
-ok 214 - octet_length("aba") should be correct
-ok 215 - octet_length("ABC") should be correct
-ok 216 - octet_length("abc") should be correct
-ok 217 - octet_length("ç") should be correct
-ok 218 - octet_length("â") should be correct
-ok 219 - overlay() should work
+ok 175 - citext || int should work
+ok 176 - bit_length(citext) should work
+ok 177 - bit_length("aardvark") should be correct
+ok 178 - bit_length("AAA") should be correct
+ok 179 - bit_length("aba") should be correct
+ok 180 - bit_length("ABC") should be correct
+ok 181 - bit_length("abc") should be correct
+ok 182 - bit_length("ç") should be correct
+ok 183 - bit_length("â") should be correct
+ok 184 - textlen("aardvark") should be correct
+ok 185 - textlen("AAA") should be correct
+ok 186 - textlen("aba") should be correct
+ok 187 - textlen("ABC") should be correct
+ok 188 - textlen("abc") should be correct
+ok 189 - textlen("ç") should be correct
+ok 190 - textlen("â") should be correct
+ok 191 - char_length("aardvark") should be correct
+ok 192 - char_length("AAA") should be correct
+ok 193 - char_length("aba") should be correct
+ok 194 - char_length("ABC") should be correct
+ok 195 - char_length("abc") should be correct
+ok 196 - char_length("ç") should be correct
+ok 197 - char_length("â") should be correct
+ok 198 - character_length("aardvark") should be correct
+ok 199 - character_length("AAA") should be correct
+ok 200 - character_length("aba") should be correct
+ok 201 - character_length("ABC") should be correct
+ok 202 - character_length("abc") should be correct
+ok 203 - character_length("ç") should be correct
+ok 204 - character_length("â") should be correct
+ok 205 - LOWER("aardvark") should be correct
+ok 206 - LOWER("AAA") should be correct
+ok 207 - LOWER("aba") should be correct
+ok 208 - LOWER("ABC") should be correct
+ok 209 - LOWER("abc") should be correct
+ok 210 - LOWER("ç") should be correct
+ok 211 - LOWER("â") should be correct
+ok 212 - octet_length(citext) should work
+ok 213 - octet_length("aardvark") should be correct
+ok 214 - octet_length("AAA") should be correct
+ok 215 - octet_length("aba") should be correct
+ok 216 - octet_length("ABC") should be correct
+ok 217 - octet_length("abc") should be correct
+ok 218 - octet_length("ç") should be correct
+ok 219 - octet_length("â") should be correct
 ok 220 - overlay() should work
 ok 221 - overlay() should work
 ok 222 - overlay() should work
 ok 223 - overlay() should work
 ok 224 - overlay() should work
 ok 225 - overlay() should work
-ok 226 - position() should work
+ok 226 - overlay() should work
 ok 227 - position() should work
 ok 228 - position() should work
 ok 229 - position() should work
 ok 230 - position() should work
 ok 231 - position() should work
 ok 232 - position() should work
-ok 233 - subtr(citext, int) should work
+ok 233 - position() should work
 ok 234 - subtr(citext, int) should work
 ok 235 - subtr(citext, int) should work
-ok 236 - subtr(citext, int, int) should work
-ok 237 - subtr(citext from int for int) should work
-ok 238 - subtr(citext from int) should work
-ok 239 - subtr(citext from regex) should work
-ok 240 - subtr(citext from regex for escape) should work
-ok 241 - trim(citext) should work
-ok 242 - trim(citext, citext) should work
-ok 243 - trim(text, citext) should work
-ok 244 - trim(citext, text) should work
-ok 245 - UPPER("aardvark") should be correct
-ok 246 - UPPER("AAA") should be correct
-ok 247 - UPPER("aba") should be correct
-ok 248 - UPPER("ABC") should be correct
-ok 249 - UPPER("abc") should be correct
-ok 250 - UPPER("ç") should be correct
-ok 251 - UPPER("â") should be correct
-ok 252 - ascii(aardvark) should work properly
-ok 253 - ascii(AAA) should work properly
-ok 254 - ascii(aba) should work properly
-ok 255 - ascii(ABC) should work properly
-ok 256 - ascii(abc) should work properly
-ok 257 - ascii(ç) should work properly
-ok 258 - ascii(â) should work properly
-ok 259 - btrim(citext) should work
-ok 260 - btrim(citext, citext) should work
-ok 261 - btrim(text, citext) should work
-ok 262 - btrim(citext, text) should work
-ok 263 - convert_to() should work the same as for text
+ok 236 - subtr(citext, int) should work
+ok 237 - subtr(citext, int, int) should work
+ok 238 - subtr(citext from int for int) should work
+ok 239 - subtr(citext from int) should work
+ok 240 - subtr(citext from regex) should work
+ok 241 - subtr(citext from regex for escape) should work
+ok 242 - trim(citext) should work
+ok 243 - trim(citext, citext) should work
+ok 244 - trim(text, citext) should work
+ok 245 - trim(citext, text) should work
+ok 246 - UPPER("aardvark") should be correct
+ok 247 - UPPER("AAA") should be correct
+ok 248 - UPPER("aba") should be correct
+ok 249 - UPPER("ABC") should be correct
+ok 250 - UPPER("abc") should be correct
+ok 251 - UPPER("ç") should be correct
+ok 252 - UPPER("â") should be correct
+ok 253 - ascii(aardvark) should work properly
+ok 254 - ascii(AAA) should work properly
+ok 255 - ascii(aba) should work properly
+ok 256 - ascii(ABC) should work properly
+ok 257 - ascii(abc) should work properly
+ok 258 - ascii(ç) should work properly
+ok 259 - ascii(â) should work properly
+ok 260 - btrim(citext) should work
+ok 261 - btrim(citext, citext) should work
+ok 262 - btrim(text, citext) should work
+ok 263 - btrim(citext, text) should work
 ok 264 - convert_to() should work the same as for text
 ok 265 - convert_to() should work the same as for text
 ok 266 - convert_to() should work the same as for text
 ok 267 - convert_to() should work the same as for text
 ok 268 - convert_to() should work the same as for text
 ok 269 - convert_to() should work the same as for text
-ok 270 - decode() should work the same as for text
-ok 271 - initcap() whould work as for text
-ok 272 - initcap() whould work as for text on all rows
+ok 270 - convert_to() should work the same as for text
+ok 271 - decode() should work the same as for text
+ok 272 - initcap() whould work as for text
 ok 273 - initcap() whould work as for text on all rows
 ok 274 - initcap() whould work as for text on all rows
 ok 275 - initcap() whould work as for text on all rows
 ok 276 - initcap() whould work as for text on all rows
 ok 277 - initcap() whould work as for text on all rows
 ok 278 - initcap() whould work as for text on all rows
-ok 279 - length("aardvark") should be correct
-ok 280 - length("AAA") should be correct
-ok 281 - length("aba") should be correct
-ok 282 - length("ABC") should be correct
-ok 283 - length("abc") should be correct
-ok 284 - length("ç") should be correct
-ok 285 - length("â") should be correct
-ok 286 - lpad(citext, int) should work
-ok 287 - lpad(citext, int, citext) should work
-ok 288 - lpad(text, int, citext) should work
-ok 289 - lpad(citext, int, text) should work
-ok 290 - ltrim(citext) should work
-ok 291 - ltrim(citext, citext) should work
-ok 292 - ltrim(text, citext) should work
-ok 293 - ltrim(citext, text) should work
-ok 294 - md5() should work as for text
+ok 279 - initcap() whould work as for text on all rows
+ok 280 - length("aardvark") should be correct
+ok 281 - length("AAA") should be correct
+ok 282 - length("aba") should be correct
+ok 283 - length("ABC") should be correct
+ok 284 - length("abc") should be correct
+ok 285 - length("ç") should be correct
+ok 286 - length("â") should be correct
+ok 287 - lpad(citext, int) should work
+ok 288 - lpad(citext, int, citext) should work
+ok 289 - lpad(text, int, citext) should work
+ok 290 - lpad(citext, int, text) should work
+ok 291 - ltrim(citext) should work
+ok 292 - ltrim(citext, citext) should work
+ok 293 - ltrim(text, citext) should work
+ok 294 - ltrim(citext, text) should work
 ok 295 - md5() should work as for text
 ok 296 - md5() should work as for text
 ok 297 - md5() should work as for text
 ok 298 - md5() should work as for text
 ok 299 - md5() should work as for text
 ok 300 - md5() should work as for text
-ok 301 - quote_ident() should work as for text
+ok 301 - md5() should work as for text
 ok 302 - quote_ident() should work as for text
 ok 303 - quote_ident() should work as for text
 ok 304 - quote_ident() should work as for text
 ok 305 - quote_ident() should work as for text
 ok 306 - quote_ident() should work as for text
 ok 307 - quote_ident() should work as for text
-ok 308 - quote_literal() should work as for text
+ok 308 - quote_ident() should work as for text
 ok 309 - quote_literal() should work as for text
 ok 310 - quote_literal() should work as for text
 ok 311 - quote_literal() should work as for text
 ok 312 - quote_literal() should work as for text
 ok 313 - quote_literal() should work as for text
 ok 314 - quote_literal() should work as for text
-ok 315 - regexp_matches() should work
-ok 316 - regexp_replace() should work
-not ok 317 - regexp_replace() should work case-insensitively # TODO XXX Case-insensitive support missing
-# Failed (TODO) test 317: "regexp_replace() should work case-insensitively"
+ok 315 - quote_literal() should work as for text
+ok 316 - regexp_matches() should work
+ok 317 - regexp_replace() should work
+not ok 318 - regexp_replace() should work case-insensitively # TODO XXX Case-insensitive support missing
+# Failed (TODO) test 318: "regexp_replace() should work case-insensitively"
 #          got: Thomas
 #     expected: ThM
-ok 318 - regexp_split_to_array() should work
-not ok 319 - regexp_split_to_array() should work case-insensitively # TODO XXX Case-insensitive support missing
-# Failed (TODO) test 319: "regexp_split_to_array() should work case-insensitively"
+ok 319 - regexp_split_to_array() should work
+not ok 320 - regexp_split_to_array() should work case-insensitively # TODO XXX Case-insensitive support missing
+# Failed (TODO) test 320: "regexp_split_to_array() should work case-insensitively"
 #          got: {helloTworld}
 #     expected: {hello,world}
-ok 320 - regexp_split_to_table() should work
-not ok 321 - regexp_split_to_table() should work case-insensitively # TODO XXX Case-insensitive support missing
-# Failed (TODO) test 321: "regexp_split_to_table() should work case-insensitively"
+ok 321 - regexp_split_to_table() should work
+not ok 322 - regexp_split_to_table() should work case-insensitively # TODO XXX Case-insensitive support missing
+# Failed (TODO) test 322: "regexp_split_to_table() should work case-insensitively"
 #          got: {helloTworld}
 #     expected: {hello,world}
-ok 322 - repeat(citext, int) should work
-ok 323 - replace() should work
-not ok 324 - replace() should work case-insensitvely # TODO XXX Case-insensitive support missing
-# Failed (TODO) test 324: "replace() should work case-insensitvely"
+ok 323 - repeat(citext, int) should work
+ok 324 - replace() should work
+not ok 325 - replace() should work case-insensitvely # TODO XXX Case-insensitive support missing
+# Failed (TODO) test 325: "replace() should work case-insensitvely"
 #          got: abcdefabcdef
 #     expected: abXXefabXXef
-ok 325 - rpad(citext, int) should work
-ok 326 - rpad(citext, int, citext) should work
-ok 327 - rpad(text, int, citext) should work
-ok 328 - rpad(citext, int, text) should work
-ok 329 - rtrim(citext) should work
-ok 330 - rtrim(citext, citext) should work
-ok 331 - rtrim(text, citext) should work
-ok 332 - rtrim(citext, text) should work
-ok 333 - split_part() should work
-not ok 334 - split_part() should work case-insensitively # TODO XXX Case-insensitive support missing
-# Failed (TODO) test 334: "split_part() should work case-insensitively"
+ok 326 - rpad(citext, int) should work
+ok 327 - rpad(citext, int, citext) should work
+ok 328 - rpad(text, int, citext) should work
+ok 329 - rpad(citext, int, text) should work
+ok 330 - rtrim(citext) should work
+ok 331 - rtrim(citext, citext) should work
+ok 332 - rtrim(text, citext) should work
+ok 333 - rtrim(citext, text) should work
+ok 334 - split_part() should work
+not ok 335 - split_part() should work case-insensitively # TODO XXX Case-insensitive support missing
+# Failed (TODO) test 335: "split_part() should work case-insensitively"
 #          got: 
 #     expected: def
-ok 335 - strpos(citext, text) should work
-ok 336 - strpos(citext, citext) should work
-not ok 337 - strpos(citext, citext) should work case-insensitively # TODO XXX Case-insensitive support missing
-# Failed (TODO) test 337: "strpos(citext, citext) should work case-insensitively"
+ok 336 - strpos(citext, text) should work
+ok 337 - strpos(citext, citext) should work
+not ok 338 - strpos(citext, citext) should work case-insensitively # TODO XXX Case-insensitive support missing
+# Failed (TODO) test 338: "strpos(citext, citext) should work case-insensitively"
 #          got: 0
 #     expected: 2
-ok 338 - substr() should work
-ok 339 - translate() should work
-not ok 340 - translate() should work case-insensitvely # TODO XXX Case-insensitive support missing
-# Failed (TODO) test 340: "translate() should work case-insensitvely"
+ok 339 - substr() should work
+ok 340 - translate() should work
+not ok 341 - translate() should work case-insensitvely # TODO XXX Case-insensitive support missing
+# Failed (TODO) test 341: "translate() should work case-insensitvely"
 #          got: abcdefabcdef
 #     expected: abXXefabXXef
-ok 341 - todate(citext, citext) should work
-ok 342 - todate(citext, text) should work
-ok 343 - todate(text, citext) should work
-ok 344 - to_number(citext, citext) should work
-ok 345 - to_number(citext, text) should work
-ok 346 - to_number(text, citext) should work
-ok 347 - to_timestamp(citext, citext) should work
-ok 348 - to_timestamp(citext, text) should work
-ok 349 - to_timestamp(text, citext) should work
-ok 350 - Should have 7 rows before to_char() inserts
-ok 351 - Should now have 19 rows
-ok 352 - like_escape("aardvark", text) should work
-ok 353 - like_escape("AAA", text) should work
-ok 354 - like_escape("aba", text) should work
-ok 355 - like_escape("ABC", text) should work
-ok 356 - like_escape("abc", text) should work
-ok 357 - like_escape("ç", text) should work
-ok 358 - like_escape("â", text) should work
-ok 359 - like_escape("aardvark", citext) should work
-ok 360 - like_escape("AAA", citext) should work
-ok 361 - like_escape("aba", citext) should work
-ok 362 - like_escape("ABC", citext) should work
-ok 363 - like_escape("abc", citext) should work
-ok 364 - like_escape("ç", citext) should work
-ok 365 - like_escape("â", citext) should work
-ok 366 - like_escape("aardvark"::text, citext) should work
-ok 367 - like_escape("AAA"::text, citext) should work
-ok 368 - like_escape("aba"::text, citext) should work
-ok 369 - like_escape("ABC"::text, citext) should work
-ok 370 - like_escape("abc"::text, citext) should work
-ok 371 - like_escape("ç"::text, citext) should work
-ok 372 - like_escape("â"::text, citext) should work
+ok 342 - todate(citext, citext) should work
+ok 343 - todate(citext, text) should work
+ok 344 - todate(text, citext) should work
+ok 345 - to_number(citext, citext) should work
+ok 346 - to_number(citext, text) should work
+ok 347 - to_number(text, citext) should work
+ok 348 - to_timestamp(citext, citext) should work
+ok 349 - to_timestamp(citext, text) should work
+ok 350 - to_timestamp(text, citext) should work
+ok 351 - Should have 7 rows before to_char() inserts
+ok 352 - Should now have 19 rows
+ok 353 - like_escape("aardvark", text) should work
+ok 354 - like_escape("AAA", text) should work
+ok 355 - like_escape("aba", text) should work
+ok 356 - like_escape("ABC", text) should work
+ok 357 - like_escape("abc", text) should work
+ok 358 - like_escape("ç", text) should work
+ok 359 - like_escape("â", text) should work
+ok 360 - like_escape("aardvark", citext) should work
+ok 361 - like_escape("AAA", citext) should work
+ok 362 - like_escape("aba", citext) should work
+ok 363 - like_escape("ABC", citext) should work
+ok 364 - like_escape("abc", citext) should work
+ok 365 - like_escape("ç", citext) should work
+ok 366 - like_escape("â", citext) should work
+ok 367 - like_escape("aardvark"::text, citext) should work
+ok 368 - like_escape("AAA"::text, citext) should work
+ok 369 - like_escape("aba"::text, citext) should work
+ok 370 - like_escape("ABC"::text, citext) should work
+ok 371 - like_escape("abc"::text, citext) should work
+ok 372 - like_escape("ç"::text, citext) should work
+ok 373 - like_escape("â"::text, citext) should work
