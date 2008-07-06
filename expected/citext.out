@@ -95,8 +95,8 @@ ok 92 - citext_cmp( citext "AARDVARK", citext "AARDVARK") should be 0
 ok 93 - citext_cmp( "Ask Bjørn Hansen", "Ask Bjørn Hansen") should be 0
 ok 94 - citext_cmp( "Ask Bjørn Hansen", "ask bjørn hansen") should be 0
 ok 95 - citext_cmp( "Ask Bjørn Hansen", "ASK BJØRN HANSEN") should be 0
-ok 96 - citext_cmp( "Ask Bjørn Hansen", "Ask Bjorn Hansen") should be -1
-ok 97 - citext_cmp( "Ask Bjorn Hansen", "Ask Bjørn Hansen") should be 1
+ok 96 - citext_cmp( "Ask Bjørn Hansen", "Ask Bjorn Hansen") should be 137
+ok 97 - citext_cmp( "Ask Bjorn Hansen", "Ask Bjørn Hansen") should be -137
 ok 98 - We should be able to select the value
 ok 99 - We should be able to select the value in uppercase
 ok 100 - We should be able to select an accented value
