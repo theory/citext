@@ -100,38 +100,43 @@ CREATE OPERATOR = (
 );
 
 CREATE OPERATOR <> (
-    LEFTARG   = CITEXT,
-    RIGHTARG  = CITEXT,
-    NEGATOR   = =,
-    PROCEDURE = citext_ne
+    LEFTARG    = CITEXT,
+    RIGHTARG   = CITEXT,
+    NEGATOR    = =,
+    COMMUTATOR = <>,
+    PROCEDURE  = citext_ne
 );
 
 CREATE OPERATOR < (
-    LEFTARG   = CITEXT,
-    RIGHTARG  = CITEXT,
-    NEGATOR   = >=,
-    PROCEDURE = citext_lt
+    LEFTARG    = CITEXT,
+    RIGHTARG   = CITEXT,
+    NEGATOR    = >=,
+    COMMUTATOR = >,
+    PROCEDURE  = citext_lt
 );
 
 CREATE OPERATOR <= (
-    LEFTARG   = CITEXT,
-    RIGHTARG  = CITEXT,
-    NEGATOR   >,
-    PROCEDURE = citext_le
+    LEFTARG    = CITEXT,
+    RIGHTARG   = CITEXT,
+    NEGATOR    = >,
+    COMMUTATOR = <=,
+    PROCEDURE  = citext_le
 );
 
 CREATE OPERATOR >= (
-    LEFTARG   = CITEXT,
-    RIGHTARG  = CITEXT,
-    NEGATOR   = <,
-    PROCEDURE = citext_ge
+    LEFTARG    = CITEXT,
+    RIGHTARG   = CITEXT,
+    NEGATOR    = <,
+    COMMUTATOR = <=,
+    PROCEDURE  = citext_ge
 );
 
 CREATE OPERATOR > (
-    LEFTARG   = CITEXT,
-    RIGHTARG  = CITEXT,
-    NEGATOR   = <=,
-    PROCEDURE = citext_gt
+    LEFTARG    = CITEXT,
+    RIGHTARG   = CITEXT,
+    NEGATOR    = <=,
+    COMMUTATOR = <,
+    PROCEDURE  = citext_gt
 );
 
 
