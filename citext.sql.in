@@ -138,7 +138,6 @@ CREATE OPERATOR > (
 CREATE OPERATOR || (
     LEFTARG   = CITEXT,
     RIGHTARG  = CITEXT,
-    NEGATOR   = <>,
     PROCEDURE = textcat
 );
 
