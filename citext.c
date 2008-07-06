@@ -128,14 +128,13 @@ PG_FUNCTION_INFO_V1(citext_hash);
 Datum
 citext_hash(PG_FUNCTION_ARGS)
 {
-    char       *txt;
+    text       *txt = PG_GETARG_TEXT_PP(0);
+    int         len = VARSIZE_ANY_EXHDR(txt);
     char       *str;
     Datum       result;
 
-    txt = cilower(PG_GETARG_TEXT_PP(0));
-    str = VARDATA_ANY(txt);
-
-    result = hash_any((unsigned char *) str, VARSIZE_ANY_EXHDR(txt));
+    str    = cilower(txt);
+    result = hash_any((unsigned char *) str, len);
 
     /* Avoid leaking memory for toasted inputs */
     PG_FREE_IF_COPY(txt, 0);
