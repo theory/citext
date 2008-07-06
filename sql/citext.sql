@@ -258,13 +258,13 @@ SELECT is(
 SELECT is(
     citext_cmp( 'Ask Bjørn Hansen', 'Ask Bjorn Hansen' ),
     137,
-    'citext_cmp( "Ask Bjørn Hansen", "Ask Bjorn Hansen") should be -1'
+    'citext_cmp( "Ask Bjørn Hansen", "Ask Bjorn Hansen") should be 137'
 );
 
 SELECT is(
     citext_cmp( 'Ask Bjorn Hansen', 'Ask Bjørn Hansen' ),
     -137,
-    'citext_cmp( "Ask Bjorn Hansen", "Ask Bjørn Hansen") should be 1'
+    'citext_cmp( "Ask Bjorn Hansen", "Ask Bjørn Hansen") should be -137'
 );
 
 /*
