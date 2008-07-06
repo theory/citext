@@ -144,31 +144,6 @@ citext_hash(PG_FUNCTION_ARGS)
     return result;
 }
 
-PG_FUNCTION_INFO_V1(citext_smaller);
-
-Datum
-citext_smaller(PG_FUNCTION_ARGS)
-{
-    text *left  = PG_GETARG_TEXT_PP(0);
-    text *right = PG_GETARG_TEXT_PP(1);
-    text *result;
-
-    result = citextcmp(left, right) < 0 ? left : right;
-    PG_RETURN_TEXT_P(result);
-}
-
-PG_FUNCTION_INFO_V1(citext_larger);
-
-Datum
-citext_larger(PG_FUNCTION_ARGS)
-{
-    text *left  = PG_GETARG_TEXT_PP(0);
-    text *right = PG_GETARG_TEXT_PP(1);
-    text *result;
-
-    result = citextcmp(left, right) > 0 ? left : right;
-    PG_RETURN_TEXT_P(result);
-}
 /*
  *      ==================
  *      OPERATOR FUNCTIONS
@@ -288,3 +263,36 @@ citext_ge(PG_FUNCTION_ARGS)
 
     PG_RETURN_BOOL(result);
 }
+
+/*
+ *      ===================
+ *      AGGREGATE FUNCTIONS
+ *      ===================
+ */
+
+PG_FUNCTION_INFO_V1(citext_smaller);
+
+Datum
+citext_smaller(PG_FUNCTION_ARGS)
+{
+    text *left  = PG_GETARG_TEXT_PP(0);
+    text *right = PG_GETARG_TEXT_PP(1);
+    text *result;
+
+    result = citextcmp(left, right) < 0 ? left : right;
+    PG_RETURN_TEXT_P(result);
+}
+
+PG_FUNCTION_INFO_V1(citext_larger);
+
+Datum
+citext_larger(PG_FUNCTION_ARGS)
+{
+    text *left  = PG_GETARG_TEXT_PP(0);
+    text *right = PG_GETARG_TEXT_PP(1);
+    text *result;
+
+    result = citextcmp(left, right) > 0 ? left : right;
+    PG_RETURN_TEXT_P(result);
+}
+
