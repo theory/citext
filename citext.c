@@ -156,18 +156,27 @@ citext_eq(PG_FUNCTION_ARGS)
 {
     text *left  = PG_GETARG_TEXT_PP(0);
     text *right = PG_GETARG_TEXT_PP(1);
+    char *lcstr, *rcstr;
     bool  result;
+
+    lcstr = cilower(left);
+    rcstr = cilower(right);
     
     /*
      * We can't do the length-comparison optimization here, as is done for the
      * text type in varlena.c, because sometimes the lengths can be different.
      * The canonical example is the turkish dotted i: the lowercase version is
      * the standard ASCII i, but the uppercase version is multibyte.
+     * Otherwise, since we only care about equality or not-equality, we can
+     * avoid all the expense of strcoll() here, and just do bitwise
+     * comparison.
      */
-    result = citextcmp(left, right) == 0;
+    result = strncmp(lcstr, rcstr, VARSIZE_ANY_EXHDR(left)) == 0;
 
     PG_FREE_IF_COPY(left, 0);
     PG_FREE_IF_COPY(right, 1);
+    pfree(lcstr);
+    pfree(rcstr);
 
     PG_RETURN_BOOL(result);
 }
@@ -179,18 +188,27 @@ citext_ne(PG_FUNCTION_ARGS)
 {
     text *left  = PG_GETARG_TEXT_PP(0);
     text *right = PG_GETARG_TEXT_PP(1);
+    char *lcstr, *rcstr;
     bool  result;
+
+    lcstr = cilower(left);
+    rcstr = cilower(right);
     
     /*
      * We can't do the length-comparison optimization here, as is done for the
      * text type in varlena.c, because sometimes the lengths can be different.
      * The canonical example is the turkish dotted i: the lowercase version is
      * the standard ASCII i, but the uppercase version is multibyte.
+     * Otherwise, since we only care about equality or not-equality, we can
+     * avoid all the expense of strcoll() here, and just do bitwise
+     * comparison.
      */
-    result = citextcmp(left, right) != 0;
+    result = strncmp(lcstr, rcstr, VARSIZE_ANY_EXHDR(left)) != 0;
 
     PG_FREE_IF_COPY(left, 0);
     PG_FREE_IF_COPY(right, 1);
+    pfree(lcstr);
+    pfree(rcstr);
 
     PG_RETURN_BOOL(result);
 }
