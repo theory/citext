@@ -6,7 +6,7 @@ aware, case-insensitve TEXT type. Essentially, it internally calls `LOWER()`
 when comparing values. Otherwise, it behaves exactly like TEXT.
 
 The standard approach to doing case-insensitive matches in PostgreSQL has been
-to use the LOWER() function in your queries, something like this:
+to use the `LOWER()` function in your queries, something like this:
 
     SELECT *
     FROM tab
@@ -18,19 +18,18 @@ This works reasonably well, but has a number of drawbacks:
   `LOWER()` on both the column and on the query value (so that both use the
   same collations).
 * It won't use an index, unless you create a functional index using `LOWER()`.
-* You can't have a case-insensitive primary key without creating two UNIQUE
+* You can't have a case-insensitive primary key without creating two unique
   indexes, one for the primary key (implicitly created) and a functional index
   using `LOWER()`.
-* It supports hash indexes and joins.
 
 The CITEXT data type allows you to replace all the calls to `LOWER()` in
 client code that wants to perform case-insensitive queries, while also
 allowing a primary key to be case-insensitive. CITEXT is multibyte aware, just
 like TEXT, which means that the comparison of uppercase and lowercase
-characters is dependent on the rules in the LC_COLLATE locale setting. Again,
-this behavior is identical to the use of `LOWER()` in queries. But because
-it's done in C and is transparent, you don't have to remember to do anything
-special in your queries.
+characters is dependent on the rules in the `LC_COLLATE` locale setting.
+Again, this behavior is identical to the use of `LOWER()` in queries. But
+because it's done in C and is transparent, you don't have to remember to do
+anything special in your queries.
 
 Installation
 ------------
