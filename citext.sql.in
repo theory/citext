@@ -97,6 +97,8 @@ CREATE OPERATOR = (
     COMMUTATOR = =,
     NEGATOR    = <>,
     PROCEDURE  = citext_eq,
+    RESTRICT   = eqsel,
+    JOIN       = eqjoinsel,
     HASHES,
     MERGES
 );
@@ -106,7 +108,9 @@ CREATE OPERATOR <> (
     RIGHTARG   = CITEXT,
     NEGATOR    = =,
     COMMUTATOR = <>,
-    PROCEDURE  = citext_ne
+    PROCEDURE  = citext_ne,
+    RESTRICT   = neqsel,
+    JOIN       = neqjoinsel
 );
 
 CREATE OPERATOR < (
@@ -114,7 +118,9 @@ CREATE OPERATOR < (
     RIGHTARG   = CITEXT,
     NEGATOR    = >=,
     COMMUTATOR = >,
-    PROCEDURE  = citext_lt
+    PROCEDURE  = citext_lt,
+    RESTRICT   = scalarltsel,
+    JOIN       = scalarltjoinsel
 );
 
 CREATE OPERATOR <= (
@@ -122,7 +128,9 @@ CREATE OPERATOR <= (
     RIGHTARG   = CITEXT,
     NEGATOR    = >,
     COMMUTATOR = <=,
-    PROCEDURE  = citext_le
+    PROCEDURE  = citext_le,
+    RESTRICT   = scalarltsel,
+    JOIN       = scalarltjoinsel
 );
 
 CREATE OPERATOR >= (
@@ -130,7 +138,9 @@ CREATE OPERATOR >= (
     RIGHTARG   = CITEXT,
     NEGATOR    = <,
     COMMUTATOR = <=,
-    PROCEDURE  = citext_ge
+    PROCEDURE  = citext_ge,
+    RESTRICT   = scalargtsel,
+    JOIN       = scalargtjoinsel
 );
 
 CREATE OPERATOR > (
@@ -138,9 +148,10 @@ CREATE OPERATOR > (
     RIGHTARG   = CITEXT,
     NEGATOR    = <=,
     COMMUTATOR = <,
-    PROCEDURE  = citext_gt
+    PROCEDURE  = citext_gt,
+    RESTRICT   = scalargtsel,
+    JOIN       = scalargtjoinsel
 );
-
 
 CREATE OPERATOR || (
     LEFTARG   = CITEXT,
@@ -542,4 +553,3 @@ CREATE OPERATOR !~~* (
     RESTRICT  = icnlikesel,
     JOIN      = icnlikejoinsel
 );
-
