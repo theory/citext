@@ -90,9 +90,9 @@ citextcmp (text *left, text *right)
 
     result = varstr_cmp(
         lcstr,
-        VARSIZE_ANY_EXHDR(left),
+        strlen(lcstr),
         rcstr,
-        VARSIZE_ANY_EXHDR(right)
+        strlen(rcstr)
     );
 
     pfree(lcstr);
@@ -171,7 +171,7 @@ citext_eq(PG_FUNCTION_ARGS)
      * avoid all the expense of strcoll() here, and just do bitwise
      * comparison.
      */
-    result = strncmp(lcstr, rcstr, VARSIZE_ANY_EXHDR(left)) == 0;
+    result = strncmp(lcstr, rcstr, strlen(lcstr)) == 0;
 
     PG_FREE_IF_COPY(left, 0);
     PG_FREE_IF_COPY(right, 1);
@@ -203,7 +203,7 @@ citext_ne(PG_FUNCTION_ARGS)
      * avoid all the expense of strcoll() here, and just do bitwise
      * comparison.
      */
-    result = strncmp(lcstr, rcstr, VARSIZE_ANY_EXHDR(left)) != 0;
+    result = strncmp(lcstr, rcstr, strlen(lcstr)) != 0;
 
     PG_FREE_IF_COPY(left, 0);
     PG_FREE_IF_COPY(right, 1);
