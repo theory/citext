@@ -8,6 +8,12 @@
 SET search_path = public;
 
 --
+-- Shell type.
+--
+
+CREATE TYPE citext;
+
+--
 --  Input and output functions.
 --
 
@@ -21,6 +27,16 @@ RETURNS cstring
 AS 'textout'
 LANGUAGE 'internal' IMMUTABLE STRICT;
 
+CREATE OR REPLACE FUNCTION citextrecv(internal)
+RETURNS citext
+AS 'textrecv'
+LANGUAGE 'internal' IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION citextsend(citext)
+RETURNS bytea
+AS 'textsend'
+LANGUAGE 'internal' IMMUTABLE STRICT;
+
 --
 --  The type itself.
 --
@@ -28,6 +44,8 @@ LANGUAGE 'internal' IMMUTABLE STRICT;
 CREATE TYPE citext (
     INPUT          = citextin,
     OUTPUT         = citextout,
+    RECEIVE        = citextrecv,
+    SEND           = citextsend,
     INTERNALLENGTH = VARIABLE,
     STORAGE        = extended
 );
