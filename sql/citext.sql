@@ -383,12 +383,12 @@ SELECT is(
 
 SELECT is(
     ARRAY( SELECT UPPER(name) FROM srt ORDER BY name )::text,
-    ARRAY['AAA'::citext, 'AARDVARK'::citext, 'ABA'::citext, 'ABC'::citext, 'ABC'::citext, 'Â'::citext, 'Ç']::text,
+    ARRAY['AAA'::citext, 'AARDVARK'::citext, 'ABA'::citext, 'ABC'::citext, 'ABC'::citext, 'Â'::citext, 'Ç'::citext]::text,
     'The UPPER(words) should be case-insensitively sorted (citext array)');
 
 SELECT is(
     ARRAY( SELECT UPPER(name) FROM srt ORDER BY name ),
-    ARRAY['aaa'::citext, 'aardvark'::citext, 'aba'::citext, 'abc'::citext, 'abc'::citext, 'â'::citext, 'ç'],
+    ARRAY['aaa'::citext, 'aardvark'::citext, 'aba'::citext, 'abc'::citext, 'abc'::citext, 'â'::citext, 'ç'::citext],
     'The UPPER(words) should case-insensitively compare'
 );
 
@@ -400,13 +400,13 @@ SELECT is(
 
 SELECT is(
     ARRAY( SELECT LOWER(name) FROM srt ORDER BY name )::text,
-    ARRAY['aaa'::citext, 'aardvark'::citext, 'aba'::citext, 'abc'::citext, 'abc'::citext, 'â'::citext, 'ç']::text,
+    ARRAY['aaa'::citext, 'aardvark'::citext, 'aba'::citext, 'abc'::citext, 'abc'::citext, 'â'::citext, 'ç'::citext]::text,
     'The UPPER(words) should be case-insensitively sorted (citext array)'
 );
 
 SELECT is(
     ARRAY( SELECT LOWER(name) FROM srt ORDER BY name ),
-    ARRAY['AAA'::citext, 'AARDVARK'::citext, 'ABA'::citext, 'ABC'::citext, 'ABC'::citext, 'Â'::citext, 'Ç'],
+    ARRAY['AAA'::citext, 'AARDVARK'::citext, 'ABA'::citext, 'ABC'::citext, 'ABC'::citext, 'Â'::citext, 'Ç'::citext],
     'The LOWER(words) should case-insensitively compare'
 );
 
