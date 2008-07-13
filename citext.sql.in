@@ -8,7 +8,7 @@
 SET search_path = public;
 
 --
--- Shell type.
+-- Shell type to keep things a bit quieter.
 --
 
 CREATE TYPE citext;
@@ -16,6 +16,7 @@ CREATE TYPE citext;
 --
 --  Input and output functions.
 --
+SET client_min_messages = warning;
 
 CREATE OR REPLACE FUNCTION citextin(cstring)
 RETURNS citext
@@ -36,6 +37,8 @@ CREATE OR REPLACE FUNCTION citextsend(citext)
 RETURNS bytea
 AS 'textsend'
 LANGUAGE 'internal' IMMUTABLE STRICT;
+
+RESET client_min_messages;
 
 --
 --  The type itself.
