@@ -7,6 +7,15 @@
 #include "access/hash.h"
 #include "fmgr.h"
 #include "utils/builtins.h"
+/* #include "utils/formatting.h" Uncomment me for 8.4. */
+
+/* Delete me for 8.4 -- */
+#include "mb/pg_wchar.h"
+#include "utils/pg_locale.h"
+#include "mb/pg_wchar.h"
+#include "tsearch/ts_locale.h"
+#include "tsearch/ts_public.h"
+/* --Delete me for 8.4 */
 
 #ifdef PG_MODULE_MAGIC
 PG_MODULE_MAGIC;
@@ -18,8 +27,7 @@ PG_MODULE_MAGIC;
 *      ====================
 */
 
-extern char  *wstring_lower  (char *str); /* In oracle_compat.c */
-static char  *cilower        (text *arg);
+static char  *str_tolower    (char *buff, size_t nbytes); /* Delete me for 8.4 */
 static int32  citextcmp      (text *left, text *right);
 extern Datum  citext_cmp     (PG_FUNCTION_ARGS);
 extern Datum  citext_hash    (PG_FUNCTION_ARGS);
@@ -39,47 +47,54 @@ extern Datum  citext_larger  (PG_FUNCTION_ARGS);
 */
 
 
-#if defined(HAVE_WCSTOMBS) && defined(HAVE_TOWLOWER)
-#define USE_WIDE_UPPER_LOWER
-#endif
-
+/* Delete me -- Copied from CVS HEAD for 8.4. */
 char *
-cilower(text *arg)
+str_tolower(char *buff, size_t nbytes)
 {
-   char *str;
-   char *result;
+	char		*result;
 
-   /* Get a the nul-terminated string from the text struct. */
-   str = DatumGetCString(
-       DirectFunctionCall1(textout, PointerGetDatum(arg))
-   );
+	if (!buff)
+		return NULL;
 
-#ifdef USE_WIDE_UPPER_LOWER
-   /* Have wstring_lower() do the work. */
-   result = wstring_lower(str);
-# else
-   /* Copy the string and process it. */
-   int   index, len;
-   char *result;
+#if defined(HAVE_WCSTOMBS) && defined(HAVE_TOWLOWER)
+	if (pg_database_encoding_max_length() > 1 && !lc_ctype_is_c())
+	{
+		wchar_t		*workspace;
+		int			curr_char = 0;
 
-   index  = 0;
-   len    = VARSIZE(arg) - VARHDRSZ;
-   result = (char *) palloc(strlen(str) + 1);
+		/* Output workspace cannot have more codes than input bytes */
+		workspace = (wchar_t *) palloc((nbytes + 1) * sizeof(wchar_t));
 
-   for (index = 0; index <= len; index++) {
-     result[index] = tolower((unsigned char) str[index] );
-   }
-#endif /* USE_WIDE_UPPER_LOWER */
+		char2wchar(workspace, nbytes + 1, buff, nbytes);
 
-   pfree(str);
-   return result;
+		for (curr_char = 0; workspace[curr_char] != 0; curr_char++)
+			workspace[curr_char] = towlower(workspace[curr_char]);
+
+		/* Make result large enough; case change might change number of bytes */
+		result = palloc(curr_char * MB_CUR_MAX + 1);
+
+		wchar2char(result, workspace, curr_char * MB_CUR_MAX + 1);
+		pfree(workspace);
+	}
+	else
+#endif		/* defined(HAVE_WCSTOMBS) && defined(HAVE_TOWLOWER) */
+	{
+		char *p;
+
+		result = pnstrdup(buff, nbytes);
+
+		for (p = result; *p; p++)
+			*p = pg_tolower((unsigned char) *p);
+	}
+
+	return result;
 }
-
+/* --Delete me for 8.4 */
 
 /* citextcmp()
- * Internal comparison function for citext strings.
- * Returns int32 negative, zero, or positive.
- */
+* Internal comparison function for citext strings.
+* Returns int32 negative, zero, or positive.
+*/
 
 static int32
 citextcmp (text *left, text *right)
@@ -87,8 +102,8 @@ citextcmp (text *left, text *right)
    char   *lcstr, *rcstr;
    int32	result;
 
-   lcstr = cilower(left);
-   rcstr = cilower(right);
+   lcstr = str_tolower(VARDATA_ANY(left), VARSIZE_ANY_EXHDR(left));
+   rcstr = str_tolower(VARDATA_ANY(right), VARSIZE_ANY_EXHDR(right));
 
    result = varstr_cmp(lcstr, strlen(lcstr),
 						rcstr, strlen(rcstr));
@@ -131,7 +146,7 @@ citext_hash(PG_FUNCTION_ARGS)
    char       *str;
    Datum       result;
 
-   str    = cilower(txt);
+   str    = str_tolower(VARDATA_ANY(txt), VARSIZE_ANY_EXHDR(txt));
    result = hash_any((unsigned char *) str, strlen(str));
    pfree(str);
 
@@ -157,8 +172,8 @@ citext_eq(PG_FUNCTION_ARGS)
    char *lcstr, *rcstr;
    bool  result;
 
-   lcstr = cilower(left);
-   rcstr = cilower(right);
+   lcstr = str_tolower(VARDATA_ANY(left), VARSIZE_ANY_EXHDR(left));
+   rcstr = str_tolower(VARDATA_ANY(right), VARSIZE_ANY_EXHDR(right));
 
    /*
     * We can't do the length-comparison optimization here, as is done for the
@@ -189,8 +204,8 @@ citext_ne(PG_FUNCTION_ARGS)
    char *lcstr, *rcstr;
    bool  result;
 
-   lcstr = cilower(left);
-   rcstr = cilower(right);
+   lcstr = str_tolower(VARDATA_ANY(left), VARSIZE_ANY_EXHDR(left));
+   rcstr = str_tolower(VARDATA_ANY(right), VARSIZE_ANY_EXHDR(right));
 
    /*
     * We can't do the length-comparison optimization here, as is done for the

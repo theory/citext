@@ -2,8 +2,9 @@ CITEXT Data Type 2.00
 =====================
 
 This distribution creates a custom PostgreSQL data type, CITEXT, a locale-
-aware, case-insensitve TEXT type. Essentially, it internally calls `LOWER()`
-when comparing values. Otherwise, it behaves exactly like TEXT.
+aware, case-insensitve TEXT type for PostgreSQL 8.3. Essentially, it
+internally calls `LOWER()` when comparing values. Otherwise, it behaves
+exactly like TEXT.
 
 The standard approach to doing case-insensitive matches in PostgreSQL has been
 to use the `LOWER()` function in your queries, something like this:
