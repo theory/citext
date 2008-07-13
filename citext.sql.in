@@ -50,7 +50,7 @@ CREATE CAST (citext AS varchar) WITHOUT FUNCTION AS IMPLICIT;
 CREATE CAST (citext AS bpchar)  WITHOUT FUNCTION AS ASSIGNMENT;
 CREATE CAST (text AS citext)    WITHOUT FUNCTION AS ASSIGNMENT;
 CREATE CAST (varchar AS citext) WITHOUT FUNCTION AS ASSIGNMENT;
-CREATE CAST (bpchar AS citext)  WITHOUT FUNCTION AS ASSIGNMENT;
+CREATE CAST (bpchar AS citext)  WITH    FUNCTION citext(bpchar) AS ASSIGNMENT;
 
 --
 -- Operator Functions.
@@ -257,7 +257,7 @@ CREATE OPERATOR ~ (
     PROCEDURE = texticregexeq,
     LEFTARG   = citext,
     RIGHTARG  = citext,
-    NEGATOR   = OPERATOR(!~),
+    NEGATOR   = !~,
     RESTRICT  = icregexeqsel,
     JOIN      = icregexeqjoinsel
 );
@@ -266,7 +266,7 @@ CREATE OPERATOR ~* (
     PROCEDURE = texticregexeq,
     LEFTARG   = citext,
     RIGHTARG  = citext,
-    NEGATOR   = OPERATOR(!~*),
+    NEGATOR   = !~*,
     RESTRICT  = icregexeqsel,
     JOIN      = icregexeqjoinsel
 );
@@ -275,7 +275,7 @@ CREATE OPERATOR !~ (
     PROCEDURE = texticregexne,
     LEFTARG   = citext,
     RIGHTARG  = citext,
-    NEGATOR   = OPERATOR(~),
+    NEGATOR   = ~,
     RESTRICT  = icregexnesel,
     JOIN      = icregexnejoinsel
 );
@@ -284,7 +284,7 @@ CREATE OPERATOR !~* (
     PROCEDURE = texticregexne,
     LEFTARG   = citext,
     RIGHTARG  = citext,
-    NEGATOR   = OPERATOR(~*),
+    NEGATOR   = ~*,
     RESTRICT  = icregexnesel,
     JOIN      = icregexnejoinsel
 );
@@ -293,7 +293,7 @@ CREATE OPERATOR ~~ (
     PROCEDURE = texticlike,
     LEFTARG   = citext,
     RIGHTARG  = citext,
-    NEGATOR   = OPERATOR(!~~),
+    NEGATOR   = !~~,
     RESTRICT  = iclikesel,
     JOIN      = iclikejoinsel
 );
@@ -302,7 +302,7 @@ CREATE OPERATOR ~~* (
     PROCEDURE = texticlike,
     LEFTARG   = citext,
     RIGHTARG  = citext,
-    NEGATOR   = OPERATOR(!~~*),
+    NEGATOR   = !~~*,
     RESTRICT  = iclikesel,
     JOIN      = iclikejoinsel
 );
@@ -311,7 +311,7 @@ CREATE OPERATOR !~~ (
     PROCEDURE = texticnlike,
     LEFTARG   = citext,
     RIGHTARG  = citext,
-    NEGATOR   = OPERATOR(~~),
+    NEGATOR   = ~~,
     RESTRICT  = icnlikesel,
     JOIN      = icnlikejoinsel
 );
@@ -320,7 +320,7 @@ CREATE OPERATOR !~~* (
     PROCEDURE = texticnlike,
     LEFTARG   = citext,
     RIGHTARG  = citext,
-    NEGATOR   = OPERATOR(~~*),
+    NEGATOR   = ~~*,
     RESTRICT  = icnlikesel,
     JOIN      = icnlikejoinsel
 );
@@ -350,7 +350,7 @@ CREATE OPERATOR ~ (
     PROCEDURE = texticregexeq,
     LEFTARG   = citext,
     RIGHTARG  = text,
-    NEGATOR   = OPERATOR(!~),
+    NEGATOR   = !~,
     RESTRICT  = icregexeqsel,
     JOIN      = icregexeqjoinsel
 );
@@ -359,7 +359,7 @@ CREATE OPERATOR ~* (
     PROCEDURE = texticregexeq,
     LEFTARG   = citext,
     RIGHTARG  = text,
-    NEGATOR   = OPERATOR(!~*),
+    NEGATOR   = !~*,
     RESTRICT  = icregexeqsel,
     JOIN      = icregexeqjoinsel
 );
@@ -368,7 +368,7 @@ CREATE OPERATOR !~ (
     PROCEDURE = texticregexne,
     LEFTARG   = citext,
     RIGHTARG  = text,
-    NEGATOR   = OPERATOR(~),
+    NEGATOR   = ~,
     RESTRICT  = icregexnesel,
     JOIN      = icregexnejoinsel
 );
@@ -377,7 +377,7 @@ CREATE OPERATOR !~* (
     PROCEDURE = texticregexne,
     LEFTARG   = citext,
     RIGHTARG  = text,
-    NEGATOR   = OPERATOR(~*),
+    NEGATOR   = ~*,
     RESTRICT  = icregexnesel,
     JOIN      = icregexnejoinsel
 );
@@ -386,7 +386,7 @@ CREATE OPERATOR ~~ (
     PROCEDURE = texticlike,
     LEFTARG   = citext,
     RIGHTARG  = text,
-    NEGATOR   = OPERATOR(!~~),
+    NEGATOR   = !~~,
     RESTRICT  = iclikesel,
     JOIN      = iclikejoinsel
 );
@@ -395,7 +395,7 @@ CREATE OPERATOR ~~* (
     PROCEDURE = texticlike,
     LEFTARG   = citext,
     RIGHTARG  = text,
-    NEGATOR   = OPERATOR(!~~*),
+    NEGATOR   = !~~*,
     RESTRICT  = iclikesel,
     JOIN      = iclikejoinsel
 );
@@ -404,7 +404,7 @@ CREATE OPERATOR !~~ (
     PROCEDURE = texticnlike,
     LEFTARG   = citext,
     RIGHTARG  = text,
-    NEGATOR   = OPERATOR(~~),
+    NEGATOR   = ~~,
     RESTRICT  = icnlikesel,
     JOIN      = icnlikejoinsel
 );
@@ -413,7 +413,7 @@ CREATE OPERATOR !~~* (
     PROCEDURE = texticnlike,
     LEFTARG   = citext,
     RIGHTARG  = text,
-    NEGATOR   = OPERATOR(~~*),
+    NEGATOR   = ~~*,
     RESTRICT  = icnlikesel,
     JOIN      = icnlikejoinsel
 );
