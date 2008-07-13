@@ -12,19 +12,17 @@
 \pset tuples_only true
 \pset pager
 
--- Just ignore errors from the next few commands.
-SET client_min_messages = fatal;
-
 -- Create plpgsql if it's not already there.
+SET client_min_messages = fatal;
 CREATE LANGUAGE plpgsql;
 
--- Load the TAP functions and the data type.
+-- Keep things quiet and start the transaction.
+SET client_min_messages = warning;
 BEGIN;
+
+-- Load the TAP functions and the data type.
 \i pgtap.sql
 \i citext.sql
-
--- Keep things quiet.
-SET client_min_messages = warning;
 
 -- Revert all changes on failure.
 \set ON_ERROR_ROLBACK true

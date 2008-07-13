@@ -1,6 +1,8 @@
 --
 --  PostgreSQL code for CITEXT.
 --
+-- Most I/O functions, and a few others, piggyback on the "text" type
+-- functions.
 
 -- Adjust this setting to control where the objects get created.
 SET search_path = public;
@@ -14,16 +16,11 @@ CREATE OR REPLACE FUNCTION citextin(cstring)
 RETURNS citext
 AS 'textin'
 LANGUAGE 'internal' IMMUTABLE STRICT;
-GRANT EXECUTE ON FUNCTION citextin(cstring) TO PUBLIC;
-COMMENT ON FUNCTION citextin(cstring) IS 'Input for locale-aware case-insensitive text';
 
 CREATE OR REPLACE FUNCTION citextout(citext)
 RETURNS cstring
 AS 'textout'
 LANGUAGE 'internal' IMMUTABLE STRICT;
-
-GRANT EXECUTE ON FUNCTION citextout(citext) TO PUBLIC;
-COMMENT ON FUNCTION citextout(citext) IS 'Output for locale-aware case-insensitive text';
 
 --
 --  The type itself.
@@ -32,10 +29,17 @@ COMMENT ON FUNCTION citextout(citext) IS 'Output for locale-aware case-insensiti
 CREATE TYPE citext (
     INPUT          = citextin,
     OUTPUT         = citextout,
-    INTERNALLENGTH = VARIABLE
+    INTERNALLENGTH = VARIABLE,
+    STORAGE        = extended
 );
 
-COMMENT ON TYPE citext IS 'Variable-length, locale-aware, case-insensitive text';
+--
+-- A single cast function.
+--
+CREATE OR REPLACE FUNCTION citext(bpchar)
+RETURNS citext
+AS 'rtrim1'
+LANGUAGE 'internal' IMMUTABLE STRICT;
 
 --
 --  Implicit and assignment type casts.
@@ -127,7 +131,7 @@ CREATE OPERATOR <= (
     LEFTARG    = CITEXT,
     RIGHTARG   = CITEXT,
     NEGATOR    = >,
-    COMMUTATOR = <=,
+    COMMUTATOR = >=,
     PROCEDURE  = citext_le,
     RESTRICT   = scalarltsel,
     JOIN       = scalarltjoinsel
