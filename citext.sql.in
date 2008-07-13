@@ -47,7 +47,7 @@ LANGUAGE 'internal' IMMUTABLE STRICT;
 
 CREATE CAST (citext AS text)    WITHOUT FUNCTION AS IMPLICIT;
 CREATE CAST (citext AS varchar) WITHOUT FUNCTION AS IMPLICIT;
-CREATE CAST (citext AS bpchar)  WITHOUT FUNCTION AS IMPLICIT;
+CREATE CAST (citext AS bpchar)  WITHOUT FUNCTION AS ASSIGNMENT;
 CREATE CAST (text AS citext)    WITHOUT FUNCTION AS ASSIGNMENT;
 CREATE CAST (varchar AS citext) WITHOUT FUNCTION AS ASSIGNMENT;
 CREATE CAST (bpchar AS citext)  WITHOUT FUNCTION AS ASSIGNMENT;
@@ -215,26 +215,6 @@ LANGUAGE 'C' IMMUTABLE STRICT;
 
 CREATE AGGREGATE max(BASETYPE=citext, SFUNC=citext_larger,  STYPE=citext);
 CREATE AGGREGATE min(BASETYPE=citext, SFUNC=citext_smaller, STYPE=citext);
-
---
--- Size functions
---
-
-CREATE FUNCTION length(citext)
-RETURNS int4 AS 'textlen'
-LANGUAGE 'internal' IMMUTABLE STRICT;
-
-CREATE FUNCTION char_length(citext)
-RETURNS int4 AS 'textlen'
-LANGUAGE 'internal' IMMUTABLE STRICT;
-
-CREATE FUNCTION character_length(citext)
-RETURNS int4 AS 'textlen'
-LANGUAGE 'internal' IMMUTABLE STRICT;
-
-CREATE FUNCTION octet_length(citext)
-RETURNS int4 AS 'textoctetlen'
-LANGUAGE 'internal' IMMUTABLE STRICT;
 
 --
 -- Miscelaneous functions
