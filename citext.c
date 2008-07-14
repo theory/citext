@@ -28,7 +28,6 @@ PG_MODULE_MAGIC;
 */
 
 extern char  *str_tolower(const char *buff, size_t nbytes);
-//static char  *str_tolower    (char *buff, size_t nbytes); /* Delete me for 8.4 */
 static int32  citextcmp      (text *left, text *right);
 extern Datum  citext_cmp     (PG_FUNCTION_ARGS);
 extern Datum  citext_hash    (PG_FUNCTION_ARGS);
