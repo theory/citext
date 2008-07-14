@@ -88,9 +88,7 @@ str_tolower(const char *buff, size_t nbytes)
 	}
 
 	return result;
-}
-
-/* --Delete me for 8.4 */
+} /* --Delete me for 8.4 */
 
 /* citextcmp()
 * Internal comparison function for citext strings.
