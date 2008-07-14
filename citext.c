@@ -27,7 +27,8 @@ PG_MODULE_MAGIC;
 *      ====================
 */
 
-static char  *str_tolower    (char *buff, size_t nbytes); /* Delete me for 8.4 */
+extern char  *str_tolower(const char *buff, size_t nbytes);
+//static char  *str_tolower    (char *buff, size_t nbytes); /* Delete me for 8.4 */
 static int32  citextcmp      (text *left, text *right);
 extern Datum  citext_cmp     (PG_FUNCTION_ARGS);
 extern Datum  citext_hash    (PG_FUNCTION_ARGS);
@@ -49,7 +50,7 @@ extern Datum  citext_larger  (PG_FUNCTION_ARGS);
 
 /* Delete me -- Copied from CVS HEAD for 8.4. */
 char *
-str_tolower(char *buff, size_t nbytes)
+str_tolower(const char *buff, size_t nbytes)
 {
 	char		*result;
 
@@ -89,6 +90,7 @@ str_tolower(char *buff, size_t nbytes)
 
 	return result;
 }
+
 /* --Delete me for 8.4 */
 
 /* citextcmp()
