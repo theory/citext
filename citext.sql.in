@@ -31,12 +31,12 @@ LANGUAGE 'internal' IMMUTABLE STRICT;
 CREATE OR REPLACE FUNCTION citextrecv(internal)
 RETURNS citext
 AS 'textrecv'
-LANGUAGE 'internal' IMMUTABLE STRICT;
+LANGUAGE 'internal' STABLE STRICT;
 
 CREATE OR REPLACE FUNCTION citextsend(citext)
 RETURNS bytea
 AS 'textsend'
-LANGUAGE 'internal' IMMUTABLE STRICT;
+LANGUAGE 'internal' STABLE STRICT;
 
 RESET client_min_messages;
 
