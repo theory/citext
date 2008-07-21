@@ -446,39 +446,39 @@ CREATE OPERATOR !~~* (
 
 CREATE OR REPLACE FUNCTION regexp_matches( citext, citext ) RETURNS TEXT[] AS '
     SELECT regexp_matches( $1::text, $2::text, ''i'' );
-' LANGUAGE SQL STRICT;
+' LANGUAGE SQL IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION regexp_matches( citext, citext, text ) RETURNS TEXT[] AS '
     SELECT regexp_matches( $1::text, $2::text, CASE WHEN strpos($3, ''c'') = 0 THEN  $3 || ''i'' ELSE $3 END );
-' LANGUAGE SQL STRICT;
+' LANGUAGE SQL IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION regexp_replace( citext, citext, text ) returns TEXT AS '
     SELECT regexp_replace( $1::text, $2::text, $3, ''i'');
-' LANGUAGE SQL STRICT;
+' LANGUAGE SQL IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION regexp_replace( citext, citext, text, text ) returns TEXT AS '
     SELECT regexp_replace( $1::text, $2::text, $3, CASE WHEN strpos($4, ''c'') = 0 THEN  $4 || ''i'' ELSE $4 END);
-' LANGUAGE SQL STRICT;
+' LANGUAGE SQL IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION regexp_split_to_array( citext, citext ) RETURNS TEXT[] AS '
     SELECT regexp_split_to_array( $1::text, $2::text, ''i'' );
-' LANGUAGE SQL STRICT;
+' LANGUAGE SQL IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION regexp_split_to_array( citext, citext, text ) RETURNS TEXT[] AS '
     SELECT regexp_split_to_array( $1::text, $2::text, CASE WHEN strpos($3, ''c'') = 0 THEN  $3 || ''i'' ELSE $3 END );
-' LANGUAGE SQL STRICT;
+' LANGUAGE SQL IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION regexp_split_to_table( citext, citext ) RETURNS SETOF TEXT AS '
     SELECT regexp_split_to_table( $1::text, $2::text, ''i'' );
-' LANGUAGE SQL STRICT;
+' LANGUAGE SQL IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION regexp_split_to_table( citext, citext, text ) RETURNS SETOF TEXT AS '
     SELECT regexp_split_to_table( $1::text, $2::text, CASE WHEN strpos($3, ''c'') = 0 THEN  $3 || ''i'' ELSE $3 END );
-' LANGUAGE SQL STRICT;
+' LANGUAGE SQL IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION strpos( citext, citext ) RETURNS INT AS '
     SELECT strpos( LOWER( $1::text ), LOWER( $2::text ) );
-' LANGUAGE SQL STRICT;
+' LANGUAGE SQL IMMUTABLE STRICT;
 
 --
 -- XXX Functions that don't yet work case-insensitively.
