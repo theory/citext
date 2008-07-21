@@ -303,6 +303,10 @@ SELECT rtrim('trimxxxx'::text,   'x'::citext) = 'trim' AS t;
 SELECT rtrim('trimxxxx'::text,   'x'::text  ) = 'trim' AS t;
 
 SELECT split_part('abc~@~def~@~ghi'::citext, '~@~', 2) = 'def' AS t;
+SELECT split_part('abcTdefTghi'::citext, 't', 2) = 'def' AS t;
+SELECT split_part('abcTdefTghi'::citext, 't'::citext, 2) = 'def' AS t;
+SELECT split_part('abcTdefTghi', 't'::citext, 2) = 'def' AS t;
+
 SELECT strpos('high'::citext, 'ig'        ) = 2 AS t;
 SELECT strpos('high',         'ig'::citext) = 2 AS t;
 SELECT strpos('high'::citext, 'ig'::citext) = 2 AS t;
@@ -316,7 +320,6 @@ SELECT substr('alphabet', 3, 2) = 'ph' AS t;
 SELECT translate('abcdefabcdef'::citext, 'cd', 'XX') = 'abXXefabXXef' AS t;
 
 -- TODO These functions should work case-insensitively, but don't.
-SELECT split_part('abcTdefTghi'::citext, 't', 2) = 'def' AS "t TODO";
 SELECT translate('abcdefabcdef'::citext, 'CD', 'XX') = 'abXXefabXXef' AS "t TODO";
 
 -- Table 9-20. Formatting Functions
