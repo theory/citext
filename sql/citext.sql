@@ -281,7 +281,16 @@ SELECT regexp_split_to_table('helloTworld'::citext, 't'::citext) AS words;
 SELECT regexp_split_to_table('helloTworld'::citext, 't'::citext, 'c') AS word;
 
 SELECT repeat('Pg'::citext, 4) = 'PgPgPgPg' AS t;
+
 SELECT replace('abcdefabcdef'::citext, 'cd', 'XX') = 'abXXefabXXef' AS t;
+SELECT replace('abcdefabcdef'::citext, 'CD', 'XX') = 'abXXefabXXef' AS t;
+SELECT replace('ab^is$abcdef'::citext, '^is$', 'XX') = 'abXXabcdef' AS t;
+SELECT replace('abcdefabcdef', 'cd'::citext, 'XX') = 'abXXefabXXef' AS t;
+SELECT replace('abcdefabcdef', 'CD'::citext, 'XX') = 'abXXefabXXef' AS t;
+SELECT replace('ab^is$abcdef', '^is$'::citext, 'XX') = 'abXXabcdef' AS t;
+SELECT replace('abcdefabcdef'::citext, 'cd'::citext, 'XX') = 'abXXefabXXef' AS t;
+SELECT replace('abcdefabcdef'::citext, 'CD'::citext, 'XX') = 'abXXefabXXef' AS t;
+SELECT replace('ab^is$abcdef'::citext, '^is$'::citext, 'XX') = 'abXXabcdef' AS t;
 
 SELECT rpad('hi'::citext, 5              ) = 'hi   ' AS t;
 SELECT rpad('hi'::citext, 5, 'xy'::citext) = 'hixyx' AS t;
@@ -307,7 +316,6 @@ SELECT substr('alphabet', 3, 2) = 'ph' AS t;
 SELECT translate('abcdefabcdef'::citext, 'cd', 'XX') = 'abXXefabXXef' AS t;
 
 -- TODO These functions should work case-insensitively, but don't.
-SELECT replace('abcdefabcdef'::citext, 'CD', 'XX') = 'abXXefabXXef' AS "t TODO";
 SELECT split_part('abcTdefTghi'::citext, 't', 2) = 'def' AS "t TODO";
 SELECT translate('abcdefabcdef'::citext, 'CD', 'XX') = 'abXXefabXXef' AS "t TODO";
 
@@ -351,7 +359,7 @@ VALUES ( to_char(  now()::timestamp,          'HH12:MI:SS') ),
 SELECT COUNT(*) = 19::bigint AS t FROM try;
 
 SELECT like_escape( name, '' ) = like_escape( name::text, '' ) AS t FROM srt;
-SELECT like_escape( name::text, ''::citext ) =like_escape( name::text, '' ) AS t FROM srt;
+SELECT like_escape( name::text, ''::citext ) = like_escape( name::text, '' ) AS t FROM srt;
 
 --- TODO: Get citext working with magic cast functions?
 SELECT cidr( '192.168.1.2'::citext ) = cidr( '192.168.1.2'::text ) AS "t TODO";

@@ -1043,6 +1043,54 @@ SELECT replace('abcdefabcdef'::citext, 'cd', 'XX') = 'abXXefabXXef' AS t;
  t
 (1 row)
 
+SELECT replace('abcdefabcdef'::citext, 'CD', 'XX') = 'abXXefabXXef' AS t;
+ t 
+---
+ t
+(1 row)
+
+SELECT replace('ab^is$abcdef'::citext, '^is$', 'XX') = 'abXXabcdef' AS t;
+ t 
+---
+ t
+(1 row)
+
+SELECT replace('abcdefabcdef', 'cd'::citext, 'XX') = 'abXXefabXXef' AS t;
+ t 
+---
+ t
+(1 row)
+
+SELECT replace('abcdefabcdef', 'CD'::citext, 'XX') = 'abXXefabXXef' AS t;
+ t 
+---
+ t
+(1 row)
+
+SELECT replace('ab^is$abcdef', '^is$'::citext, 'XX') = 'abXXabcdef' AS t;
+ t 
+---
+ t
+(1 row)
+
+SELECT replace('abcdefabcdef'::citext, 'cd'::citext, 'XX') = 'abXXefabXXef' AS t;
+ t 
+---
+ t
+(1 row)
+
+SELECT replace('abcdefabcdef'::citext, 'CD'::citext, 'XX') = 'abXXefabXXef' AS t;
+ t 
+---
+ t
+(1 row)
+
+SELECT replace('ab^is$abcdef'::citext, '^is$'::citext, 'XX') = 'abXXabcdef' AS t;
+ t 
+---
+ t
+(1 row)
+
 SELECT rpad('hi'::citext, 5              ) = 'hi   ' AS t;
  t 
 ---
@@ -1148,12 +1196,6 @@ SELECT translate('abcdefabcdef'::citext, 'cd', 'XX') = 'abXXefabXXef' AS t;
 (1 row)
 
 -- TODO These functions should work case-insensitively, but don't.
-SELECT replace('abcdefabcdef'::citext, 'CD', 'XX') = 'abXXefabXXef' AS "t TODO";
- t TODO 
---------
- f
-(1 row)
-
 SELECT split_part('abcTdefTghi'::citext, 't', 2) = 'def' AS "t TODO";
  t TODO 
 --------
@@ -1163,9 +1205,9 @@ SELECT split_part('abcTdefTghi'::citext, 't', 2) = 'def' AS "t TODO";
 SELECT translate('abcdefabcdef'::citext, 'CD', 'XX') = 'abXXefabXXef' AS "t TODO";
  t TODO 
 --------
- f
+ t
 (1 row)
-
+ 
 -- Table 9-20. Formatting Functions
 SELECT to_date('05 Dec 2000'::citext, 'DD Mon YYYY'::citext)
      = to_date('05 Dec 2000',         'DD Mon YYYY') AS t;
@@ -1265,7 +1307,7 @@ SELECT like_escape( name, '' ) = like_escape( name::text, '' ) AS t FROM srt;
  t
 (5 rows)
 
-SELECT like_escape( name::text, ''::citext ) =like_escape( name::text, '' ) AS t FROM srt;
+SELECT like_escape( name::text, ''::citext ) = like_escape( name::text, '' ) AS t FROM srt;
  t 
 ---
  t

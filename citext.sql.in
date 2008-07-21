@@ -480,6 +480,14 @@ CREATE OR REPLACE FUNCTION strpos( citext, citext ) RETURNS INT AS '
     SELECT strpos( LOWER( $1::text ), LOWER( $2::text ) );
 ' LANGUAGE SQL IMMUTABLE STRICT;
 
+CREATE OR REPLACE FUNCTION replace( citext, citext, citext ) RETURNS TEXT AS $$
+    SELECT regexp_replace( $1::text, regexp_replace($2::text, '([^a-zA-Z_0-9])', E'\\\\\\1', 'g'), $3::text, 'gi' );
+$$ LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION translate( citext, citext, citext ) RETURNS TEXT AS $$
+    SELECT regexp_replace( $1::text, regexp_replace($2::text, '([^a-zA-Z_0-9])', E'\\\\\\1', 'g'), $3::text, 'gi' );
+$$ LANGUAGE SQL IMMUTABLE STRICT;
+
 --
 -- XXX Functions that don't yet work case-insensitively.
 -- replace()
