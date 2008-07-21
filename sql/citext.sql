@@ -246,9 +246,39 @@ SELECT quote_ident( name ) = quote_ident( name::text ) AS t FROM srt;
 SELECT quote_literal( name ) = quote_literal( name::text ) AS t FROM srt;
 
 SELECT regexp_matches('foobarbequebaz'::citext, '(bar)(beque)') = ARRAY[ 'bar', 'beque' ] AS t;
-SELECT regexp_replace('Thomas'::citext, '.[mN]a.', 'M') = 'ThM' AS t;
+SELECT regexp_matches('foobarbequebaz'::citext, '(BAR)(BEQUE)') = ARRAY[ 'bar', 'beque' ] AS t;
+SELECT regexp_matches('foobarbequebaz'::citext, '(BAR)(BEQUE)'::citext) = ARRAY[ 'bar', 'beque' ] AS t;
+SELECT regexp_matches('foobarbequebaz'::citext, '(BAR)(BEQUE)'::citext, '') = ARRAY[ 'bar', 'beque' ] AS t;
+SELECT regexp_matches('foobarbequebaz'::citext, '(BAR)(BEQUE)', '') = ARRAY[ 'bar', 'beque' ] AS t;
+SELECT regexp_matches('foobarbequebaz', '(BAR)(BEQUE)'::citext, '') = ARRAY[ 'bar', 'beque' ] AS t;
+SELECT regexp_matches('foobarbequebaz'::citext, '(BAR)(BEQUE)'::citext, ''::citext) = ARRAY[ 'bar', 'beque' ] AS t;
+-- c forces case-sensitive
+SELECT regexp_matches('foobarbequebaz'::citext, '(BAR)(BEQUE)'::citext, 'c'::citext) = ARRAY[ 'bar', 'beque' ] AS "null";
+
+SELECT regexp_replace('Thomas'::citext, '.[mN]a.',         'M') = 'ThM' AS t;
+SELECT regexp_replace('Thomas'::citext, '.[MN]A.',         'M') = 'ThM' AS t;
+SELECT regexp_replace('Thomas',         '.[MN]A.'::citext, 'M') = 'ThM' AS t;
+SELECT regexp_replace('Thomas'::citext, '.[MN]A.'::citext, 'M') = 'ThM' AS t;
+-- c forces case-sensitive
+SELECT regexp_replace('Thomas'::citext, '.[MN]A.'::citext, 'M', 'c') = 'Thomas' AS t;
+
 SELECT regexp_split_to_array('hello world'::citext, E'\\s+') = ARRAY[ 'hello', 'world' ] AS t;
+SELECT regexp_split_to_array('helloTworld'::citext, 't') = ARRAY[ 'hello', 'world' ] AS t;
+SELECT regexp_split_to_array('helloTworld', 't'::citext) = ARRAY[ 'hello', 'world' ] AS t;
+SELECT regexp_split_to_array('helloTworld'::citext, 't'::citext) = ARRAY[ 'hello', 'world' ] AS t;
+SELECT regexp_split_to_array('helloTworld'::citext, 't', 's') = ARRAY[ 'hello', 'world' ] AS t;
+SELECT regexp_split_to_array('helloTworld', 't'::citext, 's') = ARRAY[ 'hello', 'world' ] AS t;
+SELECT regexp_split_to_array('helloTworld'::citext, 't'::citext, 's') = ARRAY[ 'hello', 'world' ] AS t;
+
+-- c forces case-sensitive
+SELECT regexp_split_to_array('helloTworld'::citext, 't'::citext, 'c') = ARRAY[ 'helloTworld' ] AS t;
+
 SELECT regexp_split_to_table('hello world'::citext, E'\\s+') AS words;
+SELECT regexp_split_to_table('helloTworld'::citext, 't') AS words;
+SELECT regexp_split_to_table('helloTworld',         't'::citext) AS words;
+SELECT regexp_split_to_table('helloTworld'::citext, 't'::citext) AS words;
+-- c forces case-sensitive
+SELECT regexp_split_to_table('helloTworld'::citext, 't'::citext, 'c') AS word;
 
 SELECT repeat('Pg'::citext, 4) = 'PgPgPgPg' AS t;
 SELECT replace('abcdefabcdef'::citext, 'cd', 'XX') = 'abXXefabXXef' AS t;
@@ -265,20 +295,20 @@ SELECT rtrim('trimxxxx'::text,   'x'::text  ) = 'trim' AS t;
 
 SELECT split_part('abc~@~def~@~ghi'::citext, '~@~', 2) = 'def' AS t;
 SELECT strpos('high'::citext, 'ig'        ) = 2 AS t;
+SELECT strpos('high',         'ig'::citext) = 2 AS t;
 SELECT strpos('high'::citext, 'ig'::citext) = 2 AS t;
+SELECT strpos('high'::citext, 'IG'        ) = 2 AS t;
+SELECT strpos('high',         'IG'::citext) = 2 AS t;
+SELECT strpos('high'::citext, 'IG'::citext) = 2 AS t;
+
 -- to_ascii() does not support UTF-8.
 -- to_hex() takes a numeric argument.
 SELECT substr('alphabet', 3, 2) = 'ph' AS t;
 SELECT translate('abcdefabcdef'::citext, 'cd', 'XX') = 'abXXefabXXef' AS t;
 
 -- TODO These functions should work case-insensitively, but don't.
-SELECT regexp_matches('foobarbequebaz'::citext, '(BAR)(BEQUE)') = ARRAY[ 'bar', 'beque' ] AS "t TODO";
-SELECT regexp_replace('Thomas'::citext, '.[MN]A.', 'M') = 'THM' AS "t TODO";
-SELECT regexp_split_to_array('helloTworld'::citext, 't') = ARRAY[ 'hello', 'world' ] AS "t TODO";
-SELECT regexp_split_to_table('helloTworld'::citext, 't') AS "words TODO";
 SELECT replace('abcdefabcdef'::citext, 'CD', 'XX') = 'abXXefabXXef' AS "t TODO";
 SELECT split_part('abcTdefTghi'::citext, 't', 2) = 'def' AS "t TODO";
-SELECT strpos('high'::citext, 'IG'::citext) = 2 AS "t TODO";
 SELECT translate('abcdefabcdef'::citext, 'CD', 'XX') = 'abXXefabXXef' AS "t TODO";
 
 -- Table 9-20. Formatting Functions

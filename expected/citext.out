@@ -873,7 +873,75 @@ SELECT regexp_matches('foobarbequebaz'::citext, '(bar)(beque)') = ARRAY[ 'bar', 
  t
 (1 row)
 
+SELECT regexp_matches('foobarbequebaz'::citext, '(BAR)(BEQUE)') = ARRAY[ 'bar', 'beque' ] AS t;
+ t 
+---
+ t
+(1 row)
+
+SELECT regexp_matches('foobarbequebaz'::citext, '(BAR)(BEQUE)'::citext) = ARRAY[ 'bar', 'beque' ] AS t;
+ t 
+---
+ t
+(1 row)
+
+SELECT regexp_matches('foobarbequebaz'::citext, '(BAR)(BEQUE)'::citext, '') = ARRAY[ 'bar', 'beque' ] AS t;
+ t 
+---
+ t
+(1 row)
+
+SELECT regexp_matches('foobarbequebaz'::citext, '(BAR)(BEQUE)', '') = ARRAY[ 'bar', 'beque' ] AS t;
+ t 
+---
+ t
+(1 row)
+
+SELECT regexp_matches('foobarbequebaz', '(BAR)(BEQUE)'::citext, '') = ARRAY[ 'bar', 'beque' ] AS t;
+ t 
+---
+ t
+(1 row)
+
+SELECT regexp_matches('foobarbequebaz'::citext, '(BAR)(BEQUE)'::citext, ''::citext) = ARRAY[ 'bar', 'beque' ] AS t;
+ t 
+---
+ t
+(1 row)
+
+-- c forces case-sensitive
+SELECT regexp_matches('foobarbequebaz'::citext, '(BAR)(BEQUE)'::citext, 'c'::citext) = ARRAY[ 'bar', 'beque' ] AS "null";
+ null 
+------
+ 
+(1 row)
+
 SELECT regexp_replace('Thomas'::citext, '.[mN]a.', 'M') = 'ThM' AS t;
+ t 
+---
+ t
+(1 row)
+
+SELECT regexp_replace('Thomas'::citext, '.[MN]A.',         'M') = 'ThM' AS t;
+ t 
+---
+ t
+(1 row)
+
+SELECT regexp_replace('Thomas',         '.[MN]A.'::citext, 'M') = 'ThM' AS t;
+ t 
+---
+ t
+(1 row)
+
+SELECT regexp_replace('Thomas'::citext, '.[MN]A.'::citext, 'M') = 'ThM' AS t;
+ t 
+---
+ t
+(1 row)
+
+-- c forces case-sensitive
+SELECT regexp_replace('Thomas'::citext, '.[MN]A.'::citext, 'M', 'c') = 'Thomas' AS t;
  t 
 ---
  t
@@ -885,12 +953,83 @@ SELECT regexp_split_to_array('hello world'::citext, E'\\s+') = ARRAY[ 'hello', '
  t
 (1 row)
 
+SELECT regexp_split_to_array('helloTworld'::citext, 't') = ARRAY[ 'hello', 'world' ] AS t;
+ t 
+---
+ t
+(1 row)
+
+SELECT regexp_split_to_array('helloTworld', 't'::citext) = ARRAY[ 'hello', 'world' ] AS t;
+ t 
+---
+ t
+(1 row)
+
+SELECT regexp_split_to_array('helloTworld'::citext, 't'::citext) = ARRAY[ 'hello', 'world' ] AS t;
+ t 
+---
+ t
+(1 row)
+
+SELECT regexp_split_to_array('helloTworld'::citext, 't', 's') = ARRAY[ 'hello', 'world' ] AS t;
+ t 
+---
+ t
+(1 row)
+
+SELECT regexp_split_to_array('helloTworld', 't'::citext, 's') = ARRAY[ 'hello', 'world' ] AS t;
+ t 
+---
+ t
+(1 row)
+
+SELECT regexp_split_to_array('helloTworld'::citext, 't'::citext, 's') = ARRAY[ 'hello', 'world' ] AS t;
+ t 
+---
+ t
+(1 row)
+
+-- c forces case-sensitive
+SELECT regexp_split_to_array('helloTworld'::citext, 't'::citext, 'c') = ARRAY[ 'helloTworld' ] AS t;
+ t 
+---
+ t
+(1 row)
+
 SELECT regexp_split_to_table('hello world'::citext, E'\\s+') AS words;
  words 
 -------
  hello
  world
 (2 rows)
+
+SELECT regexp_split_to_table('helloTworld'::citext, 't') AS words;
+ words 
+-------
+ hello
+ world
+(2 rows)
+
+SELECT regexp_split_to_table('helloTworld',         't'::citext) AS words;
+ words 
+-------
+ hello
+ world
+(2 rows)
+
+SELECT regexp_split_to_table('helloTworld'::citext, 't'::citext) AS words;
+ words 
+-------
+ hello
+ world
+(2 rows)
+
+-- c forces case-sensitive
+SELECT regexp_split_to_table('helloTworld'::citext, 't'::citext, 'c') AS word;
+    word     
+-------------
+ helloTworld
+(1 row)
 
 SELECT repeat('Pg'::citext, 4) = 'PgPgPgPg' AS t;
  t 
@@ -964,7 +1103,31 @@ SELECT strpos('high'::citext, 'ig'        ) = 2 AS t;
  t
 (1 row)
 
+SELECT strpos('high',         'ig'::citext) = 2 AS t;
+ t 
+---
+ t
+(1 row)
+
 SELECT strpos('high'::citext, 'ig'::citext) = 2 AS t;
+ t 
+---
+ t
+(1 row)
+
+SELECT strpos('high'::citext, 'IG'        ) = 2 AS t;
+ t 
+---
+ t
+(1 row)
+
+SELECT strpos('high',         'IG'::citext) = 2 AS t;
+ t 
+---
+ t
+(1 row)
+
+SELECT strpos('high'::citext, 'IG'::citext) = 2 AS t;
  t 
 ---
  t
@@ -985,29 +1148,6 @@ SELECT translate('abcdefabcdef'::citext, 'cd', 'XX') = 'abXXefabXXef' AS t;
 (1 row)
 
 -- TODO These functions should work case-insensitively, but don't.
-SELECT regexp_matches('foobarbequebaz'::citext, '(BAR)(BEQUE)') = ARRAY[ 'bar', 'beque' ] AS "t TODO";
- t TODO 
---------
-(0 rows)
-
-SELECT regexp_replace('Thomas'::citext, '.[MN]A.', 'M') = 'THM' AS "t TODO";
- t TODO 
---------
- f
-(1 row)
-
-SELECT regexp_split_to_array('helloTworld'::citext, 't') = ARRAY[ 'hello', 'world' ] AS "t TODO";
- t TODO 
---------
- f
-(1 row)
-
-SELECT regexp_split_to_table('helloTworld'::citext, 't') AS "words TODO";
- words TODO  
--------------
- helloTworld
-(1 row)
-
 SELECT replace('abcdefabcdef'::citext, 'CD', 'XX') = 'abXXefabXXef' AS "t TODO";
  t TODO 
 --------
@@ -1015,12 +1155,6 @@ SELECT replace('abcdefabcdef'::citext, 'CD', 'XX') = 'abXXefabXXef' AS "t TODO";
 (1 row)
 
 SELECT split_part('abcTdefTghi'::citext, 't', 2) = 'def' AS "t TODO";
- t TODO 
---------
- f
-(1 row)
-
-SELECT strpos('high'::citext, 'IG'::citext) = 2 AS "t TODO";
  t TODO 
 --------
  f
