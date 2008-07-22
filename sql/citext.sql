@@ -317,10 +317,10 @@ SELECT strpos('high'::citext, 'IG'::citext) = 2 AS t;
 -- to_ascii() does not support UTF-8.
 -- to_hex() takes a numeric argument.
 SELECT substr('alphabet', 3, 2) = 'ph' AS t;
-SELECT translate('abcdefabcdef'::citext, 'cd', 'XX') = 'abXXefabXXef' AS t;
-
--- TODO These functions should work case-insensitively, but don't.
-SELECT translate('abcdefabcdef'::citext, 'CD', 'XX') = 'abXXefabXXef' AS "t TODO";
+SELECT translate('abcdefabcdef'::citext, 'cd',         'XX') = 'abXXefabXXef' AS t;
+SELECT translate('abcdefabcdef'::citext, 'CD',         'XX') = 'abXXefabXXef' AS t;
+SELECT translate('abcdefabcdef'::citext, 'CD'::citext, 'XX') = 'abXXefabXXef' AS t;
+SELECT translate('abcdefabcdef',         'CD'::citext, 'XX') = 'abXXefabXXef' AS t;
 
 -- Table 9-20. Formatting Functions
 SELECT to_date('05 Dec 2000'::citext, 'DD Mon YYYY'::citext)

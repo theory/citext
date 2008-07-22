@@ -488,10 +488,6 @@ CREATE OR REPLACE FUNCTION split_part( citext, citext, int ) RETURNS TEXT AS $$
     SELECT (regexp_split_to_array( $1, regexp_replace($2::text, '([^a-zA-Z_0-9])', E'\\\\\\1', 'g')::citext))[$3];
 $$ LANGUAGE SQL IMMUTABLE STRICT;
 
-
-
---
--- XXX Functions that don't yet work case-insensitively.
--- split_part()
--- translate()
---
+CREATE OR REPLACE FUNCTION translate( citext, citext, text ) RETURNS TEXT AS $$
+    SELECT translate( translate( $1::text, LOWER($2::text), $3), UPPER($2::text), $3);
+$$ LANGUAGE SQL IMMUTABLE STRICT;
