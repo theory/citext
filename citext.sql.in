@@ -62,16 +62,388 @@ RETURNS citext
 AS 'rtrim1'
 LANGUAGE 'internal' IMMUTABLE STRICT;
 
+CREATE OR REPLACE FUNCTION citext(bool)
+RETURNS citext
+AS 'booltext'
+LANGUAGE 'internal' IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION bool(citext)
+RETURNS bool
+AS 'SELECT bool( $1::text )'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION int8(citext)
+RETURNS int8
+AS 'SELECT int8( $1::text )'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION citext(int8)
+RETURNS citext
+AS 'SELECT text( $1 )::citext'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION int4(citext)
+RETURNS int4
+AS 'SELECT int4( $1::text )'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION citext(int4)
+RETURNS citext
+AS 'SELECT text( $1 )::citext'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION int2(citext)
+RETURNS int2
+AS 'SELECT int2( $1::text )'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION citext(int2)
+RETURNS citext
+AS 'SELECT text( $1 )::citext'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION float4(citext)
+RETURNS float4
+AS 'SELECT float4( $1::text )'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION citext(float4)
+RETURNS citext
+AS 'SELECT text( $1 )::citext'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION float8(citext)
+RETURNS float8
+AS 'SELECT float8( $1::text )'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION citext(float8)
+RETURNS citext
+AS 'SELECT text( $1 )::citext'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION numerik(citext)
+RETURNS numeric
+AS 'SELECT CAST( $1::text AS numeric)'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION citext(numeric)
+RETURNS citext
+AS 'SELECT text( $1 )::citext'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION name(citext)
+RETURNS name
+AS 'SELECT name( $1::text )'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION citext(name)
+RETURNS citext
+AS 'SELECT text( $1 )::citext'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION cidr(citext)
+RETURNS cidr
+AS 'SELECT cidr( $1::text )'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION citext(cidr)
+RETURNS citext
+AS 'SELECT text( $1 )::citext'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION inet(citext)
+RETURNS inet
+AS 'SELECT inet( $1::text )'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION citext(inet)
+RETURNS citext
+AS 'SELECT text( $1 )::citext'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION macaddr(citext)
+RETURNS macaddr
+AS 'SELECT macaddr( $1::text )'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION citext(macaddr)
+RETURNS citext
+AS 'SELECT text( $1 )::citext'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION xml(citext)
+RETURNS xml
+AS 'SELECT xml( $1::text )'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION citext(xml)
+RETURNS citext
+AS 'SELECT text( $1 )::citext'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION money(citext)
+RETURNS money
+AS 'SELECT money( $1::text )'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION citext(money)
+RETURNS citext
+AS 'SELECT text( $1 )::citext'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION tstamp(citext)
+RETURNS timestamp
+AS 'SELECT cast( $1::text as timestamp )'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION citext(timestamp)
+RETURNS citext
+AS 'SELECT text( $1 )::citext'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION timestamptz(citext)
+RETURNS timestamptz
+AS 'SELECT cast( $1::text as timestamptz )'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION citext(timestamptz)
+RETURNS citext
+AS 'SELECT text( $1 )::citext'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION ival(citext)
+RETURNS interval
+AS 'SELECT cast( $1::text as interval )'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION citext(interval)
+RETURNS citext
+AS 'SELECT text( $1 )::citext'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION date(citext)
+RETURNS date
+AS 'SELECT cast( $1::text as date )'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION citext(date)
+RETURNS citext
+AS 'SELECT text( $1 )::citext'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION tme(citext)
+RETURNS time
+AS 'SELECT cast( $1::text as time )'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION citext(time)
+RETURNS citext
+AS 'SELECT text( $1 )::citext'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION timetz(citext)
+RETURNS timetz
+AS 'SELECT cast( $1::text as timetz )'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION citext(timetz)
+RETURNS citext
+AS 'SELECT text( $1 )::citext'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+-- XXX TODO Hrm, how to cast enums? Too much magic.
+
+CREATE OR REPLACE FUNCTION point(citext)
+RETURNS point
+AS 'SELECT cast( $1::text as point )'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION citext(point)
+RETURNS citext
+AS 'SELECT text( $1 )::citext'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION lseg(citext)
+RETURNS lseg
+AS 'SELECT cast( $1::text as lseg )'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION citext(lseg)
+RETURNS citext
+AS 'SELECT text( $1 )::citext'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION box(citext)
+RETURNS box
+AS 'SELECT cast( $1::text as box )'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION citext(box)
+RETURNS citext
+AS 'SELECT text( $1 )::citext'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION path(citext)
+RETURNS path
+AS 'SELECT cast( $1::text as path )'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION citext(path)
+RETURNS citext
+AS 'SELECT text( $1 )::citext'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION polygon(citext)
+RETURNS polygon
+AS 'SELECT cast( $1::text as polygon )'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION citext(polygon)
+RETURNS citext
+AS 'SELECT text( $1 )::citext'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION circle(citext)
+RETURNS circle
+AS 'SELECT cast( $1::text as circle )'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION citext(circle)
+RETURNS citext
+AS 'SELECT text( $1 )::citext'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION bitt(citext)
+RETURNS bit
+AS 'SELECT cast( $1::text as bit )'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION citext(bit)
+RETURNS citext
+AS 'SELECT text( $1 )::citext'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION bitv(citext)
+RETURNS bit varying
+AS 'SELECT cast( $1::text as bit varying )'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION citext(bit varying)
+RETURNS citext
+AS 'SELECT text( $1 )::citext'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION tsvector(citext)
+RETURNS tsvector
+AS 'SELECT cast( $1::text as tsvector )'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION citext(tsvector)
+RETURNS citext
+AS 'SELECT text( $1 )::citext'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION tsquery(citext)
+RETURNS tsquery
+AS 'SELECT cast( $1::text as tsquery )'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION citext(tsquery)
+RETURNS citext
+AS 'SELECT text( $1 )::citext'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION uuid(citext)
+RETURNS uuid
+AS 'SELECT cast( $1::text as uuid )'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION citext(uuid)
+RETURNS citext
+AS 'SELECT text( $1 )::citext'
+LANGUAGE SQL IMMUTABLE STRICT;
+
 --
 --  Implicit and assignment type casts.
 --
 
-CREATE CAST (citext AS text)    WITHOUT FUNCTION AS IMPLICIT;
-CREATE CAST (citext AS varchar) WITHOUT FUNCTION AS IMPLICIT;
-CREATE CAST (citext AS bpchar)  WITHOUT FUNCTION AS ASSIGNMENT;
-CREATE CAST (text AS citext)    WITHOUT FUNCTION AS ASSIGNMENT;
-CREATE CAST (varchar AS citext) WITHOUT FUNCTION AS ASSIGNMENT;
-CREATE CAST (bpchar AS citext)  WITH    FUNCTION citext(bpchar) AS ASSIGNMENT;
+CREATE CAST (citext      AS text)        WITHOUT FUNCTION                     AS IMPLICIT;
+CREATE CAST (text        AS citext)      WITHOUT FUNCTION                     AS ASSIGNMENT;
+CREATE CAST (citext      AS varchar)     WITHOUT FUNCTION                     AS IMPLICIT;
+CREATE CAST (varchar     AS citext)      WITHOUT FUNCTION                     AS ASSIGNMENT;
+CREATE CAST (citext      AS bpchar)      WITHOUT FUNCTION                     AS ASSIGNMENT;
+CREATE CAST (bpchar      AS citext)      WITH    FUNCTION citext(bpchar)      AS ASSIGNMENT;
+CREATE CAST (bytea       AS citext)      WITHOUT FUNCTION                     AS ASSIGNMENT;
+CREATE CAST (citext      AS bytea)       WITHOUT FUNCTION                     AS ASSIGNMENT;
+
+CREATE CAST (boolean     AS citext)      WITH    FUNCTION citext(boolean)     AS ASSIGNMENT;
+CREATE CAST (citext      AS boolean)     WITH    FUNCTION bool(citext)        AS ASSIGNMENT;
+CREATE CAST (float4      AS citext)      WITH    FUNCTION citext(float4)      AS ASSIGNMENT;
+CREATE CAST (citext      AS float4)      WITH    FUNCTION float4(citext)      AS ASSIGNMENT;
+CREATE CAST (float8      AS citext)      WITH    FUNCTION citext(float8)      AS ASSIGNMENT;
+CREATE CAST (citext      AS float8)      WITH    FUNCTION float8(citext)      AS ASSIGNMENT;
+CREATE CAST (numeric     AS citext)      WITH    FUNCTION citext(numeric)     AS ASSIGNMENT;
+CREATE CAST (citext      AS numeric)     WITH    FUNCTION numerik(citext)     AS ASSIGNMENT;
+CREATE CAST (int8        AS citext)      WITH    FUNCTION citext(int8)        AS ASSIGNMENT;
+CREATE CAST (citext      AS int8)        WITH    FUNCTION int8(citext)        AS ASSIGNMENT;
+CREATE CAST (int4        AS citext)      WITH    FUNCTION citext(int4)        AS ASSIGNMENT;
+CREATE CAST (citext      AS int4)        WITH    FUNCTION int4(citext)        AS ASSIGNMENT;
+CREATE CAST (int2        AS citext)      WITH    FUNCTION citext(int2)        AS ASSIGNMENT;
+CREATE CAST (citext      AS int2)        WITH    FUNCTION int2(citext)        AS ASSIGNMENT;
+CREATE CAST (name        AS citext)      WITH    FUNCTION citext(name)        AS ASSIGNMENT;
+CREATE CAST (citext      AS name)        WITH    FUNCTION name(citext)        AS ASSIGNMENT;
+CREATE CAST (cidr        AS citext)      WITH    FUNCTION citext(cidr)        AS ASSIGNMENT;
+CREATE CAST (citext      AS cidr)        WITH    FUNCTION cidr(citext)        AS ASSIGNMENT;
+CREATE CAST (inet        AS citext)      WITH    FUNCTION citext(inet)        AS ASSIGNMENT;
+CREATE CAST (citext      AS inet)        WITH    FUNCTION inet(citext)        AS ASSIGNMENT;
+CREATE CAST (macaddr     AS citext)      WITH    FUNCTION citext(macaddr)     AS ASSIGNMENT;
+CREATE CAST (citext      AS macaddr)     WITH    FUNCTION macaddr(citext)     AS ASSIGNMENT;
+CREATE CAST (xml         AS citext)      WITH    FUNCTION citext(xml)         AS ASSIGNMENT;
+CREATE CAST (citext      AS xml)         WITH    FUNCTION xml(citext)         AS ASSIGNMENT;
+CREATE CAST (money       AS citext)      WITH    FUNCTION citext(money)       AS ASSIGNMENT;
+CREATE CAST (citext      AS money)       WITH    FUNCTION money(citext)       AS ASSIGNMENT;
+
+CREATE CAST (timestamp   AS citext)      WITH    FUNCTION citext(timestamp)   AS ASSIGNMENT;
+CREATE CAST (citext      AS timestamp)   WITH    FUNCTION tstamp(citext)      AS ASSIGNMENT;
+CREATE CAST (timestamptz AS citext)      WITH    FUNCTION citext(timestamptz) AS ASSIGNMENT;
+CREATE CAST (citext      AS timestamptz) WITH    FUNCTION timestamptz(citext) AS ASSIGNMENT;
+
+CREATE CAST (interval    AS citext)      WITH    FUNCTION citext(interval)    AS ASSIGNMENT;
+CREATE CAST (citext      AS interval)    WITH    FUNCTION ival(citext)        AS ASSIGNMENT;
+
+CREATE CAST (date        AS citext)      WITH    FUNCTION citext(date)        AS ASSIGNMENT;
+CREATE CAST (citext      AS date)        WITH    FUNCTION date(citext)        AS ASSIGNMENT;
+CREATE CAST (time        AS citext)      WITH    FUNCTION citext(time)        AS ASSIGNMENT;
+CREATE CAST (citext      AS time)        WITH    FUNCTION tme(citext)         AS ASSIGNMENT;
+CREATE CAST (timetz      AS citext)      WITH    FUNCTION citext(timetz)      AS ASSIGNMENT;
+CREATE CAST (citext      AS timetz)      WITH    FUNCTION timetz(citext)      AS ASSIGNMENT;
+
+CREATE CAST (point       AS citext)      WITH    FUNCTION citext(point)       AS ASSIGNMENT;
+CREATE CAST (citext      AS point)       WITH    FUNCTION point(citext)       AS ASSIGNMENT;
+CREATE CAST (lseg        AS citext)      WITH    FUNCTION citext(lseg)        AS ASSIGNMENT;
+CREATE CAST (citext      AS lseg)        WITH    FUNCTION lseg(citext)        AS ASSIGNMENT;
+CREATE CAST (box         AS citext)      WITH    FUNCTION citext(box)         AS ASSIGNMENT;
+CREATE CAST (citext      AS box)         WITH    FUNCTION box(citext)         AS ASSIGNMENT;
+CREATE CAST (path        AS citext)      WITH    FUNCTION citext(path)        AS ASSIGNMENT;
+CREATE CAST (citext      AS path)        WITH    FUNCTION path(citext)        AS ASSIGNMENT;
+CREATE CAST (polygon     AS citext)      WITH    FUNCTION citext(polygon)     AS ASSIGNMENT;
+CREATE CAST (citext      AS polygon)     WITH    FUNCTION polygon(citext)     AS ASSIGNMENT;
+CREATE CAST (circle      AS citext)      WITH    FUNCTION citext(circle)      AS ASSIGNMENT;
+CREATE CAST (citext      AS circle)      WITH    FUNCTION circle(citext)      AS ASSIGNMENT;
+
+CREATE CAST (bit         AS citext)      WITH    FUNCTION citext(bit)         AS ASSIGNMENT;
+CREATE CAST (citext      AS bit)         WITH    FUNCTION bitt(citext)        AS ASSIGNMENT;
+CREATE CAST (bit varying AS citext)      WITH    FUNCTION citext(bit varying) AS ASSIGNMENT;
+CREATE CAST (citext      AS bit varying) WITH    FUNCTION bitv(citext)        AS ASSIGNMENT;
+
+CREATE CAST (tsvector    AS citext)      WITH    FUNCTION citext(tsvector)    AS ASSIGNMENT;
+CREATE CAST (citext      AS tsvector)    WITH    FUNCTION tsvector(citext)    AS ASSIGNMENT;
+CREATE CAST (tsquery     AS citext)      WITH    FUNCTION citext(tsquery)     AS ASSIGNMENT;
+CREATE CAST (citext      AS tsquery)     WITH    FUNCTION tsquery(citext)     AS ASSIGNMENT;
+
+CREATE CAST (uuid        AS citext)      WITH    FUNCTION citext(uuid)        AS ASSIGNMENT;
+CREATE CAST (citext      AS uuid)        WITH    FUNCTION uuid(citext)        AS ASSIGNMENT;
 
 --
 -- Operator Functions.
@@ -441,7 +813,7 @@ CREATE OPERATOR !~~* (
 
 --
 -- Matching citext in regexp functions.
--- XXX Ideally these would be implemented in C.
+-- XXX TODO Ideally these would be implemented in C.
 --
 
 CREATE OR REPLACE FUNCTION regexp_matches( citext, citext ) RETURNS TEXT[] AS '

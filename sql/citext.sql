@@ -8,6 +8,9 @@
 --
 SET client_min_messages = warning;
 \set ECHO none
+--\set ON_ERROR_ROLBACK 1
+--\set ON_ERROR_STOP true
+--BEGIN;
 \i citext.sql
 RESET client_min_messages;
 \set ECHO all
@@ -160,7 +163,7 @@ SELECT LOWER(name) as aaa FROM srt WHERE name = 'AAA'::bpchar;
 SELECT LOWER(name) as aaa FROM srt WHERE name = 'AAA';
 SELECT LOWER(name) as aaa FROM srt WHERE name = 'AAA'::citext;
 
--- LIKE shoudl be case-insensitive
+-- LIKE should be case-insensitive
 SELECT name FROM srt WHERE name     LIKE '%a%' ORDER BY name;
 SELECT name FROM srt WHERE name NOT LIKE '%b%' ORDER BY name;
 SELECT name FROM srt WHERE name     LIKE '%A%' ORDER BY name;
@@ -181,6 +184,119 @@ SELECT name FROM srt WHERE name !~ 'A$' ORDER BY name;
 -- SIMILAR TO should be case-insensitive.
 SELECT name FROM srt WHERE name SIMILAR TO '%a.*';
 SELECT name FROM srt WHERE name SIMILAR TO '%A.*';
+
+-- Explcit casts.
+SELECT true::citext = 'true' AS t;
+SELECT 'true'::citext::boolean = true AS t;
+
+SELECT 4::citext = '4' AS t;
+SELECT 4::int4::citext = '4' AS t;
+SELECT '4'::citext::int4 = 4 AS t;
+SELECT 4::integer::citext = '4' AS t;
+SELECT '4'::citext::integer = 4 AS t;
+
+SELECT 4::int8::citext = '4' AS t;
+SELECT '4'::citext::int8 = 4 AS t;
+SELECT 4::bigint::citext = '4' AS t;
+SELECT '4'::citext::bigint = 4 AS t;
+
+SELECT 4::int2::citext = '4' AS t;
+SELECT '4'::citext::int2 = 4 AS t;
+SELECT 4::smallint::citext = '4' AS t;
+SELECT '4'::citext::smallint = 4 AS t;
+
+SELECT 4.0::numeric = '4.0' AS t;
+SELECT '4.0'::citext::numeric = 4.0 AS t;
+SELECT 4.0::decimal = '4.0' AS t;
+SELECT '4.0'::citext::decimal = 4.0 AS t;
+
+SELECT 4.0::real = '4.0' AS t;
+SELECT '4.0'::citext::real = 4.0 AS t;
+SELECT 4.0::float4 = '4.0' AS t;
+SELECT '4.0'::citext::float4 = 4.0 AS t;
+
+SELECT 4.0::double precision = '4.0' AS t;
+SELECT '4.0'::citext::double precision = 4.0 AS t;
+SELECT 4.0::float8 = '4.0' AS t;
+SELECT '4.0'::citext::float8 = 4.0 AS t;
+
+SELECT 'foo'::name::citext = 'foo' AS t;
+SELECT 'foo'::citext::name = 'foo'::name AS t;
+
+SELECT 'foo'::bytea::citext = 'foo' AS t;
+SELECT 'foo'::citext::bytea = 'foo'::bytea AS t;
+
+SELECT '100'::money::citext = '$100.00' AS t;
+SELECT '100'::citext::money = '100'::money AS t;
+
+SELECT 'a'::char::citext = 'a' AS t;
+SELECT 'a'::citext::char = 'a'::char AS t;
+
+SELECT 'foo'::varchar::citext = 'foo' AS t;
+SELECT 'foo'::citext::varchar = 'foo'::varchar AS t;
+
+SELECT 'foo'::text::citext = 'foo' AS t;
+SELECT 'foo'::citext::text = 'foo'::text AS t;
+
+SELECT '192.168.100.128/25'::cidr::citext = '192.168.100.128/25' AS t;
+SELECT '192.168.100.128/25'::citext::cidr = '192.168.100.128/25'::cidr AS t;
+
+SELECT '192.168.100.128'::inet::citext = '192.168.100.128/32' AS t;
+SELECT '192.168.100.128'::citext::inet = '192.168.100.128'::inet AS t;
+
+SELECT '08:00:2b:01:02:03'::macaddr::citext = '08:00:2b:01:02:03' AS t;
+SELECT '08:00:2b:01:02:03'::citext::macaddr = '08:00:2b:01:02:03'::macaddr AS t;
+
+SELECT '<p>foo</p>'::xml::citext = '<p>foo</p>' AS t;
+SELECT '<p>foo</p>'::citext::xml::text = '<p>foo</p>'::xml::text AS t;
+
+SELECT '1999-01-08 04:05:06'::timestamp::citext = '1999-01-08 04:05:06'::timestamp::text AS t;
+SELECT '1999-01-08 04:05:06'::citext::timestamp = '1999-01-08 04:05:06'::timestamp AS t;
+SELECT '1999-01-08 04:05:06'::timestamptz::citext = '1999-01-08 04:05:06'::timestamptz::text AS t;
+SELECT '1999-01-08 04:05:06'::citext::timestamptz = '1999-01-08 04:05:06'::timestamptz AS t;
+
+SELECT '1 hour'::interval::citext = '1 hour'::interval::text AS t;
+SELECT '1 hour'::citext::interval = '1 hour'::interval AS t;
+
+SELECT '1999-01-08'::date::citext = '1999-01-08'::date::text AS t;
+SELECT '1999-01-08'::citext::date = '1999-01-08'::date AS t;
+
+SELECT '04:05:06'::time::citext = '04:05:06' AS t;
+SELECT '04:05:06'::citext::time = '04:05:06'::time AS t;
+SELECT '04:05:06'::timetz::citext = '04:05:06'::timetz::text AS t;
+SELECT '04:05:06'::citext::timetz = '04:05:06'::timetz AS t;
+
+SELECT '( 1 , 1)'::point::citext = '(1,1)' AS t;
+SELECT '( 1 , 1)'::citext::point ~= '(1,1)'::point AS t;
+SELECT '( 1 , 1 ) , ( 2 , 2 )'::lseg::citext = '[(1,1),(2,2)]' AS t;
+SELECT '( 1 , 1 ) , ( 2 , 2 )'::citext::lseg = '[(1,1),(2,2)]'::lseg AS t;
+SELECT '( 0 , 0 ) , ( 1 , 1 )'::box::citext = '(0,0),(1,1)'::box::text AS t;
+SELECT '( 0 , 0 ) , ( 1 , 1 )'::citext::box ~= '(0,0),(1,1)'::text::box AS t;
+
+SELECT '((0,0),(1,1),(2,0))'::path::citext = '((0,0),(1,1),(2,0))' AS t;
+SELECT '((0,0),(1,1),(2,0))'::citext::path = '((0,0),(1,1),(2,0))'::path AS t;
+
+SELECT '((0,0),(1,1))'::polygon::citext = '((0,0),(1,1))' AS t;
+SELECT '((0,0),(1,1))'::citext::polygon ~= '((0,0),(1,1))'::polygon AS t;
+
+SELECT '((0,0),2)'::circle::citext = '((0,0),2)'::circle::text AS t;
+SELECT '((0,0),2)'::citext::circle ~= '((0,0),2)'::text::circle AS t;
+
+SELECT '101'::bit::citext = '101'::bit::text AS t;
+SELECT '101'::citext::bit = '101'::text::bit AS t;
+SELECT '101'::bit varying::citext = '101'::bit varying::text AS t;
+SELECT '101'::citext::bit varying = '101'::text::bit varying AS t;
+SELECT 'a fat cat'::tsvector::citext = '''a'' ''cat'' ''fat''' AS t;
+SELECT 'a fat cat'::citext::tsvector = 'a fat cat'::tsvector AS t;
+SELECT 'fat & rat'::tsquery::citext = '''fat'' & ''rat''' AS t;
+SELECT 'fat & rat'::citext::tsquery = 'fat & rat'::tsquery AS t;
+SELECT 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::uuid::citext = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11' AS t;
+SELECT 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::citext::uuid = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::uuid AS t;
+
+-- XXX TODO: Get enum casts working.
+-- CREATE TYPE mood AS ENUM ('sad', 'ok', 'happy');
+-- SELECT 'sad'::mood::citext = 'sad' AS t;
+-- SELECT 'sad'::citext::mood = 'sad'::mood AS t;
 
 -- Table 9-5. SQL String Functions and Operators
 SELECT 'D'::citext || 'avid'::citext = 'David'::citext AS citext_concat;
@@ -363,7 +479,3 @@ SELECT COUNT(*) = 19::bigint AS t FROM try;
 
 SELECT like_escape( name, '' ) = like_escape( name::text, '' ) AS t FROM srt;
 SELECT like_escape( name::text, ''::citext ) = like_escape( name::text, '' ) AS t FROM srt;
-
---- TODO: Get citext working with magic cast functions?
-SELECT cidr( '192.168.1.2'::citext ) = cidr( '192.168.1.2'::text ) AS "t TODO";
-SELECT '192.168.1.2'::cidr::citext = '192.168.1.2'::cidr::text AS "t TODO";
