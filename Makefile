@@ -1,5 +1,6 @@
 MODULES = citext
 DATA_built = citext.sql
+DATA = uninstall_citext.sql
 DOCS = README.citext
 REGRESS = citext
 
