@@ -2,7 +2,7 @@
 --  PostgreSQL code for CITEXT.
 --
 -- Most I/O functions, and a few others, piggyback on the "text" type
--- functions.
+-- functions via the implicit cast to text.
 
 -- Adjust this setting to control where the objects get created.
 SET search_path = public;
@@ -55,7 +55,7 @@ CREATE TYPE citext (
 
 --
 -- A single cast function, since bpchar needs to have its whitespace trimmed
--- before it's case to citext.
+-- before it's cast to citext.
 --
 CREATE OR REPLACE FUNCTION citext(bpchar)
 RETURNS citext
@@ -375,7 +375,7 @@ CREATE CAST (varchar     AS citext)      WITHOUT FUNCTION                     AS
 CREATE CAST (citext      AS bpchar)      WITHOUT FUNCTION                     AS ASSIGNMENT;
 CREATE CAST (bpchar      AS citext)      WITH    FUNCTION citext(bpchar)      AS ASSIGNMENT;
 CREATE CAST (bytea       AS citext)      WITHOUT FUNCTION                     AS ASSIGNMENT;
-CREATE CAST (citext      AS bytea)       WITHOUT FUNCTION                     AS ASSIGNMENT;
+CREATE CAST (citext      AS bytea)       WITHOUT FUNCTION;
 
 CREATE CAST (boolean     AS citext)      WITH    FUNCTION citext(boolean)     AS ASSIGNMENT;
 CREATE CAST (citext      AS boolean)     WITH    FUNCTION bool(citext)        AS ASSIGNMENT;
@@ -407,7 +407,7 @@ CREATE CAST (citext      AS money)       WITH    FUNCTION money(citext)       AS
 CREATE CAST (timestamp   AS citext)      WITH    FUNCTION citext(timestamp)   AS ASSIGNMENT;
 CREATE CAST (citext      AS timestamp)   WITH    FUNCTION tstamp(citext)      AS ASSIGNMENT;
 CREATE CAST (timestamptz AS citext)      WITH    FUNCTION citext(timestamptz) AS ASSIGNMENT;
-CREATE CAST (citext      AS timestamptz) WITH    FUNCTION timestamptz(citext) AS ASSIGNMENT;
+CREATE CAST (citext      AS timestamptz) WITH    FUNCTION timestamptz(citext);
 
 CREATE CAST (interval    AS citext)      WITH    FUNCTION citext(interval)    AS ASSIGNMENT;
 CREATE CAST (citext      AS interval)    WITH    FUNCTION ival(citext)        AS ASSIGNMENT;
@@ -479,6 +479,7 @@ RETURNS bool
 AS 'MODULE_PATHNAME'
 LANGUAGE C IMMUTABLE STRICT;
 
+-- We overload || just to preserve "citext-ness" of the result.
 CREATE OR REPLACE FUNCTION textcat(citext, citext)
 RETURNS citext
 AS 'textcat'
@@ -557,18 +558,18 @@ CREATE OPERATOR || (
 );
 
 --
--- Comparison functions for indexing.
+-- Support functions for indexing.
 --
 
-CREATE FUNCTION citext_cmp(CITEXT, CITEXT)
-RETURNS INT
+CREATE OR REPLACE FUNCTION citext_cmp(citext, citext)
+RETURNS int4
 AS 'MODULE_PATHNAME'
 LANGUAGE C STRICT IMMUTABLE;
 
-CREATE FUNCTION citext_hash(citext)
+CREATE OR REPLACE FUNCTION citext_hash(citext)
 RETURNS int4
 AS 'MODULE_PATHNAME'
-LANGUAGE C IMMUTABLE RETURNS NULL ON NULL INPUT;
+LANGUAGE C STRICT IMMUTABLE;
 
 --
 -- The btree indexing operator class.
@@ -596,53 +597,65 @@ DEFAULT FOR TYPE citext USING hash AS
 -- Aggregates.
 --
 
-CREATE FUNCTION citext_smaller(citext, citext)
+CREATE OR REPLACE FUNCTION citext_smaller(citext, citext)
 RETURNS citext
 AS 'MODULE_PATHNAME'
 LANGUAGE 'C' IMMUTABLE STRICT;
 
-CREATE FUNCTION citext_larger(citext, citext)
+CREATE OR REPLACE FUNCTION citext_larger(citext, citext)
 RETURNS citext
 AS 'MODULE_PATHNAME'
 LANGUAGE 'C' IMMUTABLE STRICT;
 
-CREATE AGGREGATE max(BASETYPE=citext, SFUNC=citext_larger,  STYPE=citext);
-CREATE AGGREGATE min(BASETYPE=citext, SFUNC=citext_smaller, STYPE=citext);
+CREATE AGGREGATE min(citext)  (
+    SFUNC = citext_smaller,
+    STYPE = citext,
+    SORTOP = <
+);
+
+CREATE AGGREGATE max(citext)  (
+    SFUNC = citext_larger,
+    STYPE = citext,
+    SORTOP = >
+);
 
 --
--- Miscelaneous functions
+-- Miscellaneous functions
+-- These exist to preserve the "citext-ness" of the input.
 --
 
-CREATE FUNCTION lower(citext)
+CREATE OR REPLACE FUNCTION lower(citext)
 RETURNS citext AS 'lower'
 LANGUAGE 'internal' IMMUTABLE STRICT;
 
-CREATE FUNCTION upper(citext)
+CREATE OR REPLACE FUNCTION upper(citext)
 RETURNS citext AS 'upper'
 LANGUAGE 'internal' IMMUTABLE STRICT;
 
+-- needed to avoid "function is not unique" errors
+-- XXX find a better way to deal with this...
+CREATE FUNCTION quote_literal(citext)
+RETURNS text AS 'quote_literal'
+LANGUAGE 'internal' IMMUTABLE STRICT;
+
 --
--- Matching citext to citext. 
+-- CITEXT pattern matching.
 --
 
-CREATE FUNCTION texticlike(citext, citext)
+CREATE OR REPLACE FUNCTION texticlike(citext, citext)
 RETURNS bool AS 'texticlike'
 LANGUAGE 'internal' IMMUTABLE STRICT;
 
-CREATE FUNCTION texticnlike(citext, citext)
+CREATE OR REPLACE FUNCTION texticnlike(citext, citext)
 RETURNS bool AS 'texticnlike'
 LANGUAGE 'internal' IMMUTABLE STRICT;
 
-CREATE FUNCTION texticregexeq(citext, citext)
+CREATE OR REPLACE FUNCTION texticregexeq(citext, citext)
 RETURNS bool AS 'texticregexeq'
 LANGUAGE 'internal' IMMUTABLE STRICT;
 
-CREATE FUNCTION texticregexne(citext, citext)
+CREATE OR REPLACE FUNCTION texticregexne(citext, citext)
 RETURNS bool AS 'texticregexne'
-LANGUAGE 'internal' IMMUTABLE STRICT;
-
-CREATE FUNCTION quote_literal(citext)
-RETURNS text AS 'quote_literal'
 LANGUAGE 'internal' IMMUTABLE STRICT;
 
 -- regular expression Operators citext : citext
@@ -722,19 +735,19 @@ CREATE OPERATOR !~~* (
 -- Matching citext to text. 
 --
 
-CREATE FUNCTION texticlike(citext, text)
+CREATE OR REPLACE FUNCTION texticlike(citext, text)
 RETURNS bool AS 'texticlike'
 LANGUAGE 'internal' IMMUTABLE STRICT;
 
-CREATE FUNCTION texticnlike(citext, text)
+CREATE OR REPLACE FUNCTION texticnlike(citext, text)
 RETURNS bool AS 'texticnlike'
 LANGUAGE 'internal' IMMUTABLE STRICT;
 
-CREATE FUNCTION texticregexeq(citext, text)
+CREATE OR REPLACE FUNCTION texticregexeq(citext, text)
 RETURNS bool AS 'texticregexeq'
 LANGUAGE 'internal' IMMUTABLE STRICT;
 
-CREATE FUNCTION texticregexne(citext, text)
+CREATE OR REPLACE FUNCTION texticregexne(citext, text)
 RETURNS bool AS 'texticregexne'
 LANGUAGE 'internal' IMMUTABLE STRICT;
 
