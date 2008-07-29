@@ -1,6 +1,6 @@
 /*
-* PostgreSQL type definitions for CITEXT 2.0.
-*/
+ * PostgreSQL type definitions for CITEXT 2.0.
+ */
 
 #include "postgres.h"
 
@@ -22,10 +22,10 @@ PG_MODULE_MAGIC;
 #endif
 
 /*
-*      ====================
-*      FORWARD DECLARATIONS
-*      ====================
-*/
+ *      ====================
+ *      FORWARD DECLARATIONS
+ *      ====================
+ */
 
 extern char  *str_tolower(const char *buff, size_t nbytes); /* Delete me for 8.4 */
 static int32  citextcmp      (text *left, text *right);
@@ -41,11 +41,10 @@ extern Datum  citext_smaller (PG_FUNCTION_ARGS);
 extern Datum  citext_larger  (PG_FUNCTION_ARGS);
 
 /*
-*      =================
-*      UTILITY FUNCTIONS
-*      =================
-*/
-
+ *      =================
+ *      UTILITY FUNCTIONS
+ *      =================
+ */
 
 /* Delete me -- Copied from CVS HEAD for 8.4. */
 char *
@@ -90,11 +89,11 @@ str_tolower(const char *buff, size_t nbytes)
 	return result;
 } /* --Delete me for 8.4 */
 
-/* citextcmp()
-* Internal comparison function for citext strings.
-* Returns int32 negative, zero, or positive.
-*/
-
+/*
+ * citextcmp()
+ * Internal comparison function for citext strings.
+ * Returns int32 negative, zero, or positive.
+ */
 static int32
 citextcmp (text *left, text *right)
 {
@@ -105,7 +104,7 @@ citextcmp (text *left, text *right)
    rcstr = str_tolower(VARDATA_ANY(right), VARSIZE_ANY_EXHDR(right));
 
    result = varstr_cmp(lcstr, strlen(lcstr),
-						rcstr, strlen(rcstr));
+					   rcstr, strlen(rcstr));
 
    pfree(lcstr);
    pfree(rcstr);
@@ -114,10 +113,10 @@ citextcmp (text *left, text *right)
 }
 
 /*
-*      ==================
-*      INDEXING FUNCTIONS
-*      ==================
-*/
+ *      ==================
+ *      INDEXING FUNCTIONS
+ *      ==================
+ */
 
 PG_FUNCTION_INFO_V1(citext_cmp);
 
@@ -156,10 +155,10 @@ citext_hash(PG_FUNCTION_ARGS)
 }
 
 /*
-*      ==================
-*      OPERATOR FUNCTIONS
-*      ==================
-*/
+ *      ==================
+ *      OPERATOR FUNCTIONS
+ *      ==================
+ */
 
 PG_FUNCTION_INFO_V1(citext_eq);
 
@@ -171,15 +170,13 @@ citext_eq(PG_FUNCTION_ARGS)
    char *lcstr, *rcstr;
    bool  result;
 
+   /* We can't compare lengths in advance of downcasing ... */
+
    lcstr = str_tolower(VARDATA_ANY(left), VARSIZE_ANY_EXHDR(left));
    rcstr = str_tolower(VARDATA_ANY(right), VARSIZE_ANY_EXHDR(right));
 
    /*
-    * We can't do the length-comparison optimization here, as is done for the
-    * text type in varlena.c, because sometimes the lengths can be different.
-    * The canonical example is the turkish dotted i: the lowercase version is
-    * the standard ASCII i, but the uppercase version is multibyte.
-    * Otherwise, since we only care about equality or not-equality, we can
+    * Since we only care about equality or not-equality, we can
     * avoid all the expense of strcoll() here, and just do bitwise
     * comparison.
     */
@@ -203,15 +200,13 @@ citext_ne(PG_FUNCTION_ARGS)
    char *lcstr, *rcstr;
    bool  result;
 
+   /* We can't compare lengths in advance of downcasing ... */
+
    lcstr = str_tolower(VARDATA_ANY(left), VARSIZE_ANY_EXHDR(left));
    rcstr = str_tolower(VARDATA_ANY(right), VARSIZE_ANY_EXHDR(right));
 
    /*
-    * We can't do the length-comparison optimization here, as is done for the
-    * text type in varlena.c, because sometimes the lengths can be different.
-    * The canonical example is the turkish dotted i: the lowercase version is
-    * the standard ASCII i, but the uppercase version is multibyte.
-    * Otherwise, since we only care about equality or not-equality, we can
+    * Since we only care about equality or not-equality, we can
     * avoid all the expense of strcoll() here, and just do bitwise
     * comparison.
     */
@@ -294,10 +289,10 @@ citext_ge(PG_FUNCTION_ARGS)
 }
 
 /*
-*      ===================
-*      AGGREGATE FUNCTIONS
-*      ===================
-*/
+ *      ===================
+ *      AGGREGATE FUNCTIONS
+ *      ===================
+ */
 
 PG_FUNCTION_INFO_V1(citext_smaller);
 
