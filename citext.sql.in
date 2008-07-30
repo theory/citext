@@ -378,72 +378,72 @@ CREATE CAST (bytea       AS citext)      WITHOUT FUNCTION                     AS
 CREATE CAST (citext      AS bytea)       WITHOUT FUNCTION;
 
 CREATE CAST (boolean     AS citext)      WITH    FUNCTION citext(boolean)     AS ASSIGNMENT;
-CREATE CAST (citext      AS boolean)     WITH    FUNCTION bool(citext)        AS ASSIGNMENT;
+CREATE CAST (citext      AS boolean)     WITH    FUNCTION bool(citext);
 CREATE CAST (float4      AS citext)      WITH    FUNCTION citext(float4)      AS ASSIGNMENT;
-CREATE CAST (citext      AS float4)      WITH    FUNCTION float4(citext)      AS ASSIGNMENT;
+CREATE CAST (citext      AS float4)      WITH    FUNCTION float4(citext);
 CREATE CAST (float8      AS citext)      WITH    FUNCTION citext(float8)      AS ASSIGNMENT;
-CREATE CAST (citext      AS float8)      WITH    FUNCTION float8(citext)      AS ASSIGNMENT;
+CREATE CAST (citext      AS float8)      WITH    FUNCTION float8(citext);
 CREATE CAST (numeric     AS citext)      WITH    FUNCTION citext(numeric)     AS ASSIGNMENT;
-CREATE CAST (citext      AS numeric)     WITH    FUNCTION numerik(citext)     AS ASSIGNMENT;
+CREATE CAST (citext      AS numeric)     WITH    FUNCTION numerik(citext);
 CREATE CAST (int8        AS citext)      WITH    FUNCTION citext(int8)        AS ASSIGNMENT;
-CREATE CAST (citext      AS int8)        WITH    FUNCTION int8(citext)        AS ASSIGNMENT;
+CREATE CAST (citext      AS int8)        WITH    FUNCTION int8(citext);
 CREATE CAST (int4        AS citext)      WITH    FUNCTION citext(int4)        AS ASSIGNMENT;
-CREATE CAST (citext      AS int4)        WITH    FUNCTION int4(citext)        AS ASSIGNMENT;
+CREATE CAST (citext      AS int4)        WITH    FUNCTION int4(citext);
 CREATE CAST (int2        AS citext)      WITH    FUNCTION citext(int2)        AS ASSIGNMENT;
-CREATE CAST (citext      AS int2)        WITH    FUNCTION int2(citext)        AS ASSIGNMENT;
+CREATE CAST (citext      AS int2)        WITH    FUNCTION int2(citext);
 CREATE CAST (name        AS citext)      WITH    FUNCTION citext(name)        AS ASSIGNMENT;
 CREATE CAST (citext      AS name)        WITH    FUNCTION name(citext)        AS ASSIGNMENT;
 CREATE CAST (cidr        AS citext)      WITH    FUNCTION citext(cidr)        AS ASSIGNMENT;
-CREATE CAST (citext      AS cidr)        WITH    FUNCTION cidr(citext)        AS ASSIGNMENT;
+CREATE CAST (citext      AS cidr)        WITH    FUNCTION cidr(citext);
 CREATE CAST (inet        AS citext)      WITH    FUNCTION citext(inet)        AS ASSIGNMENT;
-CREATE CAST (citext      AS inet)        WITH    FUNCTION inet(citext)        AS ASSIGNMENT;
+CREATE CAST (citext      AS inet)        WITH    FUNCTION inet(citext);
 CREATE CAST (macaddr     AS citext)      WITH    FUNCTION citext(macaddr)     AS ASSIGNMENT;
-CREATE CAST (citext      AS macaddr)     WITH    FUNCTION macaddr(citext)     AS ASSIGNMENT;
+CREATE CAST (citext      AS macaddr)     WITH    FUNCTION macaddr(citext);
 CREATE CAST (xml         AS citext)      WITH    FUNCTION citext(xml)         AS ASSIGNMENT;
-CREATE CAST (citext      AS xml)         WITH    FUNCTION xml(citext)         AS ASSIGNMENT;
+CREATE CAST (citext      AS xml)         WITH    FUNCTION xml(citext);
 CREATE CAST (money       AS citext)      WITH    FUNCTION citext(money)       AS ASSIGNMENT;
-CREATE CAST (citext      AS money)       WITH    FUNCTION money(citext)       AS ASSIGNMENT;
+CREATE CAST (citext      AS money)       WITH    FUNCTION money(citext);
 
 CREATE CAST (timestamp   AS citext)      WITH    FUNCTION citext(timestamp)   AS ASSIGNMENT;
-CREATE CAST (citext      AS timestamp)   WITH    FUNCTION tstamp(citext)      AS ASSIGNMENT;
+CREATE CAST (citext      AS timestamp)   WITH    FUNCTION tstamp(citext);
 CREATE CAST (timestamptz AS citext)      WITH    FUNCTION citext(timestamptz) AS ASSIGNMENT;
 CREATE CAST (citext      AS timestamptz) WITH    FUNCTION timestamptz(citext);
 
 CREATE CAST (interval    AS citext)      WITH    FUNCTION citext(interval)    AS ASSIGNMENT;
-CREATE CAST (citext      AS interval)    WITH    FUNCTION ival(citext)        AS ASSIGNMENT;
+CREATE CAST (citext      AS interval)    WITH    FUNCTION ival(citext);
 
 CREATE CAST (date        AS citext)      WITH    FUNCTION citext(date)        AS ASSIGNMENT;
-CREATE CAST (citext      AS date)        WITH    FUNCTION date(citext)        AS ASSIGNMENT;
+CREATE CAST (citext      AS date)        WITH    FUNCTION date(citext);
 CREATE CAST (time        AS citext)      WITH    FUNCTION citext(time)        AS ASSIGNMENT;
-CREATE CAST (citext      AS time)        WITH    FUNCTION tme(citext)         AS ASSIGNMENT;
+CREATE CAST (citext      AS time)        WITH    FUNCTION tme(citext);
 CREATE CAST (timetz      AS citext)      WITH    FUNCTION citext(timetz)      AS ASSIGNMENT;
-CREATE CAST (citext      AS timetz)      WITH    FUNCTION timetz(citext)      AS ASSIGNMENT;
+CREATE CAST (citext      AS timetz)      WITH    FUNCTION timetz(citext);
 
 CREATE CAST (point       AS citext)      WITH    FUNCTION citext(point)       AS ASSIGNMENT;
-CREATE CAST (citext      AS point)       WITH    FUNCTION point(citext)       AS ASSIGNMENT;
+CREATE CAST (citext      AS point)       WITH    FUNCTION point(citext);
 CREATE CAST (lseg        AS citext)      WITH    FUNCTION citext(lseg)        AS ASSIGNMENT;
-CREATE CAST (citext      AS lseg)        WITH    FUNCTION lseg(citext)        AS ASSIGNMENT;
+CREATE CAST (citext      AS lseg)        WITH    FUNCTION lseg(citext);
 CREATE CAST (box         AS citext)      WITH    FUNCTION citext(box)         AS ASSIGNMENT;
-CREATE CAST (citext      AS box)         WITH    FUNCTION box(citext)         AS ASSIGNMENT;
+CREATE CAST (citext      AS box)         WITH    FUNCTION box(citext);
 CREATE CAST (path        AS citext)      WITH    FUNCTION citext(path)        AS ASSIGNMENT;
-CREATE CAST (citext      AS path)        WITH    FUNCTION path(citext)        AS ASSIGNMENT;
+CREATE CAST (citext      AS path)        WITH    FUNCTION path(citext);
 CREATE CAST (polygon     AS citext)      WITH    FUNCTION citext(polygon)     AS ASSIGNMENT;
-CREATE CAST (citext      AS polygon)     WITH    FUNCTION polygon(citext)     AS ASSIGNMENT;
+CREATE CAST (citext      AS polygon)     WITH    FUNCTION polygon(citext);
 CREATE CAST (circle      AS citext)      WITH    FUNCTION citext(circle)      AS ASSIGNMENT;
-CREATE CAST (citext      AS circle)      WITH    FUNCTION circle(citext)      AS ASSIGNMENT;
+CREATE CAST (citext      AS circle)      WITH    FUNCTION circle(citext);
 
 CREATE CAST (bit         AS citext)      WITH    FUNCTION citext(bit)         AS ASSIGNMENT;
-CREATE CAST (citext      AS bit)         WITH    FUNCTION bitt(citext)        AS ASSIGNMENT;
+CREATE CAST (citext      AS bit)         WITH    FUNCTION bitt(citext);
 CREATE CAST (bit varying AS citext)      WITH    FUNCTION citext(bit varying) AS ASSIGNMENT;
-CREATE CAST (citext      AS bit varying) WITH    FUNCTION bitv(citext)        AS ASSIGNMENT;
+CREATE CAST (citext      AS bit varying) WITH    FUNCTION bitv(citext);
 
 CREATE CAST (tsvector    AS citext)      WITH    FUNCTION citext(tsvector)    AS ASSIGNMENT;
-CREATE CAST (citext      AS tsvector)    WITH    FUNCTION tsvector(citext)    AS ASSIGNMENT;
+CREATE CAST (citext      AS tsvector)    WITH    FUNCTION tsvector(citext);
 CREATE CAST (tsquery     AS citext)      WITH    FUNCTION citext(tsquery)     AS ASSIGNMENT;
-CREATE CAST (citext      AS tsquery)     WITH    FUNCTION tsquery(citext)     AS ASSIGNMENT;
+CREATE CAST (citext      AS tsquery)     WITH    FUNCTION tsquery(citext);
 
 CREATE CAST (uuid        AS citext)      WITH    FUNCTION citext(uuid)        AS ASSIGNMENT;
-CREATE CAST (citext      AS uuid)        WITH    FUNCTION uuid(citext)        AS ASSIGNMENT;
+CREATE CAST (citext      AS uuid)        WITH    FUNCTION uuid(citext);
 
 --
 -- Operator Functions.

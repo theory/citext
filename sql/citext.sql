@@ -298,6 +298,243 @@ SELECT 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::citext::uuid = 'a0eebc99-9c0b-4ef
 -- SELECT 'sad'::mood::citext = 'sad' AS t;
 -- SELECT 'sad'::citext::mood = 'sad'::mood AS t;
 
+-- Assignment casts.
+CREATE TABLE caster (
+    citext      citext,
+    text        text,
+    varchar     varchar,
+    bpchar      bpchar,
+    name        name,    
+    bytea       bytea,
+    boolean     boolean,
+    float4      float4,
+    float8      float8,
+    numeric     numeric,
+    int8        int8,
+    int4        int4,
+    int2        int2,
+    cidr        cidr,   
+    inet        inet,
+    macaddr     macaddr,
+    xml         xml,
+    money       money,
+    timestamp   timestamp,
+    timestamptz timestamptz,
+    interval    interval,
+    date        date,
+    time        time,
+    timetz      timetz,
+    point       point,
+    lseg        lseg,
+    box         box,
+    path        path,
+    polygon     polygon,
+    circle      circle,
+    bit         bit,
+    bitv        bit varying,
+    tsvector    tsvector,
+    tsquery     tsquery,
+    uuid        uuid
+);
+
+INSERT INTO caster (text)          VALUES ('foo'::citext);
+INSERT INTO caster (citext)        VALUES ('foo'::text);
+
+INSERT INTO caster (varchar)       VALUES ('foo'::text);
+INSERT INTO caster (text)          VALUES ('foo'::varchar);
+INSERT INTO caster (varchar)       VALUES ('foo'::citext);
+INSERT INTO caster (citext)        VALUES ('foo'::varchar);
+
+INSERT INTO caster (bpchar)        VALUES ('foo'::text);
+INSERT INTO caster (text)          VALUES ('foo'::bpchar);
+INSERT INTO caster (bpchar)        VALUES ('foo'::citext);
+INSERT INTO caster (citext)        VALUES ('foo'::bpchar);
+
+INSERT INTO caster (name)          VALUES ('foo'::text);
+INSERT INTO caster (text)          VALUES ('foo'::name);
+INSERT INTO caster (name)          VALUES ('foo'::citext);
+INSERT INTO caster (citext)        VALUES ('foo'::name);
+
+-- Cannot cast to bytea on assignment.
+INSERT INTO caster (bytea)         VALUES ('foo'::text);
+INSERT INTO caster (text)          VALUES ('foo'::bytea);
+INSERT INTO caster (bytea)         VALUES ('foo'::citext);
+INSERT INTO caster (citext)        VALUES ('foo'::bytea);
+
+-- Cannot cast to boolean on assignment.
+INSERT INTO caster (boolean)       VALUES ('t'::text);
+INSERT INTO caster (text)          VALUES ('t'::boolean);
+INSERT INTO caster (boolean)       VALUES ('t'::citext);
+INSERT INTO caster (citext)        VALUES ('t'::boolean);
+
+-- Cannot cast to float8 on assignment.
+INSERT INTO caster (float8)        VALUES ('12.42'::text);
+INSERT INTO caster (text)          VALUES ('12.42'::float8);
+INSERT INTO caster (float8)        VALUES ('12.42'::citext);
+INSERT INTO caster (citext)        VALUES ('12.42'::float8);
+
+-- Cannot cast to float4 on assignment.
+INSERT INTO caster (float4)        VALUES ('12.42'::text);
+INSERT INTO caster (text)          VALUES ('12.42'::float4);
+INSERT INTO caster (float4)        VALUES ('12.42'::citext);
+INSERT INTO caster (citext)        VALUES ('12.42'::float4);
+
+-- Cannot cast to numeric on assignment.
+INSERT INTO caster (numeric)       VALUES ('12.42'::text);
+INSERT INTO caster (text)          VALUES ('12.42'::numeric);
+INSERT INTO caster (numeric)       VALUES ('12.42'::citext);
+INSERT INTO caster (citext)        VALUES ('12.42'::numeric);
+
+-- Cannot cast to int8 on assignment.
+INSERT INTO caster (int8)          VALUES ('12'::text);
+INSERT INTO caster (text)          VALUES ('12'::int8);
+INSERT INTO caster (int8)          VALUES ('12'::citext);
+INSERT INTO caster (citext)        VALUES ('12'::int8);
+
+-- Cannot cast to int4 on assignment.
+INSERT INTO caster (int4)          VALUES ('12'::text);
+INSERT INTO caster (text)          VALUES ('12'::int4);
+INSERT INTO caster (int4)          VALUES ('12'::citext);
+INSERT INTO caster (citext)        VALUES ('12'::int4);
+
+-- Cannot cast to int2 on assignment.
+INSERT INTO caster (int2)          VALUES ('12'::text);
+INSERT INTO caster (text)          VALUES ('12'::int2);
+INSERT INTO caster (int2)          VALUES ('12'::citext);
+INSERT INTO caster (citext)        VALUES ('12'::int2);
+
+-- Cannot cast to cidr on assignment.
+INSERT INTO caster (cidr)          VALUES ('192.168.100.128/25'::text);
+INSERT INTO caster (text)          VALUES ('192.168.100.128/25'::cidr);
+INSERT INTO caster (cidr)          VALUES ('192.168.100.128/25'::citext);
+INSERT INTO caster (citext)        VALUES ('192.168.100.128/25'::cidr);
+
+-- Cannot cast to inet on assignment.
+INSERT INTO caster (inet)          VALUES ('192.168.100.128'::text);
+INSERT INTO caster (text)          VALUES ('192.168.100.128'::inet);
+INSERT INTO caster (inet)          VALUES ('192.168.100.128'::citext);
+INSERT INTO caster (citext)        VALUES ('192.168.100.128'::inet);
+
+-- Cannot cast to macaddr on assignment.
+INSERT INTO caster (macaddr)       VALUES ('08:00:2b:01:02:03'::text);
+INSERT INTO caster (text)          VALUES ('08:00:2b:01:02:03'::macaddr);
+INSERT INTO caster (macaddr)       VALUES ('08:00:2b:01:02:03'::citext);
+INSERT INTO caster (citext)        VALUES ('08:00:2b:01:02:03'::macaddr);
+
+-- Cannot cast to xml on assignment.
+INSERT INTO caster (xml)           VALUES ('<p>foo</p>'::text);
+INSERT INTO caster (text)          VALUES ('<p>foo</p>'::xml);
+INSERT INTO caster (xml)           VALUES ('<p>foo</p>'::citext);
+INSERT INTO caster (citext)        VALUES ('<p>foo</p>'::xml);
+
+-- Cannot cast to money on assignment.
+INSERT INTO caster (money)         VALUES ('12'::text);
+INSERT INTO caster (text)          VALUES ('12'::money);
+INSERT INTO caster (money)         VALUES ('12'::citext);
+INSERT INTO caster (citext)        VALUES ('12'::money);
+
+-- Cannot cast to timestamp on assignment.
+INSERT INTO caster (timestamp)     VALUES ('1999-01-08 04:05:06'::text);
+INSERT INTO caster (text)          VALUES ('1999-01-08 04:05:06'::timestamp);
+INSERT INTO caster (timestamp)     VALUES ('1999-01-08 04:05:06'::citext);
+INSERT INTO caster (citext)        VALUES ('1999-01-08 04:05:06'::timestamp);
+
+-- Cannot cast to timestamptz on assignment.
+INSERT INTO caster (timestamptz)   VALUES ('1999-01-08 04:05:06'::text);
+INSERT INTO caster (text)          VALUES ('1999-01-08 04:05:06'::timestamptz);
+INSERT INTO caster (timestamptz)   VALUES ('1999-01-08 04:05:06'::citext);
+INSERT INTO caster (citext)        VALUES ('1999-01-08 04:05:06'::timestamptz);
+
+-- Cannot cast to interval on assignment.
+INSERT INTO caster (interval)      VALUES ('1 hour'::text);
+INSERT INTO caster (text)          VALUES ('1 hour'::interval);
+INSERT INTO caster (interval)      VALUES ('1 hour'::citext);
+INSERT INTO caster (citext)        VALUES ('1 hour'::interval);
+
+-- Cannot cast to date on assignment.
+INSERT INTO caster (date)          VALUES ('1999-01-08'::text);
+INSERT INTO caster (text)          VALUES ('1999-01-08'::date);
+INSERT INTO caster (date)          VALUES ('1999-01-08'::citext);
+INSERT INTO caster (citext)        VALUES ('1999-01-08'::date);
+
+-- Cannot cast to time on assignment.
+INSERT INTO caster (time)          VALUES ('04:05:06'::text);
+INSERT INTO caster (text)          VALUES ('04:05:06'::time);
+INSERT INTO caster (time)          VALUES ('04:05:06'::citext);
+INSERT INTO caster (citext)        VALUES ('04:05:06'::time);
+
+-- Cannot cast to timetz on assignment.
+INSERT INTO caster (timetz)        VALUES ('04:05:06'::text);
+INSERT INTO caster (text)          VALUES ('04:05:06'::timetz);
+INSERT INTO caster (timetz)        VALUES ('04:05:06'::citext);
+INSERT INTO caster (citext)        VALUES ('04:05:06'::timetz);
+
+-- Cannot cast to point on assignment.
+INSERT INTO caster (point)         VALUES ('( 1 , 1)'::text);
+INSERT INTO caster (text)          VALUES ('( 1 , 1)'::point);
+INSERT INTO caster (point)         VALUES ('( 1 , 1)'::citext);
+INSERT INTO caster (citext)        VALUES ('( 1 , 1)'::point);
+
+-- Cannot cast to lseg on assignment.
+INSERT INTO caster (lseg)          VALUES ('( 1 , 1 ) , ( 2 , 2 )'::text);
+INSERT INTO caster (text)          VALUES ('( 1 , 1 ) , ( 2 , 2 )'::lseg);
+INSERT INTO caster (lseg)          VALUES ('( 1 , 1 ) , ( 2 , 2 )'::citext);
+INSERT INTO caster (citext)        VALUES ('( 1 , 1 ) , ( 2 , 2 )'::lseg);
+
+-- Cannot cast to box on assignment.
+INSERT INTO caster (box)           VALUES ('(0,0),(1,1)'::text);
+INSERT INTO caster (text)          VALUES ('(0,0),(1,1)'::box);
+INSERT INTO caster (box)           VALUES ('(0,0),(1,1)'::citext);
+INSERT INTO caster (citext)        VALUES ('(0,0),(1,1)'::box);
+
+-- Cannot cast to path on assignment.
+INSERT INTO caster (path)          VALUES ('((0,0),(1,1),(2,0))'::text);
+INSERT INTO caster (text)          VALUES ('((0,0),(1,1),(2,0))'::path);
+INSERT INTO caster (path)          VALUES ('((0,0),(1,1),(2,0))'::citext);
+INSERT INTO caster (citext)        VALUES ('((0,0),(1,1),(2,0))'::path);
+
+-- Cannot cast to polygon on assignment.
+INSERT INTO caster (polygon)       VALUES ('((0,0),(1,1))'::text);
+INSERT INTO caster (text)          VALUES ('((0,0),(1,1))'::polygon);
+INSERT INTO caster (polygon)       VALUES ('((0,0),(1,1))'::citext);
+INSERT INTO caster (citext)        VALUES ('((0,0),(1,1))'::polygon);
+
+-- Cannot cast to circle on assignment.
+INSERT INTO caster (circle)        VALUES ('((0,0),2)'::text);
+INSERT INTO caster (text)          VALUES ('((0,0),2)'::circle);
+INSERT INTO caster (circle)        VALUES ('((0,0),2)'::citext);
+INSERT INTO caster (citext)        VALUES ('((0,0),2)'::circle);
+
+-- Cannot cast to bit on assignment.
+INSERT INTO caster (bit)           VALUES ('101'::text);
+INSERT INTO caster (text)          VALUES ('101'::bit);
+INSERT INTO caster (bit)           VALUES ('101'::citext);
+INSERT INTO caster (citext)        VALUES ('101'::bit);
+
+-- Cannot cast to bit varying on assignment.
+INSERT INTO caster (bitv)          VALUES ('101'::text);
+INSERT INTO caster (text)          VALUES ('101'::bit varying);
+INSERT INTO caster (bitv)          VALUES ('101'::citext);
+INSERT INTO caster (citext)        VALUES ('101'::bit varying);
+
+-- Cannot cast to tsvector on assignment.
+INSERT INTO caster (tsvector)      VALUES ('the fat cat'::text);
+INSERT INTO caster (text)          VALUES ('the fat cat'::tsvector);
+INSERT INTO caster (tsvector)      VALUES ('the fat cat'::citext);
+INSERT INTO caster (citext)        VALUES ('the fat cat'::tsvector);
+
+-- Cannot cast to tsquery on assignment.
+INSERT INTO caster (tsquery)       VALUES ('fat & rat'::text);
+INSERT INTO caster (text)          VALUES ('fat & rat'::tsquery);
+INSERT INTO caster (tsquery)       VALUES ('fat & rat'::citext);
+INSERT INTO caster (citext)        VALUES ('fat & rat'::tsquery);
+
+-- Cannot cast to uuid on assignment.
+INSERT INTO caster (uuid)          VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::text);
+INSERT INTO caster (text)          VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::uuid);
+INSERT INTO caster (uuid)          VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::citext);
+INSERT INTO caster (citext)        VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::uuid);
+
 -- Table 9-5. SQL String Functions and Operators
 SELECT 'D'::citext || 'avid'::citext = 'David'::citext AS citext_concat;
 SELECT 'Value: '::citext || 42 = 'Value: 42' AS text_concat;
