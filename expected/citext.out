@@ -535,7 +535,7 @@ SELECT name FROM srt WHERE name SIMILAR TO '%A.*';
  aba
 (2 rows)
 
--- Explcit casts.
+-- Explicit casts.
 SELECT true::citext = 'true' AS t;
  t 
 ---
