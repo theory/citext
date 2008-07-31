@@ -54,21 +54,21 @@ CREATE TYPE citext (
 );
 
 --
--- A single cast function, since bpchar needs to have its whitespace trimmed
--- before it's cast to citext.
+-- Type casting functions.
 --
+
 CREATE OR REPLACE FUNCTION citext(bpchar)
 RETURNS citext
 AS 'rtrim1'
 LANGUAGE 'internal' IMMUTABLE STRICT;
 
-CREATE OR REPLACE FUNCTION citext(bool)
+CREATE OR REPLACE FUNCTION citext(boolean)
 RETURNS citext
 AS 'booltext'
 LANGUAGE 'internal' IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION bool(citext)
-RETURNS bool
+RETURNS boolean
 AS 'SELECT bool( $1::text )'
 LANGUAGE SQL IMMUTABLE STRICT;
 
@@ -825,7 +825,7 @@ CREATE OPERATOR !~~* (
 );
 
 --
--- Matching citext in regexp functions.
+-- Matching citext in string comparision functions.
 -- XXX TODO Ideally these would be implemented in C.
 --
 
