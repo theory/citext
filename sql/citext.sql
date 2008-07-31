@@ -185,7 +185,7 @@ SELECT name FROM srt WHERE name !~ 'A$' ORDER BY name;
 SELECT name FROM srt WHERE name SIMILAR TO '%a.*';
 SELECT name FROM srt WHERE name SIMILAR TO '%A.*';
 
--- Explcit casts.
+-- Explicit casts.
 SELECT true::citext = 'true' AS t;
 SELECT 'true'::citext::boolean = true AS t;
 
