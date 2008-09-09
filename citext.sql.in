@@ -21,22 +21,22 @@ SET client_min_messages = warning;
 CREATE OR REPLACE FUNCTION citextin(cstring)
 RETURNS citext
 AS 'textin'
-LANGUAGE 'internal' IMMUTABLE STRICT;
+LANGUAGE internal IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION citextout(citext)
 RETURNS cstring
 AS 'textout'
-LANGUAGE 'internal' IMMUTABLE STRICT;
+LANGUAGE internal IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION citextrecv(internal)
 RETURNS citext
 AS 'textrecv'
-LANGUAGE 'internal' STABLE STRICT;
+LANGUAGE internal STABLE STRICT;
 
 CREATE OR REPLACE FUNCTION citextsend(citext)
 RETURNS bytea
 AS 'textsend'
-LANGUAGE 'internal' STABLE STRICT;
+LANGUAGE internal STABLE STRICT;
 
 RESET client_min_messages;
 
@@ -60,12 +60,22 @@ CREATE TYPE citext (
 CREATE OR REPLACE FUNCTION citext(bpchar)
 RETURNS citext
 AS 'rtrim1'
-LANGUAGE 'internal' IMMUTABLE STRICT;
+LANGUAGE internal IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION citext(boolean)
 RETURNS citext
 AS 'booltext'
-LANGUAGE 'internal' IMMUTABLE STRICT;
+LANGUAGE internal IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION inet(citext)
+RETURNS inet
+AS 'SELECT inet( $1::text )'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION citext(inet)
+RETURNS citext
+AS 'network_show'
+LANGUAGE internal IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION bool(citext)
 RETURNS boolean
@@ -148,16 +158,6 @@ AS 'SELECT cidr( $1::text )'
 LANGUAGE SQL IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION citext(cidr)
-RETURNS citext
-AS 'SELECT text( $1 )::citext'
-LANGUAGE SQL IMMUTABLE STRICT;
-
-CREATE OR REPLACE FUNCTION citext(inet)
-RETURNS citext
-AS 'network_show'
-LANGUAGE internal IMMUTABLE STRICT;
-
-CREATE OR REPLACE FUNCTION citext(inet)
 RETURNS citext
 AS 'SELECT text( $1 )::citext'
 LANGUAGE SQL IMMUTABLE STRICT;
@@ -483,7 +483,7 @@ LANGUAGE C IMMUTABLE STRICT;
 CREATE OR REPLACE FUNCTION textcat(citext, citext)
 RETURNS citext
 AS 'textcat'
-LANGUAGE 'internal' IMMUTABLE STRICT;
+LANGUAGE internal IMMUTABLE STRICT;
 
 --
 -- Operators.
@@ -620,23 +620,26 @@ CREATE AGGREGATE max(citext)  (
 );
 
 --
+
+/* Delete me for 8.4 -- */
 -- Miscellaneous functions
 -- These exist to preserve the "citext-ness" of the input.
 --
 
 CREATE OR REPLACE FUNCTION lower(citext)
 RETURNS citext AS 'lower'
-LANGUAGE 'internal' IMMUTABLE STRICT;
+LANGUAGE internal IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION upper(citext)
 RETURNS citext AS 'upper'
-LANGUAGE 'internal' IMMUTABLE STRICT;
+LANGUAGE internal IMMUTABLE STRICT;
 
 -- needed to avoid "function is not unique" errors
 -- XXX find a better way to deal with this...
 CREATE FUNCTION quote_literal(citext)
 RETURNS text AS 'quote_literal'
-LANGUAGE 'internal' IMMUTABLE STRICT;
+LANGUAGE internal IMMUTABLE STRICT;
+/* -- Delete me for 8.4 */
 
 --
 -- CITEXT pattern matching.
@@ -644,21 +647,20 @@ LANGUAGE 'internal' IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION texticlike(citext, citext)
 RETURNS bool AS 'texticlike'
-LANGUAGE 'internal' IMMUTABLE STRICT;
+LANGUAGE internal IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION texticnlike(citext, citext)
 RETURNS bool AS 'texticnlike'
-LANGUAGE 'internal' IMMUTABLE STRICT;
+LANGUAGE internal IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION texticregexeq(citext, citext)
 RETURNS bool AS 'texticregexeq'
-LANGUAGE 'internal' IMMUTABLE STRICT;
+LANGUAGE internal IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION texticregexne(citext, citext)
 RETURNS bool AS 'texticregexne'
-LANGUAGE 'internal' IMMUTABLE STRICT;
+LANGUAGE internal IMMUTABLE STRICT;
 
--- regular expression Operators citext : citext
 CREATE OPERATOR ~ (
     PROCEDURE = texticregexeq,
     LEFTARG   = citext,
@@ -737,21 +739,20 @@ CREATE OPERATOR !~~* (
 
 CREATE OR REPLACE FUNCTION texticlike(citext, text)
 RETURNS bool AS 'texticlike'
-LANGUAGE 'internal' IMMUTABLE STRICT;
+LANGUAGE internal IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION texticnlike(citext, text)
 RETURNS bool AS 'texticnlike'
-LANGUAGE 'internal' IMMUTABLE STRICT;
+LANGUAGE internal IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION texticregexeq(citext, text)
 RETURNS bool AS 'texticregexeq'
-LANGUAGE 'internal' IMMUTABLE STRICT;
+LANGUAGE internal IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION texticregexne(citext, text)
 RETURNS bool AS 'texticregexne'
-LANGUAGE 'internal' IMMUTABLE STRICT;
+LANGUAGE internal IMMUTABLE STRICT;
 
--- regular expression Operators citext : text
 CREATE OPERATOR ~ (
     PROCEDURE = texticregexeq,
     LEFTARG   = citext,
@@ -825,54 +826,54 @@ CREATE OPERATOR !~~* (
 );
 
 --
--- Matching citext in string comparision functions.
+-- Matching citext in string comparison functions.
 -- XXX TODO Ideally these would be implemented in C.
 --
+CREATE OR REPLACE FUNCTION regexp_matches( citext, citext ) RETURNS TEXT[] AS $$
+    SELECT pg_catalog.regexp_matches( $1::pg_catalog.text, $2::pg_catalog.text, 'i' );
+$$ LANGUAGE SQL IMMUTABLE STRICT;
 
-CREATE OR REPLACE FUNCTION regexp_matches( citext, citext ) RETURNS TEXT[] AS '
-    SELECT regexp_matches( $1::text, $2::text, ''i'' );
-' LANGUAGE SQL IMMUTABLE STRICT;
 
-CREATE OR REPLACE FUNCTION regexp_matches( citext, citext, text ) RETURNS TEXT[] AS '
-    SELECT regexp_matches( $1::text, $2::text, CASE WHEN strpos($3, ''c'') = 0 THEN  $3 || ''i'' ELSE $3 END );
-' LANGUAGE SQL IMMUTABLE STRICT;
+CREATE OR REPLACE FUNCTION regexp_matches( citext, citext, text ) RETURNS TEXT[] AS $$
+    SELECT pg_catalog.regexp_matches( $1::pg_catalog.text, $2::pg_catalog.text, CASE WHEN pg_catalog.strpos($3, 'c') = 0 THEN  $3 || 'i' ELSE $3 END );
+$$ LANGUAGE SQL IMMUTABLE STRICT;
 
-CREATE OR REPLACE FUNCTION regexp_replace( citext, citext, text ) returns TEXT AS '
-    SELECT regexp_replace( $1::text, $2::text, $3, ''i'');
-' LANGUAGE SQL IMMUTABLE STRICT;
+CREATE OR REPLACE FUNCTION regexp_replace( citext, citext, text ) returns TEXT AS $$
+    SELECT pg_catalog.regexp_replace( $1::pg_catalog.text, $2::pg_catalog.text, $3, 'i');
+$$ LANGUAGE SQL IMMUTABLE STRICT;
 
-CREATE OR REPLACE FUNCTION regexp_replace( citext, citext, text, text ) returns TEXT AS '
-    SELECT regexp_replace( $1::text, $2::text, $3, CASE WHEN strpos($4, ''c'') = 0 THEN  $4 || ''i'' ELSE $4 END);
-' LANGUAGE SQL IMMUTABLE STRICT;
+CREATE OR REPLACE FUNCTION regexp_replace( citext, citext, text, text ) returns TEXT AS $$
+    SELECT pg_catalog.regexp_replace( $1::pg_catalog.text, $2::pg_catalog.text, $3, CASE WHEN pg_catalog.strpos($4, 'c') = 0 THEN  $4 || 'i' ELSE $4 END);
+$$ LANGUAGE SQL IMMUTABLE STRICT;
 
-CREATE OR REPLACE FUNCTION regexp_split_to_array( citext, citext ) RETURNS TEXT[] AS '
-    SELECT regexp_split_to_array( $1::text, $2::text, ''i'' );
-' LANGUAGE SQL IMMUTABLE STRICT;
+CREATE OR REPLACE FUNCTION regexp_split_to_array( citext, citext ) RETURNS TEXT[] AS $$
+    SELECT pg_catalog.regexp_split_to_array( $1::pg_catalog.text, $2::pg_catalog.text, 'i' );
+$$ LANGUAGE SQL IMMUTABLE STRICT;
 
-CREATE OR REPLACE FUNCTION regexp_split_to_array( citext, citext, text ) RETURNS TEXT[] AS '
-    SELECT regexp_split_to_array( $1::text, $2::text, CASE WHEN strpos($3, ''c'') = 0 THEN  $3 || ''i'' ELSE $3 END );
-' LANGUAGE SQL IMMUTABLE STRICT;
+CREATE OR REPLACE FUNCTION regexp_split_to_array( citext, citext, text ) RETURNS TEXT[] AS $$
+    SELECT pg_catalog.regexp_split_to_array( $1::pg_catalog.text, $2::pg_catalog.text, CASE WHEN pg_catalog.strpos($3, 'c') = 0 THEN  $3 || 'i' ELSE $3 END );
+$$ LANGUAGE SQL IMMUTABLE STRICT;
 
-CREATE OR REPLACE FUNCTION regexp_split_to_table( citext, citext ) RETURNS SETOF TEXT AS '
-    SELECT regexp_split_to_table( $1::text, $2::text, ''i'' );
-' LANGUAGE SQL IMMUTABLE STRICT;
+CREATE OR REPLACE FUNCTION regexp_split_to_table( citext, citext ) RETURNS SETOF TEXT AS $$
+    SELECT pg_catalog.regexp_split_to_table( $1::pg_catalog.text, $2::pg_catalog.text, 'i' );
+$$ LANGUAGE SQL IMMUTABLE STRICT;
 
-CREATE OR REPLACE FUNCTION regexp_split_to_table( citext, citext, text ) RETURNS SETOF TEXT AS '
-    SELECT regexp_split_to_table( $1::text, $2::text, CASE WHEN strpos($3, ''c'') = 0 THEN  $3 || ''i'' ELSE $3 END );
-' LANGUAGE SQL IMMUTABLE STRICT;
+CREATE OR REPLACE FUNCTION regexp_split_to_table( citext, citext, text ) RETURNS SETOF TEXT AS $$
+    SELECT pg_catalog.regexp_split_to_table( $1::pg_catalog.text, $2::pg_catalog.text, CASE WHEN pg_catalog.strpos($3, 'c') = 0 THEN  $3 || 'i' ELSE $3 END );
+$$ LANGUAGE SQL IMMUTABLE STRICT;
 
-CREATE OR REPLACE FUNCTION strpos( citext, citext ) RETURNS INT AS '
-    SELECT strpos( LOWER( $1::text ), LOWER( $2::text ) );
-' LANGUAGE SQL IMMUTABLE STRICT;
+CREATE OR REPLACE FUNCTION strpos( citext, citext ) RETURNS INT AS $$
+    SELECT pg_catalog.strpos( pg_catalog.lower( $1::pg_catalog.text ), pg_catalog.lower( $2::pg_catalog.text ) );
+$$ LANGUAGE SQL IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION replace( citext, citext, citext ) RETURNS TEXT AS $$
-    SELECT regexp_replace( $1::text, regexp_replace($2::text, '([^a-zA-Z_0-9])', E'\\\\\\1', 'g'), $3::text, 'gi' );
+    SELECT pg_catalog.regexp_replace( $1::pg_catalog.text, pg_catalog.regexp_replace($2::pg_catalog.text, '([^a-zA-Z_0-9])', E'\\\\\\1', 'g'), $3::pg_catalog.text, 'gi' );
 $$ LANGUAGE SQL IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION split_part( citext, citext, int ) RETURNS TEXT AS $$
-    SELECT (regexp_split_to_array( $1, regexp_replace($2::text, '([^a-zA-Z_0-9])', E'\\\\\\1', 'g')::citext))[$3];
+    SELECT (pg_catalog.regexp_split_to_array( $1::pg_catalog.text, pg_catalog.regexp_replace($2::pg_catalog.text, '([^a-zA-Z_0-9])', E'\\\\\\1', 'g'), 'i'))[$3];
 $$ LANGUAGE SQL IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION translate( citext, citext, text ) RETURNS TEXT AS $$
-    SELECT translate( translate( $1::text, LOWER($2::text), $3), UPPER($2::text), $3);
+    SELECT pg_catalog.translate( pg_catalog.translate( $1::pg_catalog.text, pg_catalog.lower($2::pg_catalog.text), $3), pg_catalog.upper($2::pg_catalog.text), $3);
 $$ LANGUAGE SQL IMMUTABLE STRICT;
