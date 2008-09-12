@@ -304,6 +304,8 @@ CREATE TABLE caster (
     text        text,
     varchar     varchar,
     bpchar      bpchar,
+    char        char,
+    chr         "char",
     name        name,    
     bytea       bytea,
     boolean     boolean,
@@ -349,6 +351,16 @@ INSERT INTO caster (bpchar)        VALUES ('foo'::text);
 INSERT INTO caster (text)          VALUES ('foo'::bpchar);
 INSERT INTO caster (bpchar)        VALUES ('foo'::citext);
 INSERT INTO caster (citext)        VALUES ('foo'::bpchar);
+
+INSERT INTO caster (char)          VALUES ('f'::text);
+INSERT INTO caster (text)          VALUES ('f'::char);
+INSERT INTO caster (char)          VALUES ('f'::citext);
+INSERT INTO caster (citext)        VALUES ('f'::char);
+
+INSERT INTO caster (chr)           VALUES ('f'::text);
+INSERT INTO caster (text)          VALUES ('f'::"char");
+INSERT INTO caster (chr)           VALUES ('f'::citext);
+INSERT INTO caster (citext)        VALUES ('f'::"char");
 
 INSERT INTO caster (name)          VALUES ('foo'::text);
 INSERT INTO caster (text)          VALUES ('foo'::name);

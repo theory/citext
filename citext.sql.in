@@ -92,6 +92,16 @@ RETURNS boolean
 AS 'SELECT bool( $1::text )'
 LANGUAGE SQL IMMUTABLE STRICT;
 
+CREATE OR REPLACE FUNCTION "char"(citext)
+RETURNS "char"
+AS 'text_char'
+LANGUAGE internal IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION citext("char")
+RETURNS citext
+AS 'char_text'
+LANGUAGE internal IMMUTABLE STRICT;
+
 CREATE OR REPLACE FUNCTION int8(citext)
 RETURNS int8
 AS 'SELECT int8( $1::text )'
@@ -154,8 +164,8 @@ LANGUAGE SQL IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION name(citext)
 RETURNS name
-AS 'SELECT name( $1::text )'
-LANGUAGE SQL IMMUTABLE STRICT;
+AS 'text_name'
+LANGUAGE internal IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION citext(name)
 RETURNS citext
@@ -392,6 +402,8 @@ CREATE CAST (bytea       AS citext)      WITHOUT FUNCTION                     AS
 CREATE CAST (citext      AS bytea)       WITHOUT FUNCTION;
 
 CREATE CAST (citext      AS boolean)     WITH    FUNCTION bool(citext);
+CREATE CAST ("char"        AS citext)    WITH    FUNCTION citext("char")      AS ASSIGNMENT;
+CREATE CAST (citext      AS "char")      WITH    FUNCTION "char"(citext)      AS ASSIGNMENT;
 CREATE CAST (float4      AS citext)      WITH    FUNCTION citext(float4)      AS ASSIGNMENT;
 CREATE CAST (citext      AS float4)      WITH    FUNCTION float4(citext);
 CREATE CAST (float8      AS citext)      WITH    FUNCTION citext(float8)      AS ASSIGNMENT;
