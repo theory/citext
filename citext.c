@@ -1,7 +1,6 @@
 /*
- * PostgreSQL type definitions for CITEXT 2.0.
+ * $Id $
  */
-
 #include "postgres.h"
 
 #include "access/hash.h"

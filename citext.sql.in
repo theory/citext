@@ -1,11 +1,14 @@
+/* $Id $ */
+
+-- Adjust this setting to control where the objects get created.
+SET search_path = public;
+
 --
 --  PostgreSQL code for CITEXT.
 --
 -- Most I/O functions, and a few others, piggyback on the "text" type
 -- functions via the implicit cast to text.
-
--- Adjust this setting to control where the objects get created.
-SET search_path = public;
+--
 
 --
 -- Shell type to keep things a bit quieter.
@@ -16,7 +19,7 @@ CREATE TYPE citext;
 --
 --  Input and output functions.
 --
-SET client_min_messages = warning;
+SET client_min_messages = warning; /* Delete for 8.4 */
 
 CREATE OR REPLACE FUNCTION citextin(cstring)
 RETURNS citext
@@ -38,7 +41,7 @@ RETURNS bytea
 AS 'textsend'
 LANGUAGE internal STABLE STRICT;
 
-RESET client_min_messages;
+RESET client_min_messages; /* Delete for 8.4 */
 
 --
 --  The type itself.
@@ -51,10 +54,16 @@ CREATE TYPE citext (
     SEND           = citextsend,
     INTERNALLENGTH = VARIABLE,
     STORAGE        = extended
+/* Uncomment me and add a comma above for 8.4.
+    -- make it a non-preferred member of string type category
+    CATEGORY       = 'S',
+    PREFERRED      = false
+*/
 );
 
 --
--- Type casting functions.
+-- Type casting functions for those situations where the I/O casts don't
+-- automatically kick in.
 --
 
 CREATE OR REPLACE FUNCTION citext(bpchar)
@@ -67,15 +76,16 @@ RETURNS citext
 AS 'booltext'
 LANGUAGE internal IMMUTABLE STRICT;
 
-CREATE OR REPLACE FUNCTION inet(citext)
-RETURNS inet
-AS 'SELECT inet( $1::text )'
-LANGUAGE SQL IMMUTABLE STRICT;
-
 CREATE OR REPLACE FUNCTION citext(inet)
 RETURNS citext
 AS 'network_show'
 LANGUAGE internal IMMUTABLE STRICT;
+
+/* Delete me for 8.4 -- */
+CREATE OR REPLACE FUNCTION inet(citext)
+RETURNS inet
+AS 'SELECT inet( $1::text )'
+LANGUAGE SQL IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION bool(citext)
 RETURNS boolean
@@ -363,21 +373,24 @@ CREATE OR REPLACE FUNCTION citext(uuid)
 RETURNS citext
 AS 'SELECT text( $1 )::citext'
 LANGUAGE SQL IMMUTABLE STRICT;
+/* --Delete me for 8.4 */
 
 --
 --  Implicit and assignment type casts.
 --
 
-CREATE CAST (citext      AS text)        WITHOUT FUNCTION                     AS IMPLICIT;
-CREATE CAST (text        AS citext)      WITHOUT FUNCTION                     AS ASSIGNMENT;
-CREATE CAST (citext      AS varchar)     WITHOUT FUNCTION                     AS IMPLICIT;
-CREATE CAST (varchar     AS citext)      WITHOUT FUNCTION                     AS ASSIGNMENT;
-CREATE CAST (citext      AS bpchar)      WITHOUT FUNCTION                     AS ASSIGNMENT;
-CREATE CAST (bpchar      AS citext)      WITH    FUNCTION citext(bpchar)      AS ASSIGNMENT;
+CREATE CAST (citext AS text)    WITHOUT FUNCTION AS IMPLICIT;
+CREATE CAST (citext AS varchar) WITHOUT FUNCTION AS IMPLICIT;
+CREATE CAST (citext AS bpchar)  WITHOUT FUNCTION AS ASSIGNMENT;
+CREATE CAST (text AS citext)    WITHOUT FUNCTION AS ASSIGNMENT;
+CREATE CAST (varchar AS citext) WITHOUT FUNCTION AS ASSIGNMENT;
+CREATE CAST (bpchar AS citext)  WITH FUNCTION citext(bpchar)  AS ASSIGNMENT;
+CREATE CAST (boolean AS citext) WITH FUNCTION citext(boolean) AS ASSIGNMENT;
+CREATE CAST (inet AS citext)    WITH FUNCTION citext(inet)    AS ASSIGNMENT;
+/* Delete me for 8.4 -- */
 CREATE CAST (bytea       AS citext)      WITHOUT FUNCTION                     AS ASSIGNMENT;
 CREATE CAST (citext      AS bytea)       WITHOUT FUNCTION;
 
-CREATE CAST (boolean     AS citext)      WITH    FUNCTION citext(boolean)     AS ASSIGNMENT;
 CREATE CAST (citext      AS boolean)     WITH    FUNCTION bool(citext);
 CREATE CAST (float4      AS citext)      WITH    FUNCTION citext(float4)      AS ASSIGNMENT;
 CREATE CAST (citext      AS float4)      WITH    FUNCTION float4(citext);
@@ -395,7 +408,6 @@ CREATE CAST (name        AS citext)      WITH    FUNCTION citext(name)        AS
 CREATE CAST (citext      AS name)        WITH    FUNCTION name(citext)        AS ASSIGNMENT;
 CREATE CAST (cidr        AS citext)      WITH    FUNCTION citext(cidr)        AS ASSIGNMENT;
 CREATE CAST (citext      AS cidr)        WITH    FUNCTION cidr(citext);
-CREATE CAST (inet        AS citext)      WITH    FUNCTION citext(inet)        AS ASSIGNMENT;
 CREATE CAST (citext      AS inet)        WITH    FUNCTION inet(citext);
 CREATE CAST (macaddr     AS citext)      WITH    FUNCTION citext(macaddr)     AS ASSIGNMENT;
 CREATE CAST (citext      AS macaddr)     WITH    FUNCTION macaddr(citext);
@@ -444,6 +456,7 @@ CREATE CAST (citext      AS tsquery)     WITH    FUNCTION tsquery(citext);
 
 CREATE CAST (uuid        AS citext)      WITH    FUNCTION citext(uuid)        AS ASSIGNMENT;
 CREATE CAST (citext      AS uuid)        WITH    FUNCTION uuid(citext);
+/* --Delete me for 8.4 */
 
 --
 -- Operator Functions.
@@ -479,11 +492,13 @@ RETURNS bool
 AS 'MODULE_PATHNAME'
 LANGUAGE C IMMUTABLE STRICT;
 
+/* Delete me for 8.4 -- */
 -- We overload || just to preserve "citext-ness" of the result.
 CREATE OR REPLACE FUNCTION textcat(citext, citext)
 RETURNS citext
 AS 'textcat'
 LANGUAGE internal IMMUTABLE STRICT;
+/* --Delete me for 8.4 */
 
 --
 -- Operators.
@@ -551,11 +566,13 @@ CREATE OPERATOR > (
     JOIN       = scalargtjoinsel
 );
 
+/* Delete me for 8.4 -- */
 CREATE OPERATOR || (
     LEFTARG   = CITEXT,
     RIGHTARG  = CITEXT,
     PROCEDURE = textcat
 );
+/* -- Delete me for 8.4 */
 
 --
 -- Support functions for indexing.
@@ -619,9 +636,8 @@ CREATE AGGREGATE max(citext)  (
     SORTOP = >
 );
 
---
-
 /* Delete me for 8.4 -- */
+--
 -- Miscellaneous functions
 -- These exist to preserve the "citext-ness" of the input.
 --
@@ -829,10 +845,10 @@ CREATE OPERATOR !~~* (
 -- Matching citext in string comparison functions.
 -- XXX TODO Ideally these would be implemented in C.
 --
+
 CREATE OR REPLACE FUNCTION regexp_matches( citext, citext ) RETURNS TEXT[] AS $$
     SELECT pg_catalog.regexp_matches( $1::pg_catalog.text, $2::pg_catalog.text, 'i' );
 $$ LANGUAGE SQL IMMUTABLE STRICT;
-
 
 CREATE OR REPLACE FUNCTION regexp_matches( citext, citext, text ) RETURNS TEXT[] AS $$
     SELECT pg_catalog.regexp_matches( $1::pg_catalog.text, $2::pg_catalog.text, CASE WHEN pg_catalog.strpos($3, 'c') = 0 THEN  $3 || 'i' ELSE $3 END );
