@@ -45,6 +45,8 @@ DROP CAST (bytea       AS citext);
 DROP CAST (citext      AS bytea);
 DROP CAST (boolean     AS citext);
 DROP CAST (citext      AS boolean);
+DROP CAST ("char"      AS citext);
+DROP CAST (citext      AS "char");
 DROP CAST (float4      AS citext);
 DROP CAST (citext      AS float4);
 DROP CAST (float8      AS citext);
@@ -111,6 +113,8 @@ DROP FUNCTION citextsend(citext)
 DROP FUNCTION citext(bpchar)
 DROP FUNCTION citext(boolean)
 DROP FUNCTION bool(citext)
+DROP FUNCTION "char"(citext)
+DROP FUNCTION citext("char")
 DROP FUNCTION int8(citext)
 DROP FUNCTION citext(int8)
 DROP FUNCTION int4(citext)

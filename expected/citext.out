@@ -710,6 +710,30 @@ SELECT 'foo'::citext::name = 'foo'::name AS t;
  t
 (1 row)
 
+SELECT 'f'::char::citext = 'f' AS t;
+ t 
+---
+ t
+(1 row)
+
+SELECT 'f'::citext::char = 'f'::char AS t;
+ t 
+---
+ t
+(1 row)
+
+SELECT 'f'::"char"::citext = 'f' AS t;
+ t 
+---
+ t
+(1 row)
+
+SELECT 'f'::citext::"char" = 'f'::"char" AS t;
+ t 
+---
+ t
+(1 row)
+
 SELECT 'foo'::bytea::citext = 'foo' AS t;
  t 
 ---

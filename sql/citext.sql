@@ -223,6 +223,12 @@ SELECT '4.0'::citext::float8 = 4.0 AS t;
 SELECT 'foo'::name::citext = 'foo' AS t;
 SELECT 'foo'::citext::name = 'foo'::name AS t;
 
+SELECT 'f'::char::citext = 'f' AS t;
+SELECT 'f'::citext::char = 'f'::char AS t;
+
+SELECT 'f'::"char"::citext = 'f' AS t;
+SELECT 'f'::citext::"char" = 'f'::"char" AS t;
+
 SELECT 'foo'::bytea::citext = 'foo' AS t;
 SELECT 'foo'::citext::bytea = 'foo'::bytea AS t;
 
