@@ -616,15 +616,15 @@ SELECT md5( name ) = md5( name::text ) AS t FROM srt;
 SELECT quote_ident( name ) = quote_ident( name::text ) AS t FROM srt;
 SELECT quote_literal( name ) = quote_literal( name::text ) AS t FROM srt;
 
-SELECT regexp_matches('foobarbequebaz'::citext, '(bar)(beque)') = ARRAY[ 'bar', 'beque' ] AS t;
-SELECT regexp_matches('foobarbequebaz'::citext, '(BAR)(BEQUE)') = ARRAY[ 'bar', 'beque' ] AS t;
-SELECT regexp_matches('foobarbequebaz'::citext, '(BAR)(BEQUE)'::citext) = ARRAY[ 'bar', 'beque' ] AS t;
-SELECT regexp_matches('foobarbequebaz'::citext, '(BAR)(BEQUE)'::citext, '') = ARRAY[ 'bar', 'beque' ] AS t;
-SELECT regexp_matches('foobarbequebaz'::citext, '(BAR)(BEQUE)', '') = ARRAY[ 'bar', 'beque' ] AS t;
-SELECT regexp_matches('foobarbequebaz', '(BAR)(BEQUE)'::citext, '') = ARRAY[ 'bar', 'beque' ] AS t;
-SELECT regexp_matches('foobarbequebaz'::citext, '(BAR)(BEQUE)'::citext, ''::citext) = ARRAY[ 'bar', 'beque' ] AS t;
+SELECT * FROM regexp_matches('foobarbequebaz'::citext, '(bar)(beque)');
+SELECT * FROM regexp_matches('foobarbequebaz'::citext, '(BAR)(BEQUE)');
+SELECT * FROM regexp_matches('foobarbequebaz'::citext, '(BAR)(BEQUE)'::citext);
+SELECT * FROM regexp_matches('foobarbequebaz'::citext, '(BAR)(BEQUE)'::citext, '');
+SELECT * FROM regexp_matches('foobarbequebaz'::citext, '(BAR)(BEQUE)', '');
+SELECT * FROM regexp_matches('foobarbequebaz', '(BAR)(BEQUE)'::citext, '');
+SELECT * FROM regexp_matches('foobarbequebaz'::citext, '(BAR)(BEQUE)'::citext, ''::citext);
 -- c forces case-sensitive
-SELECT regexp_matches('foobarbequebaz'::citext, '(BAR)(BEQUE)'::citext, 'c'::citext) = ARRAY[ 'bar', 'beque' ] AS "null";
+SELECT * FROM regexp_matches('foobarbequebaz'::citext, '(BAR)(BEQUE)'::citext, 'c'::citext);
 
 SELECT regexp_replace('Thomas'::citext, '.[mN]a.',         'M') = 'ThM' AS t;
 SELECT regexp_replace('Thomas'::citext, '.[MN]A.',         'M') = 'ThM' AS t;

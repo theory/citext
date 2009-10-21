@@ -1834,54 +1834,53 @@ SELECT quote_literal( name ) = quote_literal( name::text ) AS t FROM srt;
  t
 (5 rows)
 
-SELECT regexp_matches('foobarbequebaz'::citext, '(bar)(beque)') = ARRAY[ 'bar', 'beque' ] AS t;
- t 
----
- t
+SELECT * FROM regexp_matches('foobarbequebaz'::citext, '(bar)(beque)');
+ regexp_matches 
+----------------
+ {bar,beque}
 (1 row)
 
-SELECT regexp_matches('foobarbequebaz'::citext, '(BAR)(BEQUE)') = ARRAY[ 'bar', 'beque' ] AS t;
- t 
----
- t
+SELECT * FROM regexp_matches('foobarbequebaz'::citext, '(BAR)(BEQUE)');
+ regexp_matches 
+----------------
+ {bar,beque}
 (1 row)
 
-SELECT regexp_matches('foobarbequebaz'::citext, '(BAR)(BEQUE)'::citext) = ARRAY[ 'bar', 'beque' ] AS t;
- t 
----
- t
+SELECT * FROM regexp_matches('foobarbequebaz'::citext, '(BAR)(BEQUE)'::citext);
+ regexp_matches 
+----------------
+ {bar,beque}
 (1 row)
 
-SELECT regexp_matches('foobarbequebaz'::citext, '(BAR)(BEQUE)'::citext, '') = ARRAY[ 'bar', 'beque' ] AS t;
- t 
----
- t
+SELECT * FROM regexp_matches('foobarbequebaz'::citext, '(BAR)(BEQUE)'::citext, '');
+ regexp_matches 
+----------------
+ {bar,beque}
 (1 row)
 
-SELECT regexp_matches('foobarbequebaz'::citext, '(BAR)(BEQUE)', '') = ARRAY[ 'bar', 'beque' ] AS t;
- t 
----
- t
+SELECT * FROM regexp_matches('foobarbequebaz'::citext, '(BAR)(BEQUE)', '');
+ regexp_matches 
+----------------
+ {bar,beque}
 (1 row)
 
-SELECT regexp_matches('foobarbequebaz', '(BAR)(BEQUE)'::citext, '') = ARRAY[ 'bar', 'beque' ] AS t;
- t 
----
- t
+SELECT * FROM regexp_matches('foobarbequebaz', '(BAR)(BEQUE)'::citext, '');
+ regexp_matches 
+----------------
+ {bar,beque}
 (1 row)
 
-SELECT regexp_matches('foobarbequebaz'::citext, '(BAR)(BEQUE)'::citext, ''::citext) = ARRAY[ 'bar', 'beque' ] AS t;
- t 
----
- t
+SELECT * FROM regexp_matches('foobarbequebaz'::citext, '(BAR)(BEQUE)'::citext, ''::citext);
+ regexp_matches 
+----------------
+ {bar,beque}
 (1 row)
 
 -- c forces case-sensitive
-SELECT regexp_matches('foobarbequebaz'::citext, '(BAR)(BEQUE)'::citext, 'c'::citext) = ARRAY[ 'bar', 'beque' ] AS "null";
- null 
-------
- 
-(1 row)
+SELECT * FROM regexp_matches('foobarbequebaz'::citext, '(BAR)(BEQUE)'::citext, 'c'::citext);
+ regexp_matches 
+----------------
+(0 rows)
 
 SELECT regexp_replace('Thomas'::citext, '.[mN]a.', 'M') = 'ThM' AS t;
  t 
