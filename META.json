@@ -8,7 +8,7 @@
    ],
    "license": "postgresql",
    "provides": {
-      "semver": {
+      "citext": {
          "abstract": "A case-insensitive text type for PostgreSQL",
          "file": "sql/citext.sql",
          "docfile": "doc/citext.md",
