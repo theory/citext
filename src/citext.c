@@ -1,6 +1,3 @@
-/*
- * $Id $
- */
 #include "postgres.h"
 
 #include "access/hash.h"
