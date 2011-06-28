@@ -130,7 +130,7 @@ Inspired by CITEXT 1.0 by Donald Fraser.
 Copyright and License
 ---------------------
 
-Copyright (c) 2008 David E. Wheeler. Some rights reserved.
+Copyright (c) 2008-2011 David E. Wheeler. Some rights reserved.
 
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose, without fee, and without a written agreement is
