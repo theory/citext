@@ -1,4 +1,16 @@
 Revision history for PostgreSQL data type CITEXT.
 
-2.00
-      - Initial public release.
+2.0.1
+      - First release on PGXN for PostgreSQL 8.3 only.
+      - Updated regression tests to reflect change in the core version.
+      - Made `regexp_matches()` return `SETOF TEXT[]` like the underlying text
+        version does. Thanks to Tom Lane for the spot!
+      - Reorganized source code for preferred layout.
+      - Added `META.json` to support PGXN.
+      - Renamed `README.citext` to `doc/citext.md` and added `README.md`.
+      - Fixed failing tests when PostgreSQL isn't compiled with libxml2
+        support.
+
+2.0.0   2008-09-14 22:20:03
+      - Initial public release to pgsql-hackers only.
+
