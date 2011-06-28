@@ -1,0 +1,46 @@
+{
+   "name": "citext",
+   "abstract": "A case-insensitive text type for PostgreSQL",
+   "description": "This distribution creates a custom PostgreSQL data type, CITEXT, a locale-aware, case-insensitve TEXT type for PostgreSQL 8.3. Essentially, it internally calls `LOWER()` when comparing values. Otherwise, it behaves exactly like TEXT.",
+   "version": "2.0.1",
+   "maintainer": [
+      "David E. Wheeler <david@justatheory.com>"
+   ],
+   "license": "postgresql",
+   "provides": {
+      "semver": {
+         "abstract": "A case-insensitive text type for PostgreSQL",
+         "file": "sql/citext.sql",
+         "docfile": "doc/citext.md",
+         "version": "2.0.1"
+      }
+   },
+   "prereqs": {
+      "runtime": {
+         "requires": {
+            "PostgreSQL": "=8.3.0"
+         }
+      }
+   },
+   "resources": {
+      "bugtracker": {
+         "web": "http://github.com/theory/citext/issues/"
+      },
+      "repository": {
+        "url":  "git://github.com/theory/citext.git",
+        "web":  "http://github.com/theory/citext/",
+        "type": "git"
+      }
+   },
+   "generated_by": "David E. Wheeler",
+   "meta-spec": {
+      "version": "1.0.0",
+      "url": "http://pgxn.org/meta/spec.txt"
+   },
+   "tags": [
+      "case-insensitive",
+      "text",
+      "unicode",
+      "multibyte"
+   ]
+}
