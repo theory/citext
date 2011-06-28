@@ -831,17 +831,13 @@ SELECT '08:00:2b:01:02:03'::citext::macaddr = '08:00:2b:01:02:03'::macaddr AS t;
 (1 row)
 
 SELECT '<p>foo</p>'::xml::citext = '<p>foo</p>' AS t;
- t 
----
- t
-(1 row)
-
+ERROR:  unsupported XML feature
+DETAIL:  This functionality requires the server to be built with libxml support.
+HINT:  You need to rebuild PostgreSQL using --with-libxml.
 SELECT '<p>foo</p>'::citext::xml::text = '<p>foo</p>'::xml::text AS t;
- t 
----
- t
-(1 row)
-
+ERROR:  unsupported XML feature
+DETAIL:  This functionality requires the server to be built with libxml support.
+HINT:  You need to rebuild PostgreSQL using --with-libxml.
 SELECT '1999-01-08 04:05:06'::timestamp::citext = '1999-01-08 04:05:06'::timestamp::text AS t;
  t 
 ---
@@ -1262,12 +1258,18 @@ LINE 1: INSERT INTO caster (xml)           VALUES ('<p>foo</p>'::tex...
                             ^
 HINT:  You will need to rewrite or cast the expression.
 INSERT INTO caster (text)          VALUES ('<p>foo</p>'::xml);
+ERROR:  unsupported XML feature
+DETAIL:  This functionality requires the server to be built with libxml support.
+HINT:  You need to rebuild PostgreSQL using --with-libxml.
 INSERT INTO caster (xml)           VALUES ('<p>foo</p>'::citext);
 ERROR:  column "xml" is of type xml but expression is of type citext
 LINE 1: INSERT INTO caster (xml)           VALUES ('<p>foo</p>'::cit...
                             ^
 HINT:  You will need to rewrite or cast the expression.
 INSERT INTO caster (citext)        VALUES ('<p>foo</p>'::xml);
+ERROR:  unsupported XML feature
+DETAIL:  This functionality requires the server to be built with libxml support.
+HINT:  You need to rebuild PostgreSQL using --with-libxml.
 -- Cannot cast to money on assignment.
 INSERT INTO caster (money)         VALUES ('12'::text);
 ERROR:  column "money" is of type money but expression is of type text
@@ -1882,7 +1884,7 @@ SELECT * FROM regexp_matches('foobarbequebaz'::citext, '(BAR)(BEQUE)'::citext, '
 ----------------
 (0 rows)
 
-SELECT regexp_replace('Thomas'::citext, '.[mN]a.', 'M') = 'ThM' AS t;
+SELECT regexp_replace('Thomas'::citext, '.[mN]a.',         'M') = 'ThM' AS t;
  t 
 ---
  t
