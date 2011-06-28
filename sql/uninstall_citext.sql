@@ -1,8 +1,3 @@
-/* $PostgreSQL: pgsql/contrib/citext/uninstall_citext.sql,v 1.1 2008/07/29 18:31:20 tgl Exp $ */
-
--- Adjust this setting to control where the objects get dropped.
-SET search_path = public;
-
 DROP OPERATOR CLASS citext_ops USING btree CASCADE;
 DROP OPERATOR CLASS citext_ops USING hash CASCADE;
 
