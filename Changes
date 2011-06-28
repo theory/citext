@@ -1,6 +1,6 @@
 Revision history for PostgreSQL data type CITEXT.
 
-2.0.1
+2.0.1   2011-06-28T04:54:06
       - First release on PGXN for PostgreSQL 8.3 only.
       - Updated regression tests to reflect change in the core version.
       - Made `regexp_matches()` return `SETOF TEXT[]` like the underlying text
