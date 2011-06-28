@@ -1,6 +1,9 @@
 Revision history for PostgreSQL data type CITEXT.
 
 2.0.2
+      - Fixed formatting of the documentation and removed the "Installation"
+        section, since that's covered by the README.
+      - Removed Subversion `$Id` leftover cruft.
 
 2.0.1   2011-06-28T05:08:07
       - First release on PGXN for PostgreSQL 8.3 only.
@@ -12,6 +15,9 @@ Revision history for PostgreSQL data type CITEXT.
       - Renamed `README.citext` to `doc/citext.md` and added `README.md`.
       - Fixed failing tests when PostgreSQL isn't compiled with libxml2
         support.
+      - Moved repository to [GitHub](https://github.com/theory/citext/).
+      - Removed setting of `search_path` in the SQL scripts. The README
+        describes a better way to install citext into a specific schema.
 
 2.0.0   2008-09-14 22:20:03
       - Initial public release to pgsql-hackers only.
