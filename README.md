@@ -1,4 +1,4 @@
-citext 2.0.1
+citext 2.0.2
 ============
 
 This distribution creates a custom PostgreSQL data type, CITEXT, a locale-
