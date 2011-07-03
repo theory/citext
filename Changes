@@ -4,6 +4,8 @@ Revision history for PostgreSQL data type CITEXT.
       - Fixed formatting of the documentation and removed the "Installation"
         section, since that's covered by the README.
       - Removed Subversion `$Id` leftover cruft.
+      - Fixed PostgreSQL version requirement in `META.json` to include any
+        release of 8.3. It has been requiring only 8.3.0.
 
 2.0.1   2011-06-28T05:08:07
       - First release on PGXN for PostgreSQL 8.3 only.
