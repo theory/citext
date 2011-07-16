@@ -1,6 +1,6 @@
 Revision history for PostgreSQL data type CITEXT.
 
-2.0.2
+2.0.2   2011-07-16T20:16:13
       - Fixed formatting of the documentation and removed the "Installation"
         section, since that's covered by the README.
       - Removed Subversion `$Id` leftover cruft.
