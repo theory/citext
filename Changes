@@ -1,8 +1,7 @@
 Revision history for PostgreSQL data type CITEXT.
 
 2.0.3
-      - Fixed the Makefile to allow `PG_CONFIG=/path/to/pg_config` to actually
-        work.
+      - Fixed the Makefile to recognize the `PG_CONFIG` environment variable.
 
 2.0.2   2011-07-16T20:16:13
       - Fixed formatting of the documentation and removed the "Installation"
